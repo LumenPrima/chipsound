@@ -1,0 +1,795 @@
+/* Baseline chrome + themable tokens. Themes (themes/*.css) override these. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+    --accent: #4ade80;
+
+    --viz-primary:   #00a1ce;
+    --viz-secondary: #00ffff;
+    --viz-glow:      rgba(136, 136, 255, 0.5);
+    --viz-grid:      rgba(136, 255, 255, 0.5);
+    --viz-grid-soft: rgba(136, 255, 255, 0.3);
+
+    --viz-canvas-bg: var(--tracker-bg);
+    --viz-ink:       #ffffff;
+
+    --viz-vol-cold: 136, 136, 255;
+    --viz-vol-mid:  136, 255, 255;
+    --viz-vol-hot:  255,  64,  64;
+
+    --vu-low:  #4ade80;
+    --vu-mid:  #facc15;
+    --vu-high: #ef4444;
+
+    --tracker-bg            : #2a2a2a;
+    --tracker-bg-alt        : #1a1a1a;
+    --tracker-row-highlight : #4a4a4a;
+    --tracker-fg            : #ffffff;
+    --tracker-note          : #8888FF;
+    --tracker-sample        : #88FFFF;
+    --tracker-volume        : #AA44CC;
+    --tracker-effect        : #88FF88;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #111827;
+    color: #ffffff;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body { overflow: hidden; }
+
+.app {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.app-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ========== Module info row ========== */
+
+.mod-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mod-info-box {
+    background: #2a2a2a;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #ffffff;
+    min-width: 164px;
+    text-align: center;
+    box-shadow: 2px 2px 0 #000;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    flex: 1;
+}
+
+.mod-info-box:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+    border-color: #d2d2d2;
+}
+
+.mod-info-box span {
+    display: block;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+/* ========== Controls row ========== */
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.retro-button {
+    background: #2a2a2a;
+    color: #ffffff;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: monospace;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 2px 2px 0 #000;
+    flex: 1;
+    cursor: pointer;
+}
+
+.retro-button:hover {
+    background: #4a4a4a;
+    border-color: #d2d2d2;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+.retro-button:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.retro-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.retro-button .fa-pause,
+.retro-button.playing .fa-play,
+.retro-button .pause-text,
+.retro-button.playing .play-text {
+    display: none;
+}
+
+.retro-button.playing .fa-pause,
+.retro-button.playing .pause-text {
+    display: inline-block;
+}
+
+.retro-button .fa-play,
+.retro-button .play-text {
+    display: inline-block;
+}
+
+.retro-button[disabled],
+.retro-button[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.retro-button[disabled]:hover,
+.retro-button[aria-disabled="true"]:hover {
+    background: #2a2a2a;
+    border-color: #4a4a4a;
+    transform: none;
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* Dim chip wrappers whose <select> child is disabled. */
+.subsong-control:has(.retro-select:disabled),
+.viz-control:has(.retro-select:disabled) {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.volume-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2a2a2a;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 6px 12px;
+    box-shadow: 2px 2px 0 #000;
+    font-size: 12px;
+    flex: 0 1 200px;
+    min-width: 120px;
+}
+
+.volume-control input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.retro-button-icon {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+}
+
+.subsong-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2a2a2a;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 6px 10px;
+    box-shadow: 2px 2px 0 #000;
+    font-size: 12px;
+    flex: 0 1 220px;
+    min-width: 120px;
+}
+.subsong-control[hidden] { display: none; }
+
+.viz-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2a2a2a;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 6px 10px;
+    box-shadow: 2px 2px 0 #000;
+    font-size: 12px;
+    flex: 0 1 220px;
+    min-width: 120px;
+}
+.viz-control[hidden] { display: none; }
+
+.retro-select {
+    background: #1a1a1a;
+    color: #ffffff;
+    border: 1px solid #4a4a4a;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-family: monospace;
+    font-size: 12px;
+    flex: 1;
+    min-width: 0;
+}
+.retro-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ========== Tracker grid ========== */
+
+.tracker-container {
+    display: grid;
+    grid-template-columns: 1fr minmax(150px, 25%);
+    gap: 16px;
+}
+/* Stamped on <html> by preboot; kept in sync by toggleSamplesVisible. */
+html.samples-hidden .tracker-container { grid-template-columns: 1fr; }
+html.samples-hidden .sample-section    { display: none; }
+
+/* Single scroll container — both axes. Sticky header rides the horizontal scroll. */
+.tracker-main {
+    min-width: 0;
+    overflow: auto;
+    contain: layout paint style;
+    /* Don't add scrollbar-width/color — overrides the ::-webkit-scrollbar rules below. */
+}
+
+/* Vertical collapsed (auto-scroll), horizontal kept for wide channel sets. */
+.tracker-main::-webkit-scrollbar { width: 0; height: 8px; }
+.tracker-main::-webkit-scrollbar-track { background: var(--tracker-bg); border-radius: 4px; }
+.tracker-main::-webkit-scrollbar-thumb { background: var(--tracker-row-highlight); border-radius: 4px; }
+.tracker-main::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--tracker-row-highlight) 70%, white);
+}
+
+.tracker-header {
+    display: none;
+    grid-template-columns: 20px repeat(8, minmax(80px, 1fr));
+    gap: 2px;
+    background: var(--tracker-bg-alt);
+    padding: 4px;
+    border-radius: 4px 4px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    /* --grid-min-width is published by tracker.js (paints across full overflow). */
+    min-width: var(--grid-min-width, 100%);
+}
+
+.tracker-grid {
+    display: none;
+    gap: 0 2px;
+    background: var(--tracker-bg-alt);
+    padding: 4px;
+    border-radius: 0 0 4px 4px;
+    min-width: var(--grid-min-width, 100%);
+    /* Paint/layout island — hidden prefetched grid isolated from the visible one. */
+    contain: content;
+}
+
+/* Spacers above row 0 and below last row — heights set by tracker.js. */
+.grid-spacer {
+    grid-column: 1 / -1;
+    background: var(--tracker-bg);
+}
+
+.channel-cell {
+    background: var(--tracker-bg);
+    color: var(--tracker-fg);
+    padding: 0 4px;
+    font-family: monospace;
+    font-size: 12px;
+    border: none;
+    white-space: nowrap;
+}
+
+.channel-cell:not(.channel-header) {
+    container-type: inline-size;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1ch;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Segment visibility tiers — floor is pitch+sample+volume; effect drops first. */
+@container (max-width: 15ch) { .channel-cell { gap: 0.5ch; } }
+@container (max-width: 13ch) { .channel-cell { gap: 0;     } }
+@container (max-width: 12ch) { .channel-cell .effect { display: none; } }
+
+.row-label {
+    background: var(--tracker-bg);
+    color: var(--tracker-fg);
+    padding: 0 4px;
+    text-align: right;
+    font-family: monospace;
+    font-size: 12px;
+    min-width: 20px;
+}
+
+.header-label {
+    background: var(--tracker-bg);
+    padding: 4px;
+    min-width: 20px;
+    cursor: pointer;
+    border: none;
+    color: var(--tracker-fg);
+}
+
+.header-label.muteable {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease;
+}
+.header-label.muteable:hover { background: var(--tracker-row-highlight); }
+.header-label.muteable:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.header-label-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+    color: var(--header-icon-color, currentColor);
+    opacity: var(--header-icon-opacity, 0.65);
+    transition: opacity 0.15s ease;
+}
+.header-label.muteable:hover .header-label-icon,
+.header-label.muteable:focus-visible .header-label-icon { opacity: 1; }
+
+.channel-header {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    color: inherit;
+}
+
+.channel-header:hover { background: var(--tracker-row-highlight); }
+.channel-header:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.channel-label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    width: 100%;
+}
+
+.canvas-parent {
+    width: 100%;
+    height: 40px;
+    background: var(--viz-canvas-bg);
+    border-radius: 4px;
+    position: relative;
+    /* Scopes paint/layout per canvas — with 32-64 of these repainting at
+       30 Hz, this lets the browser skip up-tree invalidation when any one
+       canvas paints. Each canvas-parent has fixed height and a single
+       full-bleed child, so containment is safe. */
+    contain: layout style paint;
+}
+
+.visualization-canvas {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #4a4a4a;
+    border-radius: 2px;
+    background: #2a2a2a;
+}
+
+/* ========== Sample list ========== */
+
+.sample-section { min-width: 0; }
+
+.sample-list {
+    background: var(--tracker-bg);
+    padding: 8px;
+    display: none;
+    border-radius: 4px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--tracker-row-highlight) var(--tracker-bg);
+}
+
+.sample-list::-webkit-scrollbar { width: 8px; }
+.sample-list::-webkit-scrollbar-track { background: var(--tracker-bg); border-radius: 4px; }
+.sample-list::-webkit-scrollbar-thumb { background: var(--tracker-row-highlight); border-radius: 4px; }
+.sample-list::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--tracker-row-highlight) 70%, white);
+}
+
+.sample-item {
+    padding: 4px;
+    font-size: 12px;
+    height: 24px;
+    color: var(--tracker-fg);
+    font-family: monospace;
+}
+
+.sample-item.highlighted { background: var(--tracker-row-highlight); }
+
+/* ========== States ========== */
+
+.muted {
+    opacity: 0.5;
+    filter: grayscale(80%);
+}
+
+.highlighted-row {
+    background: var(--tracker-row-highlight) !important;
+}
+
+.note, .sample, .volume, .effect {
+    transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.note    { color: var(--tracker-note);   }
+.sample  { color: var(--tracker-sample); }
+.volume  { color: var(--tracker-volume); }
+.effect  { color: var(--tracker-effect); }
+
+/* ========== Toast ========== */
+
+#toast {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    background: #1f2937;
+    color: #ffffff;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 10px 16px;
+    box-shadow: 3px 3px 0 #000;
+    font-family: monospace;
+    font-size: 13px;
+    max-width: min(90vw, 480px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    z-index: 2000;
+}
+
+#toast.visible {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+#toast[data-variant="error"] { border-color: #ef4444; }
+#toast[data-variant="warn"]  { border-color: #facc15; }
+#toast[data-variant="info"]  { border-color: var(--accent); }
+
+/* ========== Drop zone ========== */
+
+#dropZone {
+    position: fixed;
+    inset: 0;
+    background: rgba(19, 4, 27, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 1500;
+}
+
+body.drag-over #dropZone { opacity: 1; }
+
+.drop-zone-card {
+    background: #1f2937;
+    border: 3px dashed var(--accent);
+    border-radius: 12px;
+    padding: 32px 56px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    font-family: monospace;
+    color: #ffffff;
+}
+
+.drop-zone-card i {
+    font-size: 48px;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+
+.drop-zone-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.drop-zone-hint {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* ========== Help / keyboard shortcuts overlay ========== */
+
+#helpOverlay {
+    /* Popup palette is intentionally theme-independent (dark backdrop, hardcoded
+       chrome). `--help-accent` is the lone "lively" colour used by the title and
+       the footer links so it contrasts with the dark card in every theme. */
+    --help-accent: #facc15;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2500;
+}
+
+#helpOverlay.visible { display: flex; }
+
+.help-card {
+    background: #1f2937;
+    border: 2px solid #4a4a4a;
+    border-radius: 8px;
+    box-shadow: 6px 6px 0 #000;
+    min-width: min(560px, 92vw);
+    max-width: 92vw;
+    max-height: 86vh;
+    overflow: auto;
+    padding: 20px 24px;
+    color: #ffffff;
+    font-family: monospace;
+}
+
+.help-card h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: var(--help-accent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.help-card .help-close {
+    background: transparent;
+    border: 1px solid #4a4a4a;
+    color: #ffffff;
+    border-radius: 3px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.help-card .help-close:hover { background: #4a4a4a; }
+
+.help-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 16px;
+    row-gap: 6px;
+    font-size: 13px;
+}
+
+.help-list dt {
+    color: #facc15;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.help-list dd {
+    margin: 0;
+    color: #e5e7eb;
+}
+
+.help-credits {
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 1px solid #2a2a2a;
+    font-size: 10px;
+    line-height: 1.6;
+    color: #6b7280;
+    text-align: center;
+}
+.help-credits a {
+    color: #9ca3af;
+    text-decoration: none;
+    border-bottom: 1px dotted #4a4a4a;
+}
+.help-credits a:hover,
+.help-credits a:focus-visible {
+    color: var(--help-accent);
+    border-bottom-color: currentColor;
+}
+.help-credits-license { color: #4a4a4a; }
+
+.help-credits .help-home {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+.help-credits .help-home a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.02em;
+    color: var(--help-accent);
+    border-bottom: none;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+.help-credits .help-home a:hover,
+.help-credits .help-home a:focus-visible {
+    transform: translateY(-1px);
+    filter: brightness(1.15);
+    outline: none;
+}
+.help-credits .help-home img {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+}
+.help-credits .help-home .help-support .help-support-icon {
+    font-size: 18px;
+    width: 22px;
+    line-height: 1;
+    text-align: center;
+}
+
+kbd {
+    display: inline-block;
+    background: #2a2a2a;
+    border: 1px solid #4a4a4a;
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font: inherit;
+    font-size: 12px;
+    color: #ffffff;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* ========== Responsive ========== */
+
+@media (max-width: 768px) {
+    .tracker-container { grid-template-columns: 1fr; }
+
+    .channel-cell { min-width: 60px; font-size: 10px; }
+    .row-label, .header-label { min-width: 30px; font-size: 10px; }
+
+    .sample-list { margin-top: 16px; height: auto !important; max-height: 200px; }
+
+    .retro-button { padding: 4px 8px; font-size: 10px; flex: 1 1 calc(50% - 4px); }
+
+    .mod-info-box {
+        min-width: 0;
+        flex: 1 1 calc(50% - 4px);
+        padding: 6px;
+        font-size: 10px;
+    }
+
+    .canvas-parent { height: 28px; }
+}
+
+/* Mobile — trim to essentials; patterns own the viewport. */
+@media (max-width: 640px) {
+    /* Wider row-label column so 2-char hex doesn't clip on bold themes. */
+    :root { --row-label-col: 28px; }
+
+    /* Show only Title (2nd child). */
+    .mod-info-box:not(:nth-child(2)) { display: none; }
+
+    #subsongControl,
+    #toggle-visualizations,
+    #toggle-samples,
+    #show-help,
+    .volume-control {
+        display: none;
+    }
+
+    .controls .retro-button .btn-label { display: none; }
+    .controls .retro-button {
+        flex: 1 1 calc(20% - 8px) !important;
+        min-width: 0 !important;
+        padding: 6px 8px !important;
+        gap: 0;
+    }
+
+    /* Viz + theme pickers share row 2 (~50% basis each). */
+    .controls .viz-control,
+    .controls .theme-control {
+        flex: 1 1 calc(50% - 8px) !important;
+        min-width: 0 !important;
+    }
+
+    .sample-section { display: none; }
+
+    /* Force single-column tracker — beats per-theme grid re-templates. */
+    .tracker-container { grid-template-columns: 1fr !important; }
+
+    /* Collapse .app to single-column flex — beats per-theme grid layouts. */
+    .app {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 8px !important;
+        margin: 0 !important;
+        max-width: none !important;
+    }
+
+    .controls { flex-direction: row !important; }
+}
+
+/* Tablet (641-1024 px) — force row 1 = 5 transport buttons. */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .controls #load,
+    .controls #play,
+    .controls #stop,
+    .controls #previous,
+    .controls #next {
+        flex: 1 1 calc(20% - 8px) !important;
+        min-width: 0 !important;
+    }
+}
+
+/* Hide help (?) below 1024 px — `?` keyboard shortcut still works. */
+@media (min-width: 641px) and (max-width: 1024px) {
+    #show-help { display: none; }
+}
+
+
+/* ========== Theme-picker chip ========== */
+
+.theme-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2a2a2a;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 6px 10px;
+    box-shadow: 2px 2px 0 #000;
+    font-size: 12px;
+    flex: 0 1 200px;
+    min-width: 120px;
+}
+
+
+/* Uniform control-bar heights — opted out by hifi-deck (round buttons). */
+:root:not(.theme-hifi-deck) .controls {
+    align-items: stretch;
+}
+
+:root:not(.theme-hifi-deck) .controls > .retro-button {
+    align-items: center;
+}

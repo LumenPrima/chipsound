@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chipsound — a browser-based player for tracker music (.mod, .s3m, .xm, .it). Drop a module on the page and it plays.">
+    <title>Chipsound — Player</title>
+
+    <link rel="icon" type="image/svg+xml" href="./images/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="96x96" href="./images/favicon-96x96.png">
+    <link rel="apple-touch-icon" href="./images/apple-touch-icon.png">
+    <meta name="theme-color" content="#00ff88">
+
+    <!-- First-paint gate: class hides body, JS removes it once the theme CSS resolves. -->
+    <style>html.theme-loading body { visibility: hidden; }</style>
+
+    <link rel="modulepreload" href="./js/index.js">
+    <link rel="preload" href="./css/fontawesome/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+    <link rel="stylesheet" href="./css/style.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="./css/fontawesome/fontawesome.min.css">
+    <link rel="stylesheet" href="./css/fontawesome/solid.min.css">
+
+    <!-- Synchronous preboot: apply saved theme + samples-hidden class before first paint. -->
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var reveal = function () { root.classList.remove('theme-loading'); };
+            root.classList.add('theme-loading');
+            setTimeout(reveal, 1000);
+
+            try {
+                var DEFAULT_ID = 'clusters';
+                var SAFE_ID = /^[a-z0-9-]{1,40}$/;
+                var id = DEFAULT_ID;
+                var samplesHidden = false;
+                try {
+                    var raw = localStorage.getItem('modplayer.theme');
+                    if (raw) {
+                        var saved = JSON.parse(raw);
+                        if (typeof saved === 'string' && SAFE_ID.test(saved)) id = saved;
+                    }
+                    var samplesRaw = localStorage.getItem('modplayer.showSamples');
+                    if (samplesRaw !== null) {
+                        var parsed = JSON.parse(samplesRaw);
+                        if (parsed === false) samplesHidden = true;
+                    }
+                } catch (e) { /* private mode etc. — keep defaults */ }
+
+                root.classList.add('theme-' + id);
+                if (samplesHidden) root.classList.add('samples-hidden');
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = './css/themes/' + id + '.css';
+                link.dataset.themeId = id;
+                link.onload = link.onerror = reveal;
+                document.head.appendChild(link);
+            } catch (e) {
+                reveal();
+            }
+        })();
+    </script>
+
+    <!-- Prefetch (not preload): the worklets are loaded via addModule() only
+         after the first user gesture, so prefetch warms the cache without the
+         "preload not used in time" warning. -->
+    <link rel="prefetch" href="./js/chiptune3.worklet.js">
+    <link rel="prefetch" href="./js/libopenmpt.worklet.js">
+
+    <script type="module" src="./js/index.js"></script>
+</head>
+<body>
+    <main class="app">
+        <header class="app-header">
+            <h1>Chipsound</h1>
+        </header>
+
+        <section class="mod-info" aria-label="Module info">
+            <div class="mod-info-box"><span>Filename</span><div id="fileName"></div></div>
+            <div class="mod-info-box"><span>Title</span><div id="songName"></div></div>
+            <div class="mod-info-box"><span>Order</span><div id="order"></div></div>
+            <div class="mod-info-box"><span>Pattern</span><div id="pattern"></div></div>
+            <div class="mod-info-box"><span>Row</span><div id="row"></div></div>
+            <div class="mod-info-box"><span>BPM</span><div id="bpm"></div></div>
+            <div class="mod-info-box"><span>Channels</span><div id="channels"></div></div>
+            <div class="mod-info-box"><span>Samples</span><div id="samples"></div></div>
+        </section>
+
+        <section class="controls" id="trackerControls" aria-label="Playback controls">
+            <input type="file" id="files" name="files" accept=".mod,.s3m,.xm,.it" hidden>
+            <button id="load" class="retro-button" type="button" aria-label="Load module (L)" title="Load module (L)">
+                <i class="fas fa-folder-open" aria-hidden="true"></i> <span class="btn-label">Load</span>
+            </button>
+            <button id="play" class="retro-button" type="button" aria-label="Play (Space)" title="Play / Pause (Space)" disabled>
+                <i class="fas fa-play" aria-hidden="true"></i>
+                <i class="fas fa-pause" aria-hidden="true"></i>
+                <span class="btn-label play-text">Play</span>
+                <span class="btn-label pause-text">Pause</span>
+            </button>
+            <button id="stop" class="retro-button" type="button" aria-label="Stop and rewind to start (S)" title="Stop (S)" disabled>
+                <i class="fas fa-stop" aria-hidden="true"></i> <span class="btn-label">Stop</span>
+            </button>
+            <button id="previous" class="retro-button" type="button" aria-label="Previous order (Left)" title="Previous order (←)" disabled>
+                <i class="fas fa-step-backward" aria-hidden="true"></i> <span class="btn-label">Previous</span>
+            </button>
+            <button id="next" class="retro-button" type="button" aria-label="Next order (Right)" title="Next order (→)" disabled>
+                <i class="fas fa-step-forward" aria-hidden="true"></i> <span class="btn-label">Next</span>
+            </button>
+            <label id="subsongControl" class="subsong-control" title="Subsong" hidden>
+                <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
+                <select id="subsong" class="retro-select" aria-label="Subsong" title="Subsong"></select>
+            </label>
+            <label class="theme-control" aria-label="Theme" title="Cycle theme (T)">
+                <i class="fa-solid fa-table-cells-large" aria-hidden="true"></i>
+                <select id="themePicker" class="retro-select" aria-label="Theme (T)" title="Cycle theme (T)"></select>
+            </label>
+            <button id="toggle-visualizations" class="retro-button" type="button" aria-label="Toggle effects (E)" title="Toggle effects (E)" disabled>
+                <i class="fa-solid fa-eye" aria-hidden="true"></i> <span class="btn-label">Effects</span>
+            </button>
+            <label id="vizControl" class="viz-control" aria-label="Visualization" title="Visualization (V to cycle)">
+                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                <select id="vizPicker" class="retro-select" aria-label="Visualization (V to cycle)" title="Visualization (V to cycle)" disabled></select>
+            </label>
+            <button id="toggle-samples" class="retro-button" type="button" aria-label="Toggle samples (I)" title="Toggle samples (I)" disabled>
+                <i class="fa-solid fa-record-vinyl" aria-hidden="true"></i> <span class="btn-label">Samples</span>
+            </button>
+            <label class="volume-control" aria-label="Volume" title="Volume">
+                <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+                <input id="volume" type="range" min="0" max="100" step="1" value="100" aria-label="Volume" title="Volume">
+            </label>
+            <button id="show-help" class="retro-button retro-button-icon" type="button" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">
+                <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+            </button>
+        </section>
+
+        <section class="tracker-container">
+            <div class="tracker-main">
+                <div id="trackerHeader" class="tracker-header" role="row"></div>
+                <div id="trackerPatterns"></div>
+            </div>
+            <aside class="sample-section" aria-label="Samples">
+                <div id="sampleList" class="sample-list"></div>
+            </aside>
+        </section>
+    </main>
+
+    <div id="dropZone" aria-hidden="true">
+        <div class="drop-zone-card">
+            <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+            <div class="drop-zone-title">Drop module to play</div>
+            <div class="drop-zone-hint">.mod, .s3m, .xm, .it</div>
+        </div>
+    </div>
+</body>
+</html>

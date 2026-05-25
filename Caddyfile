@@ -1,0 +1,32 @@
+# Chipsound — Caddy config. Listens on $PORT (defaults to :80 locally; the HF
+# Space wrapper image sets PORT=7860). Swap for your domain to get auto-HTTPS.
+
+:{$PORT:80} {
+    root * /usr/share/caddy
+
+    # Fallback compression for anything not pre-compressed at build time.
+    encode {
+        zstd
+        gzip
+    }
+
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+
+    @assets path /js/* /css/* /images/*
+    header @assets Cache-Control "public, max-age=86400"
+
+    @html path / /index.html
+    header @html Cache-Control "no-cache"
+
+    # `precompressed` serves the build-time .br / .zst sibling at zero runtime
+    # CPU cost. `browse` is required for runtime theme + viz directory
+    # discovery (src/js/themes.js, src/js/viz-engine.js parse the HTML listing).
+    file_server {
+        precompressed br zstd gzip
+        browse
+    }
+}

@@ -1,0 +1,286 @@
+/* Newspaper — 1960s broadsheet front page on newsprint. */
+
+:root.theme-newspaper {
+    --theme-name: "Newspaper";
+
+    --accent: #1a1a1a;
+
+    --viz-primary:   #1a1a1a;
+    --viz-secondary: #555555;
+    --viz-glow:      rgba(0, 0, 0, 0.35);
+    --viz-grid:      rgba(0, 0, 0, 0.5);
+    --viz-grid-soft: rgba(0, 0, 0, 0.18);
+    /* Near-black ink — default white viz-ink disappears on newsprint. */
+    --viz-ink:       #1a1a1a;
+    --viz-vol-cold: 120, 120, 120;
+    --viz-vol-mid:   50,  50,  50;
+    --viz-vol-hot:   10,  10,  10;
+
+    --vu-low:  #555555;
+    --vu-mid:  #1a1a1a;
+    --vu-high: #b91c1c;
+
+    --tracker-bg            : #f4ecd8;
+    --tracker-bg-alt        : #e8dfc4;
+    --tracker-row-highlight : #d4b886;
+    --tracker-fg            : #1a1a1a;
+    --tracker-note          : #1a1a1a;
+    --tracker-sample        : #5a3a1a;
+    --tracker-volume        : #7a1a1a;
+    --tracker-effect        : #1a3a1a;
+}
+
+/* Page. */
+:root.theme-newspaper body {
+    background: #f4ecd8;
+    color: #1a1a1a;
+    font-family: 'Times New Roman', 'Georgia', serif;
+}
+
+/* Newsprint grain. */
+:root.theme-newspaper body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 13% 27%, rgba(0,0,0,0.06) 0 1px, transparent 1px),
+        radial-gradient(circle at 67% 71%, rgba(0,0,0,0.05) 0 1px, transparent 1px),
+        radial-gradient(circle at 89% 19%, rgba(0,0,0,0.04) 0 1px, transparent 1px);
+    background-size: 7px 7px, 11px 11px, 17px 17px;
+    z-index: 0;
+}
+:root.theme-newspaper .app {
+    position: relative;
+    z-index: 1;
+    padding: 24px;
+    gap: 10px;
+    max-width: 1500px;
+    margin: 16px auto;
+}
+
+/* Masthead. */
+:root.theme-newspaper .app-header {
+    border-top: 4px solid #1a1a1a;
+    border-bottom: 2px solid #1a1a1a;
+    padding: 8px 0 4px;
+    margin-bottom: 6px;
+}
+:root.theme-newspaper .app-header h1 {
+    text-align: center;
+    color: #1a1a1a;
+    font-family: 'Times New Roman', 'Georgia', serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    margin: 0;
+    text-transform: uppercase;
+}
+/* Dateline. */
+:root.theme-newspaper .app-header::after {
+    content: 'Vol. CXXIV  ·  No. 38  ·  Tracker Edition  ·  All The Mod That\'s Fit To Print';
+    display: block;
+    text-align: center;
+    font-family: 'Times New Roman', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    padding: 2px 0 0;
+    border-top: 1px solid #1a1a1a;
+    margin-top: 4px;
+}
+
+/* Mod-info: column dividers, no boxes. */
+:root.theme-newspaper .mod-info {
+    background: transparent;
+    border-top: 1px solid #1a1a1a;
+    border-bottom: 1px solid #1a1a1a;
+    border-radius: 0;
+    padding: 4px 0;
+    gap: 0;
+    font-family: 'Times New Roman', serif;
+    font-size: 12px;
+}
+:root.theme-newspaper .mod-info-box {
+    background: transparent;
+    border: none;
+    border-right: 1px solid #1a1a1a;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0 12px;
+    flex: 1 0 auto;
+    min-width: 0;
+    transition: none;
+    text-align: left;
+}
+:root.theme-newspaper .mod-info-box:last-child { border-right: none; }
+:root.theme-newspaper .mod-info-box:hover { transform: none; background: transparent; }
+:root.theme-newspaper .mod-info-box span {
+    display: block;
+    color: #1a1a1a;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-style: italic;
+    font-weight: normal;
+}
+:root.theme-newspaper .mod-info-box > div {
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* Controls = bylines strip. */
+:root.theme-newspaper .controls {
+    background: transparent;
+    border-bottom: 2px solid #1a1a1a;
+    border-radius: 0;
+    padding: 6px 0;
+    gap: 4px;
+}
+
+:root.theme-newspaper .retro-button {
+    background: #1a1a1a;
+    color: #f4ecd8;
+    border: 1px solid #1a1a1a;
+    border-radius: 0;
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 9px;
+    box-shadow: none;
+    transition: none;
+}
+:root.theme-newspaper .retro-button:hover { background: #f4ecd8; color: #1a1a1a; }
+:root.theme-newspaper .retro-button:disabled { background: #c0b9a7; border-color: #8a8270; color: #5a5a5a; opacity: 1; }
+:root.theme-newspaper .retro-button[aria-pressed="true"] { background: #b91c1c; color: #f4ecd8; border-color: #b91c1c; }
+
+/* Chip chrome matches the button slab; slider accent flips to cream below. */
+:root.theme-newspaper .retro-select,
+:root.theme-newspaper .subsong-control,
+:root.theme-newspaper .viz-control,
+:root.theme-newspaper .theme-control,
+:root.theme-newspaper .volume-control {
+    background: #1a1a1a;
+    border: 1px solid #1a1a1a;
+    border-radius: 0;
+    color: #f4ecd8;
+    font-family: 'Times New Roman', serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: none;
+    transition: none;
+}
+:root.theme-newspaper .retro-select { padding: 4px 8px; }
+:root.theme-newspaper .retro-select option { background: #1a1a1a; color: #f4ecd8; }
+
+/* Cap picker chips so the row fits one line; only resting width is constrained. */
+:root.theme-newspaper .subsong-control,
+:root.theme-newspaper .viz-control,
+:root.theme-newspaper .theme-control { flex: 0 1 140px; min-width: 90px; }
+:root.theme-newspaper .volume-control { flex: 0 1 140px; min-width: 100px; }
+
+/* Pin ? to the right edge. */
+:root.theme-newspaper #show-help { margin-left: auto; }
+
+:root.theme-newspaper input[type="range"] { accent-color: #f4ecd8; }
+
+/* Tracker container — framed page section. */
+:root.theme-newspaper .tracker-container {
+    background: #f4ecd8;
+    border: 1px solid #1a1a1a;
+    border-radius: 0;
+    padding: 0;
+    gap: 0;
+}
+
+/* Section slug — spans both grid columns above tracker-main + sample-section. */
+:root.theme-newspaper .tracker-container::before {
+    content: 'THE TRACKER';
+    grid-column: 1 / -1;
+    padding: 6px 12px 4px;
+    border-bottom: 3px double #1a1a1a;
+    font-family: 'Times New Roman', serif;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #1a1a1a;
+}
+
+:root.theme-newspaper .tracker-header {
+    background: #1a1a1a;
+    border-radius: 0;
+    padding: 0;
+}
+:root.theme-newspaper .channel-header {
+    background: #1a1a1a;
+    color: #f4ecd8;
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-right: 1px solid #f4ecd8;
+}
+:root.theme-newspaper .channel-header:last-child { border-right: none; }
+:root.theme-newspaper .channel-header:hover { background: #b91c1c; }
+
+/* Stocks-page column rules. */
+:root.theme-newspaper .tracker-grid {
+    background: #f4ecd8;
+    border-radius: 0;
+}
+:root.theme-newspaper .channel-cell {
+    background: #f4ecd8;
+    color: #1a1a1a;
+    font-family: 'Courier New', monospace;
+    border-right: 1px dotted #1a1a1a;
+}
+:root.theme-newspaper .row-label {
+    background: #e8dfc4;
+    color: #1a1a1a;
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    border-right: 1px solid #1a1a1a;
+}
+:root.theme-newspaper .channel-cell.row-current,
+:root.theme-newspaper .row-label.row-current {
+    background: #1a1a1a;
+    color: #f4ecd8;
+}
+
+/* Samples = classified ads gutter. */
+:root.theme-newspaper .sample-section { padding-left: 0; border-left: 1px solid #1a1a1a; }
+:root.theme-newspaper .sample-list {
+    background: #e8dfc4;
+    border: none;
+    border-radius: 0;
+    padding: 6px 8px;
+}
+:root.theme-newspaper .sample-list::before {
+    content: 'CLASSIFIEDS';
+    display: block;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    border-bottom: 3px double #1a1a1a;
+    font-family: 'Times New Roman', serif;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #1a1a1a;
+}
+:root.theme-newspaper .sample-item {
+    background: transparent;
+    color: #1a1a1a;
+    font-family: 'Times New Roman', serif;
+    font-size: 12px;
+    border-bottom: 1px dotted #1a1a1a;
+    border-radius: 0;
+}
+:root.theme-newspaper .sample-item:hover { background: #d4b886; }
+:root.theme-newspaper .sample-item.highlighted { background: #1a1a1a; color: #f4ecd8; }

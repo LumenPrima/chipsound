@@ -1,0 +1,271 @@
+/* Skinplayer — late-90s skinned desktop media player. */
+
+:root.theme-skinplayer {
+    --theme-name: "Skinplayer";
+
+    --accent: #00ff7f;
+
+    --viz-primary:   #00ff7f;
+    --viz-secondary: #00d9ff;
+    --viz-glow:      rgba(0, 255, 127, 0.45);
+    --viz-grid:      rgba(0, 217, 255, 0.4);
+    --viz-grid-soft: rgba(0, 217, 255, 0.18);
+    --viz-vol-cold:   10,  40,  60;
+    --viz-vol-mid:    0, 217, 255;
+    --viz-vol-hot:    0, 255, 127;
+
+    --vu-low:  #00ff7f;
+    --vu-mid:  #ffd24a;
+    --vu-high: #ff3a3a;
+
+    --tracker-bg            : #161c26;
+    --tracker-bg-alt        : #0d121b;
+    --tracker-row-highlight : #1e3a2a;
+    --tracker-fg            : #c7d7e0;
+    --tracker-note          : #6ec3ff;
+    --tracker-sample        : #7ce0c8;
+    --tracker-volume        : #d28aff;
+    --tracker-effect        : #b9ff7c;
+}
+
+/* Chassis. */
+:root.theme-skinplayer body {
+    background:
+        linear-gradient(180deg, #1a2536 0%, #0a0f17 100%);
+    color: #c7d7e0;
+    font-family: "Tahoma", "Verdana", system-ui, sans-serif;
+}
+
+:root.theme-skinplayer .app {
+    padding: 14px;
+    gap: 0;
+}
+
+/* Title bar. */
+:root.theme-skinplayer .app-header {
+    background: linear-gradient(180deg, #4a5d7a 0%, #1f2a3e 50%, #0d1422 100%);
+    border: 1px solid #050a14;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    padding: 6px 12px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+:root.theme-skinplayer .app-header h1 {
+    color: #e0eaf5;
+    font-family: "Tahoma", "Verdana", sans-serif;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7);
+    margin: 0;
+}
+
+/* Mod-info — continuous LCD readout. */
+:root.theme-skinplayer .mod-info {
+    background: #0a1018;
+    border: 1px solid #050a14;
+    border-top: none;
+    border-bottom: 1px solid #050a14;
+    border-radius: 0;
+    padding: 8px 14px;
+    gap: 4px 24px;
+    box-shadow:
+        inset 0 0 14px rgba(0, 0, 0, 0.9),
+        inset 0 0 40px rgba(0, 255, 127, 0.05);
+}
+:root.theme-skinplayer .mod-info-box {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    min-width: 80px;
+    text-align: left;
+    transition: none;
+    color: #00ff7f;
+    text-shadow: 0 0 6px rgba(0, 255, 127, 0.55);
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12px;
+}
+:root.theme-skinplayer .mod-info-box:hover {
+    transform: none;
+    background: transparent;
+    border-color: transparent;
+}
+:root.theme-skinplayer .mod-info-box span {
+    color: #335545;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: none;
+}
+
+/* Transport cluster. */
+:root.theme-skinplayer .controls {
+    background: linear-gradient(180deg, #3a4a64 0%, #1a2536 100%);
+    border: 1px solid #050a14;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 6px 10px;
+    gap: 4px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+}
+
+:root.theme-skinplayer .retro-button {
+    background: linear-gradient(180deg, #5a6e8a 0%, #2a3850 100%);
+    border: 1px solid #050a14;
+    border-radius: 2px;
+    color: #d4dde8;
+    font-family: "Tahoma", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 8px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+    transition: none;
+}
+:root.theme-skinplayer .retro-button:hover {
+    background: linear-gradient(180deg, #6a7e9a 0%, #3a4860 100%);
+    transform: none;
+}
+:root.theme-skinplayer .retro-button:active,
+:root.theme-skinplayer .retro-button[aria-pressed="true"] {
+    background: linear-gradient(180deg, #1a2436 0%, #2a3850 100%);
+    box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.6),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+:root.theme-skinplayer .retro-button:disabled {
+    opacity: 0.45;
+    background: linear-gradient(180deg, #3a4658 0%, #1f2838 100%);
+}
+:root.theme-skinplayer #play.playing {
+    background: linear-gradient(180deg, #00d967 0%, #006633 100%);
+    color: #021a0c;
+    border-color: #003315;
+}
+
+:root.theme-skinplayer .retro-select,
+:root.theme-skinplayer .subsong-control,
+:root.theme-skinplayer .viz-control,
+:root.theme-skinplayer .theme-control,
+:root.theme-skinplayer .volume-control {
+    background: linear-gradient(180deg, #5a6e8a 0%, #2a3850 100%);
+    border: 1px solid #050a14;
+    border-radius: 2px;
+    color: #d4dde8;
+    font-family: "Tahoma", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+:root.theme-skinplayer .retro-select { background: transparent; border: none; box-shadow: none; color: inherit; padding: 4px 8px; font-family: "Consolas", monospace; }
+/* Pin <option> palette — browser otherwise renders white on dark unreadably. */
+:root.theme-skinplayer .retro-select option {
+    background-color: #2a3850;
+    color: #d4dde8;
+}
+
+:root.theme-skinplayer input[type="range"] { accent-color: #00ff7f; }
+
+/* Tracker container = combined EQ/playlist window. */
+:root.theme-skinplayer .tracker-container {
+    background: linear-gradient(180deg, #3a4a64 0%, #1a2536 100%);
+    border: 1px solid #050a14;
+    border-radius: 6px;
+    padding: 8px;
+    gap: 8px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+:root.theme-skinplayer .tracker-header {
+    background: #0d121b;
+    border: 1px solid #050a14;
+    border-radius: 3px;
+    padding: 2px;
+}
+:root.theme-skinplayer .channel-header {
+    background: #0d121b;
+    color: #00ff7f;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    text-shadow: 0 0 4px rgba(0, 255, 127, 0.4);
+    border-right: 1px solid #050a14;
+    text-transform: uppercase;
+}
+:root.theme-skinplayer .channel-header:hover { background: #1a2a20; }
+
+:root.theme-skinplayer .tracker-grid {
+    background: #0d121b;
+    border: 1px solid #050a14;
+    border-radius: 3px;
+}
+:root.theme-skinplayer .channel-cell {
+    background: transparent;
+    color: #c7d7e0;
+    font-family: "Consolas", monospace;
+    border-right: 1px dotted rgba(0, 255, 127, 0.08);
+}
+:root.theme-skinplayer .row-label {
+    background: #050a14;
+    color: #00b85a;
+    font-family: "Consolas", monospace;
+    border-right: 1px solid #0a1018;
+}
+:root.theme-skinplayer .channel-cell.row-current,
+:root.theme-skinplayer .row-label.row-current {
+    background: rgba(0, 255, 127, 0.16);
+    color: #d8fff0;
+}
+
+/* Sample list = playlist window. */
+:root.theme-skinplayer .sample-section { padding-left: 0; }
+:root.theme-skinplayer .sample-list {
+    background: #0d121b;
+    border: 1px solid #050a14;
+    border-radius: 3px;
+    padding: 6px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+}
+:root.theme-skinplayer .sample-list::before {
+    content: "▸ PLAYLIST";
+    display: block;
+    padding: 2px 4px 4px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #1a2536;
+    font-family: "Tahoma", sans-serif;
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #00ff7f;
+    text-shadow: 0 0 4px rgba(0, 255, 127, 0.5);
+}
+:root.theme-skinplayer .sample-item {
+    background: transparent;
+    color: #8fb5c8;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    border-bottom: 1px dotted #1a2536;
+    border-radius: 0;
+    padding: 3px 6px;
+}
+:root.theme-skinplayer .sample-item:hover { background: rgba(0, 255, 127, 0.08); color: #d4e8f0; }
+:root.theme-skinplayer .sample-item.highlighted {
+    background: rgba(0, 255, 127, 0.16);
+    color: #00ff7f;
+    text-shadow: 0 0 4px rgba(0, 255, 127, 0.5);
+}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="44" viewBox="0 0 220 44" role="img" aria-label="Support on Ko-fi">
+    <rect x="1" y="1" width="218" height="42" rx="8" fill="#050a07" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M 22 30
+             C 22 30 12 24 12 18
+             C 12 14 14 12 17 12
+             C 19 12 21 13 22 15
+             C 23 13 25 12 27 12
+             C 30 12 32 14 32 18
+             C 32 24 22 30 22 30 Z"
+          fill="#00ff88"/>
+    <text x="44" y="28" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#00ff88">Support on Ko-fi</text>
+</svg>

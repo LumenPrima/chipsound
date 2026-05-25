@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="44" viewBox="0 0 220 44" role="img" aria-label="Launch player">
+    <rect x="1" y="1" width="218" height="42" rx="8" fill="#00ff88" stroke="#00ff88" stroke-width="1.5"/>
+    <path d="M 16 12 L 16 32 L 32 22 Z" fill="#050a07"/>
+    <text x="42" y="28" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#050a07">Launch player</text>
+</svg>

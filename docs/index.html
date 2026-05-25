@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===== Primary Meta Tags ===== -->
+    <title>Chipsound — Modern, themeable browser-based player for tracker music</title>
+    <meta name="title" content="Chipsound — Modern, themeable browser-based player for tracker music">
+    <meta name="description" content="Chipsound is a free, themeable, in-browser player for tracker music — MOD, S3M, XM, IT. Drag, drop, play. No install, no upload, no account. The demoscene, in your browser.">
+    <meta name="keywords" content="mod player, s3m player, xm player, it player, tracker music, demoscene, amiga music, chiptune, web audio, browser player, libopenmpt, openmpt, modarchive">
+    <meta name="author" content="Gamosoft">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://chipsound.com/">
+
+    <!-- ===== Preconnect / DNS prefetch ===== -->
+    <link rel="preconnect" href="https://ko-fi.com" crossorigin>
+    <link rel="dns-prefetch" href="https://github.com">
+    <link rel="dns-prefetch" href="https://modarchive.org">
+
+    <!-- ===== Open Graph / Facebook / LinkedIn ===== -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chipsound.com/">
+    <meta property="og:title" content="Chipsound — Modern, themeable browser-based player for tracker music">
+    <meta property="og:description" content="Free, themeable, in-browser player for MOD / S3M / XM / IT tracker modules. Drag, drop, play. The demoscene, in your browser.">
+    <meta property="og:image" content="https://chipsound.com/og-image.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Chipsound — browser-based tracker music player">
+    <meta property="og:site_name" content="Chipsound">
+    <meta property="og:locale" content="en_US">
+
+    <!-- ===== Twitter Card ===== -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@gamosoft">
+    <meta name="twitter:creator" content="@gamosoft">
+    <meta name="twitter:url" content="https://chipsound.com/">
+    <meta name="twitter:title" content="Chipsound — Modern, themeable browser-based player for tracker music">
+    <meta name="twitter:description" content="Free, themeable, in-browser player for MOD / S3M / XM / IT. Drag, drop, play.">
+    <meta name="twitter:image" content="https://chipsound.com/og-image.png">
+    <meta name="twitter:image:alt" content="Chipsound — browser-based tracker music player">
+
+    <!-- ===== Favicons / Theme ===== -->
+    <link rel="icon" type="image/svg+xml" href="./images/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="96x96" href="./images/favicon-96x96.png">
+    <link rel="apple-touch-icon" href="./images/apple-touch-icon.png">
+    <meta name="theme-color" content="#00ff88">
+    <meta name="color-scheme" content="dark">
+
+    <!-- ===== JSON-LD: SoftwareApplication ===== -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Chipsound",
+        "alternateName": "Chipsound \u2014 Modern, themeable browser-based player for tracker music",
+        "description": "Free, themeable, in-browser player for tracker music \u2014 MOD, S3M, XM, IT. No install, no upload, no account. The demoscene, in your browser.",
+        "url": "https://chipsound.com/",
+        "image": "https://chipsound.com/og-image.png",
+        "screenshot": "https://chipsound.com/og-image.png",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "MusicApplication",
+        "operatingSystem": "Any (web browser)",
+        "browserRequirements": "Requires a modern browser with WebAssembly and AudioWorklet support",
+        "datePublished": "2026-01-01",
+        "dateModified": "2026-05-21",
+        "license": "https://opensource.org/licenses/MIT",
+        "downloadUrl": "https://github.com/gamosoft/chipsound",
+        "codeRepository": "https://github.com/gamosoft/chipsound",
+        "isAccessibleForFree": true,
+        "featureList": "Plays MOD, S3M, XM and IT tracker modules; drag-and-drop file loading; fully themeable via CSS; real-time per-channel visualizations; channel mute and solo; subsong picker; keyboard shortcuts for every action; mobile and touch friendly; 100% client-side playback (no upload); MIT-licensed source",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "author": {
+            "@type": "Person",
+            "name": "Gamosoft",
+            "url": "https://github.com/gamosoft"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Gamosoft",
+            "url": "https://github.com/gamosoft",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://chipsound.com/images/icon-512.png",
+                "width": 512,
+                "height": 512
+            }
+        }
+    }
+    </script>
+
+    <!-- ===== JSON-LD: FAQPage ===== -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is Chipsound?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A free, open-source player for tracker music formats \u2014 MOD, S3M, XM, IT \u2014 that runs entirely inside your web browser. Drop a module on the page and it plays. No install, no upload, no account."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is Chipsound really free?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes \u2014 100% free, no premium tier, no ads, no tracking. The source is MIT-licensed on GitHub. If you'd like to support development you can leave a tip on Ko-fi, but it's never required."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do my files get uploaded anywhere?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Chipsound decodes modules entirely client-side using WebAssembly. Your files never leave your browser. There are no accounts, no telemetry, and no analytics \u2014 just open the page and play."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What file formats does Chipsound support?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Anything libopenmpt can decode: .mod, .s3m, .xm, .it, and their variants (MTM, STM, FAR, ULT, and more). If your tracker file plays in OpenMPT, it should play in Chipsound."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Where can I find tracker music to play?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The Mod Archive (modarchive.org) hosts over 200,000 free modules, including the demoscene classics from Purple Motion, Skaven, Necros, and the rest of the Future Crew / Renaissance crowd, among others. Download a module and drop it on the player."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does Chipsound work on mobile?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. The UI is fully responsive and touch-friendly. Small screens show a compact column layout but every feature \u2014 playback, channel mute, theme switching, visualizations \u2014 works on phones and tablets."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I add my own themes or visualizations to Chipsound?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes \u2014 themes are plain CSS files and visualizations are plain JS files. Drop a new file into the css/themes/ or js/visualizations/ folder and it shows up automatically on the next load. No build step, no registration list to edit."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <style>
+        :root {
+            --bg:           #050a07;
+            --bg-surface:   #0a1410;
+            --bg-card:      #0f1a14;
+            --primary:      #00ff88;
+            --primary-dim:  #00cc66;
+            --primary-deep: #0a3320;
+            --text:         #e8eae8;
+            --text-muted:   #9aa39e;
+            --border:       #1e3a2a;
+            --border-bright:#2a5a3a;
+            --shadow-glow:  rgba(0, 255, 136, 0.2);
+
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+            --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at top, rgba(0, 255, 136, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(0, 255, 136, 0.04) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        a { color: var(--primary); text-decoration: none; transition: color .15s ease; }
+        a:hover { color: var(--primary-dim); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        /* ===== Header (sticky) ===== */
+        header.site-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(5, 10, 7, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 24px; max-width: 1100px; margin: 0 auto;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand img { width: 36px; height: 36px; }
+        .brand-name {
+            font-family: var(--font-mono);
+            font-size: 20px; font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.04em;
+        }
+        nav.site-nav { display: flex; align-items: center; gap: 8px; }
+        nav.site-nav a {
+            font-size: 14px; font-weight: 500;
+            padding: 8px 14px; border-radius: 6px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: color .15s, background .15s;
+        }
+        nav.site-nav a:hover { color: var(--primary); background: rgba(0, 255, 136, 0.05); }
+        nav.site-nav a.cta {
+            background: var(--primary); color: var(--bg);
+            font-weight: 700; padding: 8px 18px;
+            box-shadow: 0 0 14px var(--shadow-glow);
+        }
+        nav.site-nav a.cta:hover { background: var(--primary-dim); color: var(--bg); }
+
+        /* ===== Hero ===== */
+        .hero {
+            text-align: center;
+            padding: 80px 24px 64px;
+        }
+        .hero-logo {
+            width: 180px; height: 180px;
+            filter: drop-shadow(0 0 24px var(--shadow-glow));
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-family: var(--font-mono);
+            font-size: clamp(40px, 7vw, 72px);
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.04em;
+            text-shadow: 0 0 24px var(--shadow-glow);
+            margin-bottom: 12px;
+        }
+        .hero .tagline {
+            font-size: clamp(16px, 2.2vw, 22px);
+            color: var(--text-muted);
+            max-width: 680px;
+            margin: 0 auto 36px;
+        }
+        .format-chips {
+            display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+            margin-bottom: 36px;
+        }
+        .format-chips .chip {
+            font-family: var(--font-mono);
+            font-size: 13px; font-weight: 700;
+            padding: 6px 14px;
+            border: 1px solid var(--border-bright);
+            border-radius: 20px;
+            color: var(--primary);
+            background: var(--bg-surface);
+            letter-spacing: 0.05em;
+        }
+        .cta-row {
+            display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-family: var(--font-mono);
+            font-size: 15px; font-weight: 700;
+            padding: 16px 28px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            transition: transform .15s, box-shadow .15s, background .15s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .btn-primary {
+            background: var(--primary); color: var(--bg);
+            box-shadow: 0 0 24px var(--shadow-glow);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dim); color: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 32px var(--shadow-glow);
+        }
+        .btn-secondary {
+            background: transparent; color: var(--primary);
+            border-color: var(--border-bright);
+        }
+        .btn-secondary:hover {
+            background: rgba(0, 255, 136, 0.06);
+            border-color: var(--primary);
+        }
+
+        /* ===== Section base ===== */
+        section.block {
+            padding: 64px 0;
+            border-top: 1px solid var(--border);
+        }
+        section.block h2 {
+            font-family: var(--font-mono);
+            font-size: clamp(24px, 4vw, 34px);
+            color: var(--primary);
+            margin-bottom: 8px;
+            letter-spacing: 0.04em;
+        }
+        section.block .lead {
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 720px;
+            margin-bottom: 36px;
+        }
+
+        /* ===== Features grid ===== */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+        .feature {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            transition: border-color .15s, transform .15s;
+        }
+        .feature:hover {
+            border-color: var(--border-bright);
+            transform: translateY(-2px);
+        }
+        .feature .icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+            line-height: 1;
+        }
+        .feature h3 {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            color: var(--primary);
+            margin-bottom: 6px;
+            letter-spacing: 0.04em;
+        }
+        .feature p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* ===== Screenshots gallery (horizontal scroll-snap carousel) ===== */
+        .shots {
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 4px 4px 14px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-bright) transparent;
+        }
+        .shots::-webkit-scrollbar { height: 8px; }
+        .shots::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
+        .shots::-webkit-scrollbar-track { background: transparent; }
+        .shot {
+            position: relative;
+            flex: 0 0 min(640px, 88vw);
+            aspect-ratio: 16/10;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0;
+            scroll-snap-align: start;
+            cursor: zoom-in;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        .shot:hover, .shot:focus-visible {
+            border-color: var(--border-bright);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+            outline: none;
+        }
+        .shot img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .shot figcaption {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--primary);
+            background: linear-gradient(to top, rgba(5, 10, 7, 0.92) 0%, rgba(5, 10, 7, 0.55) 70%, transparent 100%);
+        }
+
+        /* ===== Screenshot lightbox (native <dialog>) ===== */
+        .lightbox {
+            border: none;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            color: var(--text);
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        .lightbox::backdrop {
+            background: rgba(2, 6, 4, 0.94);
+            backdrop-filter: blur(6px);
+        }
+        .lightbox-figure {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            position: relative;
+        }
+        .lightbox-figure img {
+            max-width: 95vw;
+            max-height: 88vh;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 12px 80px rgba(0, 0, 0, 0.7);
+            background: var(--bg-card);
+        }
+        .lightbox-figure figcaption {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 4vh;
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--primary);
+            background: rgba(5, 10, 7, 0.78);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+        .lightbox-btn {
+            position: absolute;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font: 600 22px/1 system-ui, sans-serif;
+            cursor: pointer;
+            transition: background .15s, border-color .15s, transform .12s;
+        }
+        .lightbox-btn:hover, .lightbox-btn:focus-visible {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.45);
+            outline: none;
+            transform: scale(1.05);
+        }
+        .lightbox-close { top: 18px; right: 18px; }
+        .lightbox-prev  { left: 18px; top: 50%; transform: translateY(-50%); }
+        .lightbox-next  { right: 18px; top: 50%; transform: translateY(-50%); }
+        .lightbox-prev:hover, .lightbox-next:hover,
+        .lightbox-prev:focus-visible, .lightbox-next:focus-visible {
+            transform: translateY(-50%) scale(1.05);
+        }
+        @media (max-width: 600px) {
+            .lightbox-prev { left: 8px; }
+            .lightbox-next { right: 8px; }
+            .lightbox-close { top: 8px; right: 8px; }
+        }
+
+        /* ===== Support / open-source band ===== */
+        .support {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: center;
+        }
+        @media (max-width: 720px) {
+            .support { grid-template-columns: 1fr; }
+        }
+        .support-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 28px;
+        }
+        .support-card h3 {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: 0.04em;
+        }
+        .support-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        /* ===== FAQ ===== */
+        .faq {
+            display: grid;
+            gap: 12px;
+        }
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0;
+            overflow: hidden;
+            transition: border-color .15s;
+        }
+        .faq-item:hover { border-color: var(--border-bright); }
+        .faq-item > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 18px 22px;
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.03em;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
+        }
+        .faq-item > summary::-webkit-details-marker { display: none; }
+        .faq-item > summary::after {
+            content: "+";
+            font-size: 22px;
+            color: var(--text-muted);
+            line-height: 1;
+            transition: transform .2s ease;
+        }
+        .faq-item[open] > summary::after { transform: rotate(45deg); }
+        .faq-item .faq-body {
+            padding: 0 22px 18px;
+            color: var(--text-muted);
+            font-size: 14.5px;
+        }
+        .faq-item .faq-body code {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: var(--primary);
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 36px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        footer .footer-links {
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        footer .footer-links a {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        footer .footer-links a:hover { color: var(--primary); }
+        footer .credit {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--primary-deep);
+        }
+        footer .credit .heart { color: var(--primary); }
+
+        /* ===== Small screens ===== */
+        @media (max-width: 600px) {
+            .header-inner { padding: 12px 16px; gap: 8px; }
+            .brand-name { font-size: 17px; }
+            nav.site-nav a { padding: 6px 10px; font-size: 13px; }
+            nav.site-nav a.cta { padding: 6px 14px; }
+            .hero { padding: 48px 16px 40px; }
+            .hero-logo { width: 140px; height: 140px; }
+            section.block { padding: 48px 0; }
+            .container { padding: 0 16px; }
+            .btn { padding: 14px 22px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="/" aria-label="Chipsound home">
+                <img src="./images/favicon.svg" alt="">
+                <span class="brand-name">CHIPSOUND</span>
+            </a>
+            <nav class="site-nav" aria-label="Primary">
+                <a href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">Donate</a>
+                <a class="cta" href="./player.html">▶ Launch</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===== HERO ===== -->
+        <section class="hero">
+            <img class="hero-logo" src="./images/favicon.svg" alt="Chipsound logo">
+            <h1>CHIPSOUND</h1>
+            <p class="tagline">Modern, themeable, browser-based player for tracker music. The demoscene, in your browser.</p>
+            <div class="format-chips" aria-label="Supported formats">
+                <span class="chip">.MOD</span>
+                <span class="chip">.S3M</span>
+                <span class="chip">.XM</span>
+                <span class="chip">.IT</span>
+            </div>
+            <div class="cta-row">
+                <a class="btn btn-primary" href="./player.html">▶ Launch the Player</a>
+                <a class="btn btn-secondary" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">View on GitHub</a>
+            </div>
+        </section>
+
+        <!-- ===== WHAT IS IT ===== -->
+        <section class="block">
+            <div class="container">
+                <h2>// What is Chipsound?</h2>
+                <p class="lead">
+                    Chipsound is a lightweight, in-browser player for the tracker music formats that powered the demoscene, the Amiga, and a generation of PC games. Open a URL, drop a module on the page, and it plays. No install, no upload, no account. Everything runs client-side &mdash; your files never leave your browser, and the entire UI is yours to theme.
+                </p>
+                <div class="cta-row" style="justify-content: flex-start;">
+                    <a class="btn btn-primary" href="./player.html">▶ Try it now</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SCREENSHOTS ===== -->
+        <section class="block">
+            <div class="container">
+                <h2>// What it looks like</h2>
+                <p class="lead">Same player, different skins. Every visualization, every color, every border is just CSS.</p>
+                <div class="shots" aria-label="Theme screenshots, scroll horizontally to see all">
+                    <figure class="shot">
+                        <img src="./images/theme-skinplayer.jpg" alt="Chipsound rendered with the Skinplayer theme — late-90s skinned media-player aesthetic" loading="lazy" decoding="async" width="800" height="500">
+                        <figcaption>Skinplayer</figcaption>
+                    </figure>
+                    <figure class="shot">
+                        <img src="./images/theme-mixtape.jpg" alt="Chipsound rendered with the Mixtape theme — warm cassette-era aesthetic" loading="lazy" decoding="async" width="800" height="500">
+                        <figcaption>Mixtape</figcaption>
+                    </figure>
+                    <figure class="shot">
+                        <img src="./images/theme-crt-green.jpg" alt="Chipsound rendered with the CRT Green theme — phosphor-green terminal aesthetic" loading="lazy" decoding="async" width="800" height="500">
+                        <figcaption>CRT Green</figcaption>
+                    </figure>
+                    <figure class="shot">
+                        <img src="./images/theme-field-journal.jpg" alt="Chipsound rendered with the Field Journal theme — paper-notebook aesthetic" loading="lazy" decoding="async" width="800" height="500">
+                        <figcaption>Field Journal</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FEATURES ===== -->
+        <section class="block">
+            <div class="container">
+                <h2>// Why use it?</h2>
+                <p class="lead">A tracker player with theming and visualizations built in. Hosted free, source open.</p>
+                <div class="features">
+                    <div class="feature">
+                        <span class="icon">🎚️</span>
+                        <h3>MODULE FORMATS</h3>
+                        <p>MOD, S3M, XM, IT and their variants. Anything libopenmpt decodes plays here, no conversion step.</p>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">🎨</span>
+                        <h3>CSS THEMES</h3>
+                        <p>Every color, border, and font is a CSS variable. Press <code>T</code> to cycle through the bundled themes.</p>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">🎬</span>
+                        <h3>PER-CHANNEL VISUALIZATIONS</h3>
+                        <p>Rendered off the main thread for a smoother experience. Press <code>V</code> to cycle.</p>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">🖱️</span>
+                        <h3>DROP A FILE, IT PLAYS</h3>
+                        <p>Drag a module onto the page, pick one from disk, or share a link with <code>?load=&lt;url&gt;</code>.</p>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">🔒</span>
+                        <h3>LOCAL-ONLY</h3>
+                        <p>Files decode in your browser. No uploads, no accounts.</p>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">🆓</span>
+                        <h3>MIT-LICENSED</h3>
+                        <p>Source on GitHub.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FAQ ===== -->
+        <section class="block" id="faq">
+            <div class="container">
+                <h2>// Frequently asked</h2>
+                <p class="lead">Short answers to the questions everyone asks first.</p>
+                <div class="faq">
+                    <details class="faq-item">
+                        <summary>What is Chipsound?</summary>
+                        <div class="faq-body">
+                            A free, open-source player for tracker music formats &mdash; MOD, S3M, XM, IT &mdash; that runs entirely inside your web browser. Drop a module on the page and it plays. No install, no upload, no account.
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Is Chipsound really free?</summary>
+                        <div class="faq-body">
+                            Yes &mdash; 100% free. The source is MIT-licensed on GitHub. If you'd like to support development you can leave a tip on Ko-fi.
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Do my files get uploaded anywhere?</summary>
+                        <div class="faq-body">
+                            No. Chipsound decodes modules entirely client-side using WebAssembly. Your files never leave your browser, just open the page and play.
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary>What file formats does it support?</summary>
+                        <div class="faq-body">
+                            Anything <code>libopenmpt</code> can decode: <code>.mod</code>, <code>.s3m</code>, <code>.xm</code>, <code>.it</code>, and their variants (MTM, STM, FAR, ULT, and more). If your tracker file plays in OpenMPT, it should play in Chipsound.
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Where can I find tracker music to play?</summary>
+                        <div class="faq-body">
+                            <a href="https://modarchive.org" target="_blank" rel="noopener">The Mod Archive</a> hosts over 200,000 free modules, including the demoscene classics from Purple Motion, Skaven, Necros, and the rest of the Future Crew / Renaissance crowd, among others. Download a module and drop it on the player.
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Does it work on mobile?</summary>
+                        <div class="faq-body">
+                            Yes. The UI is fully responsive and touch-friendly. Small screens show a compact column layout but every feature &mdash; playback, channel mute, theme switching, visualizations &mdash; works on phones and tablets.
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Can I add my own themes or visualizations?</summary>
+                        <div class="faq-body">
+                            Yes &mdash; themes are plain CSS files and visualizations are plain JS files. Drop a new file into <code>css/themes/</code> or <code>js/visualizations/</code> and it shows up automatically on the next load. No build step, no registration list to edit.
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SUPPORT / OPEN SOURCE ===== -->
+        <section class="block">
+            <div class="container">
+                <h2>// Free, open, supported by you</h2>
+                <p class="lead">
+                    Chipsound is free and will always be. It's built on the work of other open-source projects — libopenmpt (the OpenMPT team's reference decoder), Chiptune.js (the WebAudio bridge by DrSnuggles), and Font Awesome. If it brings you joy, you can give a little back.
+                </p>
+                <div class="support">
+                    <div class="support-card">
+                        <h3>★ Star it on GitHub</h3>
+                        <p>The source code is fully open. Read it, fork it, contribute themes and visualizations. Stars help discovery a lot.</p>
+                        <a class="btn btn-secondary" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">github.com/gamosoft/chipsound</a>
+                    </div>
+                    <div class="support-card">
+                        <h3>☕ Buy me a coffee</h3>
+                        <p>If Chipsound played back a <code>.mod</code> you hadn't heard since 1994, consider tossing a few euros at Ko-fi. No obligation, no paywall.</p>
+                        <a class="btn btn-secondary" href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">ko-fi.com/gamosoft</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="./player.html">Launch Player</a>
+            <a href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/gamosoft/chipsound/blob/main/LICENSE" target="_blank" rel="noopener">License (MIT)</a>
+            <a href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">Donate</a>
+            <a href="https://modarchive.org" target="_blank" rel="noopener">Find modules at The Mod Archive</a>
+        </div>
+        <p class="credit">
+            Made with <span class="heart">&#9829;</span> for the demoscene &nbsp;&middot;&nbsp; &copy; 2026 Gamosoft
+        </p>
+    </footer>
+
+    <!-- ===== Screenshot lightbox ===== -->
+    <dialog id="shotLightbox" class="lightbox" aria-label="Theme screenshot">
+        <button class="lightbox-btn lightbox-close" type="button" aria-label="Close" title="Close (Esc)">&times;</button>
+        <button class="lightbox-btn lightbox-prev" type="button" aria-label="Previous screenshot" title="Previous (←)">&lsaquo;</button>
+        <button class="lightbox-btn lightbox-next" type="button" aria-label="Next screenshot" title="Next (→)">&rsaquo;</button>
+        <figure class="lightbox-figure">
+            <img alt="">
+            <figcaption></figcaption>
+        </figure>
+    </dialog>
+
+    <script>
+        (function () {
+            const dlg = document.getElementById('shotLightbox');
+            if (!dlg || typeof dlg.showModal !== 'function') return;
+            const img = dlg.querySelector('.lightbox-figure img');
+            const cap = dlg.querySelector('.lightbox-figure figcaption');
+            const shots = Array.from(document.querySelectorAll('.shots .shot'));
+            let idx = 0;
+
+            function show(i) {
+                idx = (i + shots.length) % shots.length;
+                const srcImg = shots[idx].querySelector('img');
+                const srcCap = shots[idx].querySelector('figcaption');
+                img.src = srcImg.currentSrc || srcImg.src;
+                img.alt = srcImg.alt || '';
+                cap.textContent = srcCap ? srcCap.textContent : '';
+                if (!dlg.open) dlg.showModal();
+            }
+
+            shots.forEach((s, i) => {
+                s.tabIndex = 0;
+                s.setAttribute('role', 'button');
+                s.addEventListener('click', () => show(i));
+                s.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(i); }
+                });
+            });
+
+            dlg.querySelector('.lightbox-close').addEventListener('click', () => dlg.close());
+            dlg.querySelector('.lightbox-prev').addEventListener('click', () => show(idx - 1));
+            dlg.querySelector('.lightbox-next').addEventListener('click', () => show(idx + 1));
+            // Close when clicking outside the image: native dialog backdrop targets
+            // <dialog>, but our full-sized <figure> intercepts everything inside it,
+            // so we also accept clicks on the figure itself (image clicks have
+            // e.target = <img> and are ignored).
+            dlg.addEventListener('click', (e) => {
+                if (e.target === dlg || e.target.classList.contains('lightbox-figure')) {
+                    dlg.close();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (!dlg.open) return;
+                if (e.key === 'ArrowLeft')  show(idx - 1);
+                else if (e.key === 'ArrowRight') show(idx + 1);
+            });
+        })();
+    </script>
+</body>
+</html>

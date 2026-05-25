@@ -1,0 +1,138 @@
+# Chipsound
+
+[![GitHub Stars](https://img.shields.io/github/stars/gamosoft/chipsound)](https://github.com/gamosoft/chipsound/stargazers)
+[![License](https://img.shields.io/github/license/gamosoft/chipsound)](LICENSE)
+![Vanilla JS](https://img.shields.io/badge/JS-vanilla-yellow)
+
+<p align="center">
+  <img src="src/images/favicon.svg" alt="Chipsound" width="256">
+</p>
+
+## What is Chipsound?
+
+A lightweight in-browser player for the tracker music formats that powered the demoscene, the Amiga, and a generation of PC games (`.mod`, `.s3m`, `.xm`, `.it`). Open a URL or drop a module on the page and it plays. No install, no upload, no account. Everything runs client-side, every color is CSS, every visualization is real-time.
+
+Under the hood: Chipsound doesn't decode anything itself. [libopenmpt](https://lib.openmpt.org/libopenmpt/) (compiled to WebAssembly via [Chiptune.js](https://github.com/DrSnuggles/chiptune)) does the audio, and this project reads the playback state — channel volumes, current order/row, instrument data — to draw the pattern view, the off-thread per-channel visualizations, the mute/solo overlays, and the subsong picker. Add to that the themes, shareable `?load=<url>` links, keyboard shortcuts, and the performance work to keep everything running without glitching the audio.
+
+<p align="center">
+  <img src="docs/images/theme-skinplayer.jpg" alt="Skinplayer theme" title="Skinplayer" width="49%">
+  <img src="docs/images/theme-mixtape.jpg" alt="Mixtape theme" title="Mixtape" width="49%">
+  <br>
+  <img src="docs/images/theme-crt-green.jpg" alt="CRT Green theme" title="CRT Green" width="49%">
+  <img src="docs/images/theme-field-journal.jpg" alt="Field Journal theme" title="Field Journal" width="49%">
+</p>
+
+## Who is it for?
+
+- Demoscene fans revisiting Future Crew, Purple Motion, Skaven, Necros, and the rest of the crew
+- Retro gamers who remember when MS-DOS games shipped a `.s3m` soundtrack on the install disk
+- Tracker music collectors with a folder of `.mod` files that just need to play in one tab
+- Mobile listeners who want a tracker player that doesn't need an app store
+- Developers looking for a zero-dependency, themeable, embeddable player they can host themselves
+
+<p align="center">
+  <a href="https://chipsound.com"><img src="docs/images/website-button.svg" alt="chipsound.com" height="44"></a>
+  &nbsp;
+  <a href="https://chipsound.com/player.html"><img src="docs/images/player-button.svg" alt="Launch the player" height="44"></a>
+  &nbsp;
+  <a href="https://ko-fi.com/gamosoft"><img src="docs/images/support-button.svg" alt="Support on Ko-fi" height="44"></a>
+</p>
+
+## Why Chipsound?
+
+| | Chipsound | Other Players |
+|---|-----------|----------------|
+| Install | None — open the URL | Download + install, often Windows-only |
+| Formats | MOD, S3M, XM, IT | Often format-specific |
+| Mobile | Touch + responsive | Rarely |
+| Themes | Fully themeable via CSS | Usually fixed |
+| Visualizations | Real-time, per-channel | Limited or none |
+| Privacy | All client-side | Varies |
+| Cost | Free | Free or paid |
+| Open-source | MIT | Mixed |
+
+Other things worth mentioning:
+
+- Plays anything libopenmpt can decode (MOD, S3M, XM, IT and their variants)
+- Drag a module onto the page and it auto-plays
+- Press `T` to cycle themes, `V` to cycle visualizations
+- Click a channel header to mute it; Ctrl-click to solo
+- Subsong picker for modules that ship multiple subsongs
+- `?` opens the full keyboard shortcut list
+
+## Quick start
+
+**Try it now:** [chipsound.com/player.html](https://chipsound.com/player.html) to jump straight to the player.
+
+Drop a `.mod`, `.s3m`, `.xm`, or `.it` file on the page and it plays. Tens of thousands of free tracker modules are at [The Mod Archive](https://modarchive.org).
+
+### Run it locally
+
+The app is pure static HTML/CSS/JS in [`src/`](src/). Browsers require `AudioWorklet`s to be served over HTTP (not `file://`), so pick any static server:
+
+```bash
+# Python 3
+cd src && python -m http.server 8765
+
+# Node + npx
+npx http-server src -p 8765 -c-1
+
+# Docker + Caddy
+docker build -t chipsound . && docker run --rm -p 8765:80 chipsound
+```
+
+Then open <http://localhost:8765/>.
+
+> Python's server caches aggressively. Hard-reload with `Ctrl + Shift + R`, or use `npx http-server -c-1` which sets `Cache-Control: no-store`.
+
+### Load a module by URL
+
+The player accepts a `?load=<url>` query parameter pointing to any HTTP(S) URL:
+
+```text
+https://chipsound.com/player.html?load=./tracks/awesome.s3m
+https://chipsound.com/player.html?load=https://example.com/cool.mod
+https://chipsound.com/player.html?load=https%3A%2F%2Fapi.modarchive.org%2Fdownloads.php%3Fmoduleid%3D212083
+```
+
+> **Loading from The Mod Archive.** Modarchive's `downloads.php` endpoint sends the right CORS headers and works directly, but the `?` inside the inner URL must be percent-encoded (`%3F`), otherwise the outer query parser splits the URL in two:
+
+
+## Keyboard shortcuts
+
+| Key | Action |
+|---|---|
+| `Space` / `P` | Play / Pause |
+| `S` | Stop |
+| `L` | Open file… |
+| `←` / `→` | Previous / next order |
+| `E` | Toggle effects (visualizations on/off) |
+| `V` | Cycle visualization |
+| `I` | Toggle samples panel |
+| `T` | Cycle theme |
+| `?` | Show this help |
+| `Esc` | Close this help |
+| Click header | Toggle channel mute |
+| Ctrl + Click header | Solo channel (mute others) |
+| Click grip icon in header | Toggle ALL channels |
+| Drop file | Load and auto-play |
+
+## License
+
+[MIT-licensed](LICENSE) — free to use, modify, fork, embed, and redistribute. Copyright © 2026 Gamosoft.
+
+The MIT license covers first-party code only. Bundled third-party components keep their own licenses:
+
+- **libopenmpt** — BSD-3-Clause. See [`docs/third-party/libopenmpt-LICENSE.txt`](docs/third-party/libopenmpt-LICENSE.txt).
+- **Chiptune.js** — MIT. See [`docs/third-party/chiptune-js-LICENSE.txt`](docs/third-party/chiptune-js-LICENSE.txt).
+- **Font Awesome Free 6.5.1** — Icons CC BY 4.0, fonts SIL OFL 1.1, code MIT. See [`docs/third-party/font-awesome-LICENSE.txt`](docs/third-party/font-awesome-LICENSE.txt).
+
+Full notice summary in [`NOTICE`](NOTICE).
+
+## Credits
+
+Chipsound is a UI shell on top of other open-source work:
+
+- **[libopenmpt](https://lib.openmpt.org/libopenmpt/)** — the OpenMPT team's reference decoder, compiled to WebAssembly.
+- **[Chiptune.js](https://github.com/DrSnuggles/chiptune)** — the WebAudio wrapper around libopenmpt by DrSnuggles (and originally [chiptune2.js](https://github.com/deskjet/chiptune2.js) by deskjet).
+- **[Font Awesome](https://fontawesome.com)** — the icon set used throughout the UI.

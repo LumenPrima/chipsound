@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="44" viewBox="0 0 220 44" role="img" aria-label="chipsound.com">
+    <rect x="1" y="1" width="218" height="42" rx="8" fill="#050a07" stroke="#00ff88" stroke-width="1.5"/>
+    <g transform="translate(11, 10)">
+        <rect x="0" y="5" width="4" height="2.5" rx="0.5" fill="#2e5a3f"/>
+        <rect x="0" y="11" width="4" height="2.5" rx="0.5" fill="#2e5a3f"/>
+        <rect x="0" y="17" width="4" height="2.5" rx="0.5" fill="#2e5a3f"/>
+        <rect x="20" y="5" width="4" height="2.5" rx="0.5" fill="#2e5a3f"/>
+        <rect x="20" y="11" width="4" height="2.5" rx="0.5" fill="#2e5a3f"/>
+        <rect x="20" y="17" width="4" height="2.5" rx="0.5" fill="#2e5a3f"/>
+        <rect x="4" y="2" width="16" height="20" rx="3" fill="#050a07" stroke="#00ff88" stroke-width="1.6"/>
+        <path d="M 7 14 L 10 14 L 10 10 L 13 10 L 13 14 L 16 14 L 16 10 L 19 10"
+              stroke="#00ff88" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="46" y="28" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#00ff88">chipsound.com</text>
+</svg>

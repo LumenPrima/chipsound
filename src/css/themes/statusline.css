@@ -1,0 +1,73 @@
+/* Statusline + hero tracker — Vim-statusline-style info row, thin control ribbon. */
+
+:root.theme-statusline {
+    --theme-name: "Statusline";
+}
+
+:root.theme-statusline .app { gap: 8px; padding: 8px 16px; }
+:root.theme-statusline .app-header h1 { font-size: 1rem; letter-spacing: 2px; color: #9ca3af; }
+
+:root.theme-statusline .mod-info {
+    background: #1a1f2b;
+    border: 1px solid #2a2f3b;
+    border-radius: 4px;
+    padding: 6px 12px;
+    gap: 0;
+    font-family: monospace;
+    font-size: 12px;
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+:root.theme-statusline .mod-info-box {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0 10px 0 0;
+    min-width: 0;
+    flex: 0 0 auto;
+    text-align: left;
+    color: #e5e7eb;
+    font-size: 12px;
+    transition: none;
+}
+:root.theme-statusline .mod-info-box:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: transparent;
+}
+:root.theme-statusline .mod-info-box span {
+    display: inline;
+    color: #4ade80;
+    font-weight: normal;
+    margin-right: 6px;
+}
+:root.theme-statusline .mod-info-box span::after { content: ':'; color: #6b7280; }
+:root.theme-statusline .mod-info-box > div {
+    display: inline;
+    color: #f9fafb;
+}
+:root.theme-statusline .mod-info-box + .mod-info-box {
+    border-left: 1px solid #2a2f3b;
+    padding-left: 10px;
+}
+
+/* Icon-only buttons: font-size: 0 collapses text nodes + label spans; <i>
+   restores its own size. Height stays unset so `.controls` align-items:
+   stretch matches the tallest sibling (dropdowns). */
+:root.theme-statusline .controls { gap: 4px; }
+:root.theme-statusline .retro-button {
+    width: 32px;
+    min-height: 28px;
+    padding: 0;
+    gap: 0;
+    font-size: 0;
+    box-shadow: 1px 1px 0 #000;
+    flex: 0 0 auto;
+}
+:root.theme-statusline .retro-button > i { font-size: 12px; }
+:root.theme-statusline .controls > #toggle-visualizations,
+:root.theme-statusline .controls > .volume-control {
+    margin-left: 12px;
+}
+
+:root.theme-statusline .tracker-container { flex: 1 1 auto; }

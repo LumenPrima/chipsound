@@ -1,0 +1,45 @@
+Third-Party Notices
+===================
+
+This product is licensed under MIT (see /LICENSE) and includes software
+developed by the following third parties. Each component below remains
+under its own license; reproduce the matching license text from
+/docs/third-party/ whenever this software is redistributed.
+
+
+1. libopenmpt
+-------------
+
+   Upstream:  https://lib.openmpt.org/libopenmpt/
+   Bundled as: src/js/libopenmpt.worklet.js
+   License:   BSD-3-Clause
+
+   Copyright (c) 2004-2026, OpenMPT Project Developers and Contributors
+   Copyright (c) 1997-2003, Olivier Lapicque
+
+   Full text: /docs/third-party/libopenmpt-LICENSE.txt
+
+
+2. Chiptune.js (chiptune2.js / chiptune3.js)
+---------------------------------------------
+
+   Upstream:  https://github.com/DrSnuggles/chiptune
+              https://github.com/deskjet/chiptune2.js
+   Bundled as: src/js/chiptune3.js, src/js/chiptune3.worklet.js
+   License:   MIT (X11)
+
+   Copyright (c) 2013-2017 The chiptune2.js contributors.
+
+   Full text: /docs/third-party/chiptune-js-LICENSE.txt
+
+
+3. Font Awesome Free 6.5.1
+---------------------------
+
+   Upstream:   https://fontawesome.com
+   Bundled as: src/css/fontawesome/ (self-hosted, solid family only)
+   License:    Icons CC BY 4.0 · Fonts SIL OFL 1.1 · Code MIT
+
+   Copyright (c) Fonticons, Inc.
+
+   Full text: /docs/third-party/font-awesome-LICENSE.txt

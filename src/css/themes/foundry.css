@@ -1,0 +1,285 @@
+/* Foundry — industrial-brutalist concrete with safety-orange accents.
+   Samples sit to the LEFT of the tracker. */
+
+:root.theme-foundry {
+    --theme-name: "Foundry";
+
+    --accent: #ff6a00;
+
+    --viz-primary:   #ff6a00;
+    --viz-secondary: #d4d4d4;
+    --viz-glow:      rgba(255, 106, 0, 0.45);
+    --viz-grid:      rgba(212, 212, 212, 0.5);
+    --viz-grid-soft: rgba(212, 212, 212, 0.22);
+    --viz-vol-cold:  60,  60,  60;
+    --viz-vol-mid: 212, 212, 212;
+    --viz-vol-hot: 255, 106,   0;
+
+    --vu-low:  #6a9e6a;
+    --vu-mid:  #ffb84a;
+    --vu-high: #ff3a1a;
+
+    --tracker-bg            : #2a2a2a;
+    --tracker-bg-alt        : #1a1a1a;
+    --tracker-row-highlight : #4a2a0a;
+    --tracker-fg            : #e8e8e8;
+    --tracker-note          : #d4d4d4;
+    --tracker-sample        : #ffb84a;
+    --tracker-volume        : #ff6a00;
+    --tracker-effect        : #a8a8a8;
+}
+
+:root.theme-foundry body {
+    background: #5a5a5a;
+    color: #e8e8e8;
+    font-family: "Impact", "Arial Black", "Helvetica Neue", sans-serif;
+    min-height: 100vh;
+}
+/* Concrete texture. */
+:root.theme-foundry body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 13% 27%, rgba(255,255,255,0.04) 0 2px, transparent 2px),
+        radial-gradient(circle at 67% 71%, rgba(0,0,0,0.06) 0 1px, transparent 1px),
+        radial-gradient(circle at 89% 19%, rgba(0,0,0,0.04) 0 2px, transparent 2px);
+    background-size: 11px 11px, 7px 7px, 17px 17px;
+    z-index: 0;
+}
+
+:root.theme-foundry .app {
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    gap: 0;
+}
+
+/* Hazard-tape stripe + masthead. */
+:root.theme-foundry .app-header {
+    position: relative;
+    background: #1a1a1a;
+    color: #ff6a00;
+    padding: 26px 24px 14px;
+    margin: 0;
+    border-bottom: 4px solid #ff6a00;
+}
+:root.theme-foundry .app-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 14px;
+    background:
+        repeating-linear-gradient(135deg,
+            #ff6a00 0,
+            #ff6a00 18px,
+            #1a1a1a 18px,
+            #1a1a1a 36px);
+}
+:root.theme-foundry .app-header h1 {
+    color: #ff6a00;
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-weight: 900;
+    font-size: 2.4rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin: 0;
+}
+:root.theme-foundry .app-header::after {
+    content: "// STRUCTURAL  /  BILL OF MATERIALS  /  REV. 04";
+    display: block;
+    margin-top: 2px;
+    color: #d4d4d4;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* Mod-info: gauge-cluster boxes. */
+:root.theme-foundry .mod-info {
+    background: #1a1a1a;
+    border-bottom: 1px solid #5a5a5a;
+    border-radius: 0;
+    padding: 12px 24px;
+    gap: 0;
+}
+:root.theme-foundry .mod-info-box {
+    background: #2a2a2a;
+    border: 1px solid #0a0a0a;
+    border-radius: 0;
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.06);
+    padding: 8px 12px;
+    text-align: left;
+    transition: none;
+    color: #ffb84a;
+    font-family: "Consolas", monospace;
+    font-size: 13px;
+    font-weight: bold;
+    min-width: 110px;
+    flex: 0 1 auto;
+}
+:root.theme-foundry .mod-info-box:hover { transform: none; background: #2a2a2a; border-color: #0a0a0a; }
+:root.theme-foundry .mod-info-box + .mod-info-box { border-left: none; }
+:root.theme-foundry .mod-info-box span {
+    color: #ff6a00;
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-size: 9px;
+    font-weight: normal;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+/* Controls — foreman's toolbar. */
+:root.theme-foundry .controls {
+    background: #0a0a0a;
+    border-bottom: 1px solid #5a5a5a;
+    border-radius: 0;
+    padding: 8px 24px;
+    gap: 4px;
+}
+
+:root.theme-foundry .retro-button {
+    background: #2a2a2a;
+    color: #e8e8e8;
+    border: 1px solid #0a0a0a;
+    border-radius: 0;
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-weight: normal;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.06);
+    transition: none;
+}
+:root.theme-foundry .retro-button:hover {
+    background: #ff6a00;
+    color: #1a1a1a;
+    transform: none;
+}
+:root.theme-foundry .retro-button:disabled { opacity: 0.3; }
+:root.theme-foundry .retro-button[aria-pressed="true"] {
+    background: #ff6a00;
+    color: #1a1a1a;
+}
+:root.theme-foundry #play.playing { background: #ff3a1a; color: #1a1a1a; }
+
+:root.theme-foundry .retro-select,
+:root.theme-foundry .subsong-control,
+:root.theme-foundry .viz-control,
+:root.theme-foundry .theme-control,
+:root.theme-foundry .volume-control {
+    background: #2a2a2a;
+    border: 1px solid #0a0a0a;
+    border-radius: 0;
+    color: #e8e8e8;
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+:root.theme-foundry .retro-select option {
+    background: #2a2a2a;
+    color: #e8e8e8;
+}
+
+:root.theme-foundry input[type="range"] { accent-color: #ff6a00; }
+
+/* Tracker container. */
+:root.theme-foundry .tracker-container {
+    background: #1a1a1a;
+    border: none;
+    border-radius: 0;
+    padding: 16px 24px;
+    gap: 16px;
+}
+/* Samples on the LEFT. `:not(.samples-hidden)` on :root catches the preboot
+   class so the pane doesn't flash in on load. `grid-auto-flow: dense` is
+   required because .sample-section is the 2nd DOM child pinned to col 1. */
+:root.theme-foundry:not(.samples-hidden) .tracker-container {
+    grid-template-columns: minmax(160px, 22%) 1fr;
+    grid-auto-flow: dense;
+}
+:root.theme-foundry:not(.samples-hidden) .tracker-container .sample-section { grid-column: 1; grid-row: 1; }
+:root.theme-foundry:not(.samples-hidden) .tracker-container .tracker-main { grid-column: 2; grid-row: 1; min-width: 0; }
+
+:root.theme-foundry .tracker-header {
+    background: #0a0a0a;
+    border-bottom: 2px solid #ff6a00;
+    border-radius: 0;
+    padding: 0;
+}
+:root.theme-foundry .channel-header {
+    background: #0a0a0a;
+    color: #ff6a00;
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-weight: normal;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-right: 1px solid #5a5a5a;
+}
+:root.theme-foundry .channel-header:last-child { border-right: none; }
+:root.theme-foundry .channel-header:hover { background: #ff6a00; color: #0a0a0a; }
+
+:root.theme-foundry .tracker-grid {
+    background: #1a1a1a;
+    border-radius: 0;
+}
+:root.theme-foundry .channel-cell {
+    background: transparent;
+    color: #e8e8e8;
+    font-family: "Consolas", "Courier New", monospace;
+    border-right: 1px solid #2a2a2a;
+}
+:root.theme-foundry .row-label {
+    background: #0a0a0a;
+    color: #ffb84a;
+    font-family: "Consolas", monospace;
+    font-weight: bold;
+    border-right: 2px solid #ff6a00;
+}
+:root.theme-foundry .channel-cell.row-current,
+:root.theme-foundry .row-label.row-current {
+    background: #ff6a00;
+    color: #0a0a0a;
+}
+
+/* Samples — rebar/BOM sidebar. */
+:root.theme-foundry .sample-section { padding-left: 0; }
+:root.theme-foundry .sample-list {
+    background: #0a0a0a;
+    border: 1px solid #ff6a00;
+    border-radius: 0;
+    padding: 8px;
+    scrollbar-color: #ff6a00 #1a1a1a;
+}
+:root.theme-foundry .sample-list::before {
+    content: "■ MATERIALS";
+    display: block;
+    padding: 4px 6px 8px;
+    margin-bottom: 6px;
+    border-bottom: 2px solid #ff6a00;
+    color: #ff6a00;
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+:root.theme-foundry .sample-item {
+    background: transparent;
+    color: #d4d4d4;
+    font-family: "Consolas", monospace;
+    font-size: 12px;
+    border-bottom: 1px solid #2a2a2a;
+    border-radius: 0;
+    padding: 4px 6px;
+}
+:root.theme-foundry .sample-item:hover { background: #2a2a2a; color: #ffb84a; }
+:root.theme-foundry .sample-item.highlighted {
+    background: #ff6a00;
+    color: #0a0a0a;
+}

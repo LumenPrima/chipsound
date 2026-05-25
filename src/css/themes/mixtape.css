@@ -1,0 +1,298 @@
+/* Mixtape — compact cassette J-card on a wood-grain desk. */
+
+:root.theme-mixtape {
+    --theme-name: "Mixtape";
+
+    --accent: #c5343a;
+
+    --viz-primary:   #c5343a;
+    --viz-secondary: #d4982a;
+    --viz-glow:      rgba(197, 52, 58, 0.4);
+    --viz-grid:      rgba(60, 40, 25, 0.4);
+    --viz-grid-soft: rgba(60, 40, 25, 0.2);
+    /* Deep warm-brown ink — default white viz-ink disappears on cream. */
+    --viz-ink:       #3c2819;
+    --viz-vol-cold: 150, 130, 100;
+    --viz-vol-mid:  212, 152,  42;
+    --viz-vol-hot:  197,  52,  58;
+
+    --vu-low:  #4e7a3a;
+    --vu-mid:  #d4982a;
+    --vu-high: #c5343a;
+
+    --tracker-bg            : #f4e9d1;
+    --tracker-bg-alt        : #e6d6b3;
+    --tracker-row-highlight : #d9b97a;
+    --tracker-fg            : #2b2419;
+    --tracker-note          : #1f3a6e;
+    --tracker-sample        : #5a3a1a;
+    --tracker-volume        : #a0224a;
+    --tracker-effect        : #2a4a2a;
+}
+
+/* Wood-grain desk. */
+:root.theme-mixtape body {
+    background:
+        linear-gradient(135deg, #8a5a3a 0%, #6a4426 100%);
+    color: #2b2419;
+    font-family: "Georgia", "Times New Roman", serif;
+}
+/* Paper grain inside .app so the wood-grain desk shows through the edges. */
+:root.theme-mixtape .app::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 23% 47%, rgba(60,40,25,0.07) 0 1px, transparent 1px),
+        radial-gradient(circle at 71% 29%, rgba(60,40,25,0.05) 0 1px, transparent 1px),
+        radial-gradient(circle at 12% 81%, rgba(60,40,25,0.04) 0 1px, transparent 1px);
+    background-size: 9px 9px, 13px 13px, 19px 19px;
+    z-index: 0;
+    border-radius: 4px;
+}
+
+/* J-card body — grid places transport on the bottom without DOM reorder. */
+:root.theme-mixtape .app {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+        "header"
+        "info"
+        "tracker"
+        "controls";
+    gap: 0;
+    padding: 18px;
+    background: #f4e9d1;
+    box-shadow:
+        inset 0 0 0 1px #2b2419,
+        inset 0 0 0 2px #f4e9d1,
+        inset 0 0 0 3px #2b2419,
+        12px 12px 32px rgba(0, 0, 0, 0.5);
+    max-width: 1600px;
+    margin: 16px auto;
+    height: calc(100vh - 32px);
+    border-radius: 4px;
+}
+:root.theme-mixtape .app-header        { grid-area: header; position: relative; z-index: 1; }
+:root.theme-mixtape .mod-info          { grid-area: info; position: relative; z-index: 1; }
+:root.theme-mixtape .tracker-container { grid-area: tracker; min-height: 0; position: relative; z-index: 1; }
+:root.theme-mixtape .controls          { grid-area: controls; position: relative; z-index: 1; }
+
+/* Header = SIDE A stamp + cassette title. */
+:root.theme-mixtape .app-header {
+    border-bottom: 2px solid #2b2419;
+    padding: 0 0 4px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+:root.theme-mixtape .app-header h1 {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 1.4rem;
+    color: #2b2419;
+    letter-spacing: 0.5px;
+}
+:root.theme-mixtape .app-header::after {
+    content: "SIDE A  ·  TYPE II HIGH BIAS  ·  NR";
+    color: #c5343a;
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-weight: bold;
+    font-size: 10px;
+    letter-spacing: 3px;
+    padding: 2px 8px;
+    border: 1.5px solid #c5343a;
+    border-radius: 1px;
+}
+
+/* Mod-info — handwritten label fields. */
+:root.theme-mixtape .mod-info {
+    background: #efddb8;
+    border: 1.5px solid #2b2419;
+    border-radius: 2px;
+    padding: 10px 14px;
+    gap: 6px 24px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 0 #c0a070;
+}
+:root.theme-mixtape .mod-info-box {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    text-align: left;
+    transition: none;
+    color: #1f3a6e;
+    font-family: "Bradley Hand", "Comic Sans MS", "Marker Felt", cursive;
+    font-size: 15px;
+    min-width: 110px;
+}
+:root.theme-mixtape .mod-info-box:hover { transform: none; background: transparent; border-color: transparent; }
+:root.theme-mixtape .mod-info-box span {
+    display: block;
+    color: #6a5028;
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 1px;
+}
+:root.theme-mixtape .mod-info-box > div {
+    border-bottom: 1px solid #8a7050;
+    padding-bottom: 1px;
+}
+
+/* Tracker = J-card insert. */
+:root.theme-mixtape .tracker-container {
+    background: #f4e9d1;
+    border: 1.5px solid #2b2419;
+    border-radius: 2px;
+    padding: 0;
+    gap: 0;
+}
+
+:root.theme-mixtape .tracker-header {
+    background: #2b2419;
+    border-radius: 0;
+    padding: 0;
+}
+:root.theme-mixtape .channel-header {
+    background: #2b2419;
+    color: #f4e9d1;
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-weight: bold;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-right: 1px solid #f4e9d1;
+}
+:root.theme-mixtape .channel-header:last-child { border-right: none; }
+:root.theme-mixtape .channel-header:hover { background: #c5343a; }
+
+:root.theme-mixtape .tracker-grid {
+    background: #f4e9d1;
+    border-radius: 0;
+}
+:root.theme-mixtape .channel-cell {
+    background: #f4e9d1;
+    color: #2b2419;
+    font-family: "Courier New", monospace;
+    border-right: 1px dotted #8a7050;
+    border-bottom: 1px solid rgba(60, 40, 25, 0.04);
+}
+:root.theme-mixtape .row-label {
+    background: #e6d6b3;
+    color: #6a5028;
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-weight: bold;
+    border-right: 1.5px solid #2b2419;
+}
+:root.theme-mixtape .channel-cell.row-current,
+:root.theme-mixtape .row-label.row-current {
+    background: #d9b97a;
+    color: #2b2419;
+}
+
+/* Samples = B-side track index. */
+:root.theme-mixtape .sample-section { padding-left: 0; border-left: 1.5px solid #2b2419; }
+:root.theme-mixtape .sample-list {
+    background: #e6d6b3;
+    border: none;
+    border-radius: 0;
+    padding: 8px;
+}
+:root.theme-mixtape .sample-list::before {
+    content: "B-SIDE";
+    display: block;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 2px solid #2b2419;
+    font-family: "Helvetica", "Arial", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #c5343a;
+}
+:root.theme-mixtape .sample-item {
+    background: transparent;
+    color: #1f3a6e;
+    font-family: "Bradley Hand", "Comic Sans MS", "Marker Felt", cursive;
+    font-size: 14px;
+    border-bottom: 1px solid #b8987a;
+    border-radius: 0;
+    padding: 3px 4px;
+}
+:root.theme-mixtape .sample-item:hover { background: rgba(197, 52, 58, 0.12); }
+:root.theme-mixtape .sample-item.highlighted {
+    background: #c5343a;
+    color: #f4e9d1;
+}
+
+/* Controls — bottom-edge transport keys. */
+:root.theme-mixtape .controls {
+    background: #1a1612;
+    border: 1.5px solid #2b2419;
+    border-top: 3px solid #c5343a;
+    border-radius: 0 0 2px 2px;
+    padding: 10px 14px;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+:root.theme-mixtape .retro-button {
+    background: linear-gradient(180deg, #3a3026 0%, #1a1612 100%);
+    color: #f4e9d1;
+    border: 1px solid #050300;
+    border-radius: 2px;
+    font-family: "Helvetica", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 5px 8px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 2px 0 #050300;
+    transition: none;
+}
+:root.theme-mixtape .retro-button:hover {
+    background: linear-gradient(180deg, #4a3e30 0%, #2a2218 100%);
+    transform: none;
+}
+:root.theme-mixtape .retro-button:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+:root.theme-mixtape .retro-button:disabled { opacity: 0.4; }
+:root.theme-mixtape #play.playing {
+    background: linear-gradient(180deg, #d4982a 0%, #8a6018 100%);
+    color: #1a1612;
+}
+
+:root.theme-mixtape .retro-select,
+:root.theme-mixtape .subsong-control,
+:root.theme-mixtape .viz-control,
+:root.theme-mixtape .theme-control,
+:root.theme-mixtape .volume-control {
+    background: linear-gradient(180deg, #3a3026 0%, #1a1612 100%);
+    border: 1px solid #050300;
+    border-radius: 2px;
+    color: #f4e9d1;
+    font-family: "Helvetica", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 2px 0 #050300;
+}
+:root.theme-mixtape .retro-select { background: transparent; border: none; box-shadow: none; color: inherit; padding: 4px 8px; }
+:root.theme-mixtape .retro-select option { background: #1a1612; color: #f4e9d1; }
+
+:root.theme-mixtape input[type="range"] { accent-color: #c5343a; }

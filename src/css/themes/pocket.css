@@ -1,0 +1,278 @@
+/* Pocket — 4-color reflective-LCD handheld inside a plastic shell. */
+
+:root.theme-pocket {
+    --theme-name: "Pocket";
+
+    /* 4-tone olive-LCD palette: 1 = paper, 4 = ink. */
+    --pocket-1: #c7d28a;
+    --pocket-2: #8aa05a;
+    --pocket-3: #4f6630;
+    --pocket-4: #1d2a10;
+
+    --accent: #4f6630;
+
+    --viz-primary:   #1d2a10;
+    --viz-secondary: #4f6630;
+    --viz-glow:      rgba(29, 42, 16, 0.55);
+    --viz-grid:      rgba(79, 102, 48, 0.5);
+    --viz-grid-soft: rgba(79, 102, 48, 0.22);
+    /* Deep forest ink — default white viz-ink disappears on the olive tracker-bg. */
+    --viz-ink:       #2a3a1a;
+    --viz-vol-cold: 138, 160,  90;
+    --viz-vol-mid:   79, 102,  48;
+    --viz-vol-hot:   29,  42,  16;
+
+    --vu-low:  #8aa05a;
+    --vu-mid:  #4f6630;
+    --vu-high: #1d2a10;
+
+    --tracker-bg            : #c7d28a;
+    --tracker-bg-alt        : #b8c47a;
+    --tracker-row-highlight : #8aa05a;
+    --tracker-fg            : #1d2a10;
+    --tracker-note          : #1d2a10;
+    --tracker-sample        : #4f6630;
+    --tracker-volume        : #1d2a10;
+    --tracker-effect        : #4f6630;
+}
+
+/* Plastic shell. */
+:root.theme-pocket body {
+    background:
+        radial-gradient(ellipse at top, #c8a89e 0%, #9a8074 60%, #6a5a52 100%);
+    color: #1d2a10;
+    font-family: "Verdana", "Geneva", sans-serif;
+    min-height: 100vh;
+}
+
+:root.theme-pocket .app {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+        "header"
+        "info"
+        "tracker"
+        "info2"
+        "controls";
+    gap: 8px;
+    padding: 22px 28px 28px;
+    background:
+        linear-gradient(180deg, #d4c8c0 0%, #b8a89e 50%, #8a7a72 100%);
+    margin: 14px auto;
+    max-width: 1500px;
+    height: calc(100vh - 28px);
+    border: 1px solid #4a3a32;
+    border-radius: 24px 24px 80px 24px;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+        0 12px 32px rgba(0, 0, 0, 0.5);
+}
+:root.theme-pocket .app-header        { grid-area: header; }
+:root.theme-pocket .mod-info          { grid-area: info; }
+:root.theme-pocket .tracker-container { grid-area: tracker; min-height: 0; }
+:root.theme-pocket .controls          { grid-area: controls; }
+
+/* Header silkscreen. */
+:root.theme-pocket .app-header {
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+    padding: 0 0 6px;
+}
+:root.theme-pocket .app-header h1 {
+    color: #4a3a32;
+    font-family: "Verdana", sans-serif;
+    font-weight: bold;
+    font-size: 1rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Mod-info — battery/model status strip. */
+:root.theme-pocket .mod-info {
+    background: rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    padding: 6px 10px;
+    gap: 0 18px;
+    color: #1d2a10;
+    font-family: "Verdana", sans-serif;
+}
+:root.theme-pocket .mod-info-box {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    text-align: left;
+    transition: none;
+    color: #4a3a32;
+    font-family: "Verdana", sans-serif;
+    font-weight: bold;
+    font-size: 11px;
+    min-width: 90px;
+}
+:root.theme-pocket .mod-info-box:hover { transform: none; background: transparent; border-color: transparent; }
+:root.theme-pocket .mod-info-box span {
+    display: block;
+    color: rgba(74, 58, 50, 0.7);
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 1px;
+}
+
+/* Tracker = LCD screen inset. */
+:root.theme-pocket .tracker-container {
+    background: #c7d28a;
+    border: 2px solid #1d2a10;
+    border-radius: 6px;
+    padding: 6px;
+    gap: 6px;
+    box-shadow:
+        inset 0 0 0 2px #4a3a32,
+        inset 0 0 0 6px #c7d28a,
+        inset 4px 4px 8px rgba(29, 42, 16, 0.18);
+}
+
+:root.theme-pocket .tracker-header {
+    background: #b8c47a;
+    border-radius: 2px;
+    padding: 0;
+}
+:root.theme-pocket .channel-header {
+    background: #b8c47a;
+    color: #1d2a10;
+    font-family: "Verdana", sans-serif;
+    font-weight: bold;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-right: 1px solid #4f6630;
+}
+:root.theme-pocket .channel-header:last-child { border-right: none; }
+:root.theme-pocket .channel-header:hover { background: #8aa05a; }
+
+:root.theme-pocket .tracker-grid {
+    background: #c7d28a;
+    border-radius: 2px;
+}
+:root.theme-pocket .channel-cell {
+    background: transparent;
+    color: #1d2a10;
+    font-family: "Consolas", monospace;
+    border-right: 1px dotted rgba(29, 42, 16, 0.18);
+}
+:root.theme-pocket .row-label {
+    background: #b8c47a;
+    color: #4f6630;
+    font-family: "Consolas", monospace;
+    font-weight: bold;
+    border-right: 1px solid #4f6630;
+}
+:root.theme-pocket .channel-cell.row-current,
+:root.theme-pocket .row-label.row-current {
+    background: #1d2a10;
+    color: #c7d28a;
+}
+
+/* Samples = cartridge label panel. */
+:root.theme-pocket .sample-section { padding-left: 0; }
+:root.theme-pocket .sample-list {
+    background: #efe4d2;
+    border: 2px solid #1d2a10;
+    border-radius: 3px;
+    padding: 6px 8px;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        2px 2px 0 #4a3a32;
+}
+:root.theme-pocket .sample-list::before {
+    content: "▮ CART";
+    display: block;
+    padding: 4px 6px;
+    margin: -4px -6px 6px;
+    background: #d4583a;
+    color: #efe4d2;
+    font-family: "Verdana", sans-serif;
+    font-weight: bold;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+}
+:root.theme-pocket .sample-item {
+    background: transparent;
+    color: #1d2a10;
+    font-family: "Verdana", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #b8a89e;
+    border-radius: 0;
+    padding: 3px 4px;
+}
+:root.theme-pocket .sample-item:hover { background: rgba(212, 88, 58, 0.15); }
+:root.theme-pocket .sample-item.highlighted { background: #d4583a; color: #efe4d2; }
+
+/* Controls — bottom button cluster. */
+:root.theme-pocket .controls {
+    background: transparent;
+    border-radius: 0;
+    padding: 8px 0 0;
+    gap: 8px;
+    justify-content: center;
+}
+
+:root.theme-pocket .retro-button {
+    background:
+        radial-gradient(circle at 30% 30%, #d4583a 0%, #8a3018 80%);
+    color: #efe4d2;
+    border: 1px solid #4a1a08;
+    border-radius: 999px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    gap: 0;
+    font-size: 0;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+        2px 2px 0 rgba(0, 0, 0, 0.45);
+    transition: none;
+}
+:root.theme-pocket .retro-button > i { font-size: 14px; }
+:root.theme-pocket .retro-button:hover { transform: translate(-1px, -1px); }
+:root.theme-pocket .retro-button:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+:root.theme-pocket .retro-button:disabled { opacity: 0.4; }
+:root.theme-pocket #play.playing {
+    background: radial-gradient(circle at 30% 30%, #6ad04f 0%, #2a6018 80%);
+    color: #efe4d2;
+}
+
+:root.theme-pocket .retro-select,
+:root.theme-pocket .subsong-control,
+:root.theme-pocket .viz-control,
+:root.theme-pocket .theme-control,
+:root.theme-pocket .volume-control {
+    background: radial-gradient(circle at 30% 30%, #d4583a 0%, #8a3018 80%);
+    color: #efe4d2;
+    border: 1px solid #4a1a08;
+    border-radius: 999px;
+    font-family: "Verdana", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+        2px 2px 0 rgba(0, 0, 0, 0.45);
+    padding: 4px 14px;
+}
+:root.theme-pocket .retro-select { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+:root.theme-pocket .retro-select option { background: #efe4d2; color: #2a1408; }
+
+:root.theme-pocket input[type="range"] { accent-color: #d4583a; }

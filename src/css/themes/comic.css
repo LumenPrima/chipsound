@@ -1,0 +1,162 @@
+/* Comic book — primary colors, halftone dots, heavy outlines, action bursts. */
+
+:root.theme-comic {
+    --theme-name: "Comic Book";
+
+    --comic-red:    #d62828;
+    --comic-blue:   #1d4ed8;
+    --comic-yellow: #facc15;
+    --comic-paper:  #fff5b1;
+    --comic-ink:    #0a0a0a;
+
+    --accent: var(--comic-red);
+
+    --viz-primary:   var(--comic-red);
+    --viz-secondary: var(--comic-blue);
+    --viz-glow:      rgba(214, 40, 40, 0.5);
+    --viz-grid:      rgba(10, 10, 10, 0.4);
+    --viz-grid-soft: rgba(10, 10, 10, 0.18);
+
+    --viz-canvas-bg: var(--comic-paper);
+    --viz-ink:       var(--comic-ink);
+
+    --viz-vol-cold:  29,  78, 216;
+    --viz-vol-mid:   250, 204,  21;
+    --viz-vol-hot:   214,  40,  40;
+
+    --vu-low:  var(--comic-blue);
+    --vu-mid:  var(--comic-yellow);
+    --vu-high: var(--comic-red);
+
+    --tracker-bg            : var(--comic-paper);
+    --tracker-bg-alt        : #ffe680;
+    --tracker-row-highlight : var(--comic-yellow);
+    --tracker-fg            : var(--comic-ink);
+    --tracker-note          : var(--comic-red);
+    --tracker-sample        : var(--comic-blue);
+    --tracker-volume        : #b91c1c;
+    --tracker-effect        : var(--comic-ink);
+}
+
+:root.theme-comic body {
+    background:
+        /* Halftone dots, scaled small */
+        radial-gradient(circle, rgba(10, 10, 10, 0.18) 1.2px, transparent 1.6px) 0 0 / 8px 8px,
+        var(--comic-paper);
+    color: var(--comic-ink);
+    font-family: "Bangers", "Impact", "Arial Black", sans-serif;
+    letter-spacing: 0.5px;
+}
+
+:root.theme-comic .app {
+    background: var(--comic-paper);
+    border: 4px solid var(--comic-ink);
+    border-radius: 0;
+    padding: 16px;
+    box-shadow: 6px 6px 0 var(--comic-ink);
+}
+
+/* Action-burst title: layered conic gradient + offset shadow stack. */
+:root.theme-comic .app-header h1 {
+    display: inline-block;
+    background: var(--comic-yellow);
+    color: var(--comic-red);
+    font-family: "Impact", "Arial Black", sans-serif;
+    font-size: 1.75rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border: 4px solid var(--comic-ink);
+    transform: rotate(-2deg);
+    text-shadow: 2px 2px 0 var(--comic-ink);
+    box-shadow: 4px 4px 0 var(--comic-ink);
+}
+
+:root.theme-comic .mod-info {
+    background: var(--comic-blue);
+    border: 4px solid var(--comic-ink);
+    border-radius: 0;
+    padding: 10px;
+    box-shadow: 4px 4px 0 var(--comic-ink);
+    gap: 8px;
+}
+:root.theme-comic .mod-info-box {
+    background: var(--comic-yellow);
+    border: 3px solid var(--comic-ink);
+    border-radius: 0;
+    box-shadow: 3px 3px 0 var(--comic-ink);
+    color: var(--comic-ink);
+    font-family: "Impact", sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+:root.theme-comic .mod-info-box:hover {
+    background: var(--comic-paper);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--comic-ink);
+}
+:root.theme-comic .mod-info-box span {
+    color: var(--comic-red);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+:root.theme-comic .retro-button,
+:root.theme-comic .volume-control,
+:root.theme-comic .subsong-control,
+:root.theme-comic .viz-control,
+:root.theme-comic .theme-control {
+    background: var(--comic-red);
+    color: #fff;
+    border: 3px solid var(--comic-ink);
+    border-radius: 0;
+    box-shadow: 3px 3px 0 var(--comic-ink);
+    font-family: "Impact", sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 12px;
+    text-shadow: 1px 1px 0 var(--comic-ink);
+}
+:root.theme-comic .retro-button:hover {
+    background: var(--comic-yellow);
+    color: var(--comic-ink);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--comic-ink);
+    text-shadow: none;
+}
+:root.theme-comic .retro-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--comic-ink);
+}
+:root.theme-comic .retro-select {
+    background: #fff;
+    color: var(--comic-ink);
+    border: 2px solid var(--comic-ink);
+    border-radius: 0;
+    font-family: "Impact", sans-serif;
+    font-weight: 900;
+}
+
+:root.theme-comic .tracker-container,
+:root.theme-comic .sample-list,
+:root.theme-comic .canvas-parent {
+    background: var(--comic-paper);
+    border: 3px solid var(--comic-ink);
+    border-radius: 0;
+    box-shadow: 3px 3px 0 var(--comic-ink);
+}
+:root.theme-comic .visualization-canvas {
+    background: var(--comic-paper);
+    border: 2px solid var(--comic-ink);
+    border-radius: 0;
+}
+
+:root.theme-comic .channel-cell.row-current,
+:root.theme-comic .row-label.row-current {
+    background: var(--comic-red);
+    color: #fff;
+}

@@ -1,0 +1,153 @@
+/* CRT green — sister theme of crt-amber.css. */
+
+:root.theme-crt-green {
+    --theme-name: "CRT green";
+
+    --crt-green: #33ff66;
+    --crt-green-dim: #1a7a33;
+    --crt-glow: rgba(51, 255, 102, 0.45);
+
+    --accent: var(--crt-green);
+
+    --viz-primary:   var(--crt-green);
+    --viz-secondary: #80ff99;
+    --viz-glow:      rgba(20, 200, 80, 0.45);
+    --viz-grid:      rgba(51, 255, 102, 0.45);
+    --viz-grid-soft: rgba(51, 255, 102, 0.25);
+    --viz-vol-cold:  0,   60,  25;
+    --viz-vol-mid:   40,  180, 70;
+    --viz-vol-hot:   160, 255, 180;
+    --vu-low:        #1a8b3a;
+    --vu-mid:        #33ff66;
+    --vu-high:       #a0ffb4;
+
+    --tracker-bg            : #030f06;
+    --tracker-bg-alt        : #030f06;
+    --tracker-row-highlight : #0a2a14;
+    --tracker-fg            : var(--crt-green);
+    --tracker-note          : var(--crt-green);
+    --tracker-sample        : var(--crt-green);
+    --tracker-volume        : var(--crt-green);
+    --tracker-effect        : var(--crt-green);
+}
+
+:root.theme-crt-green body {
+    background:
+        radial-gradient(ellipse at center, #061008 0%, #010604 80%),
+        #010604;
+    color: var(--crt-green);
+}
+
+:root.theme-crt-green .app {
+    margin: 24px;
+    padding: 24px;
+    border: 4px solid #0a1f10;
+    border-radius: 14px;
+    background: #020a04;
+    box-shadow:
+        inset 0 0 0 2px #0e3a18,
+        0 0 0 6px #02050a,
+        0 0 32px rgba(51, 255, 102, 0.22),
+        0 16px 40px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Vignette — own compositor layer via will-change so it isn't re-blended
+   into .app on every tracker row tick. */
+:root.theme-crt-green .app::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+    pointer-events: none;
+    z-index: 11;
+    will-change: transform;
+}
+
+/* Static scanlines — see THEMES.md. */
+:root.theme-crt-green .app::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+        180deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(51, 255, 102, 0.05) 3px,
+        rgba(0, 0, 0, 0.22) 4px
+    );
+    background-size: 100% 4px;
+    background-repeat: repeat;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* ASCII title — figlet "Small" font, "CHIPSOUND". \\ = one literal backslash;
+   \A = newline. h1 text stays in the DOM (font-size: 0) for screen readers. */
+:root.theme-crt-green .app-header h1 {
+    color: transparent;
+    font-size: 0;
+    line-height: 0;
+}
+:root.theme-crt-green .app-header h1::before {
+    content:
+        "  ___  _  _  ___  ___   ___   ___   _   _  _  _  ___  \A"
+        " / __|| || ||_ _|| _ \\ / __| / _ \\ | | | || \\| ||   \\ \A"
+        "| (__ | __ | | | |  _/ \\__ \\| (_) || |_| || .` || |) |\A"
+        " \\___||_||_||___||_|   |___/ \\___/  \\___/ |_|\\_||___/ ";
+    display: block;
+    white-space: pre;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.1;
+    color: var(--crt-green);
+    text-shadow: 0 0 4px var(--crt-glow), 0 0 10px var(--crt-glow), 0 0 18px var(--crt-glow);
+    letter-spacing: 0;
+}
+:root.theme-crt-green .app-header h1::after {
+    content: "> READY_";
+    display: block;
+    margin-top: 6px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--crt-green-dim);
+    text-shadow: 0 0 4px var(--crt-glow);
+}
+
+/* Chrome — text-shadow only on static chips; mod-info updates per row tick. */
+:root.theme-crt-green .mod-info-box,
+:root.theme-crt-green .retro-button,
+:root.theme-crt-green .volume-control,
+:root.theme-crt-green .subsong-control,
+:root.theme-crt-green .viz-control,
+:root.theme-crt-green .theme-control {
+    background: #051a0a;
+    border-color: var(--crt-green-dim);
+    color: var(--crt-green);
+    box-shadow: 2px 2px 0 #000;
+}
+:root.theme-crt-green .retro-button,
+:root.theme-crt-green .volume-control,
+:root.theme-crt-green .subsong-control,
+:root.theme-crt-green .viz-control,
+:root.theme-crt-green .theme-control {
+    text-shadow: 0 0 3px var(--crt-glow);
+}
+:root.theme-crt-green .mod-info-box span { color: var(--crt-green-dim); }
+:root.theme-crt-green .retro-button:hover {
+    background: #0a2a14;
+    border-color: var(--crt-green);
+    box-shadow: 3px 3px 0 #000, 0 0 8px var(--crt-glow);
+}
+:root.theme-crt-green .retro-select {
+    background: #021006;
+    color: var(--crt-green);
+    border-color: var(--crt-green-dim);
+}
+
+/* Tracker driven by --tracker-* tokens above. No text-shadow on cells. */
+:root.theme-crt-green .sample-list { background: #021006; }
+:root.theme-crt-green .canvas-parent { background: #020a04; }
+:root.theme-crt-green .visualization-canvas { background: #010604; border-color: var(--crt-green-dim); }

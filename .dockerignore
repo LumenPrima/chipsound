@@ -1,0 +1,6 @@
+# Exclude everything, re-include only what the image needs.
+*
+!src/
+!Caddyfile
+!NOTICE
+!docs/third-party/

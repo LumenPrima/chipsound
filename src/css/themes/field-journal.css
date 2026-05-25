@@ -1,0 +1,176 @@
+/* Field Journal — graph-paper lab notebook with ballpoint ink. Inspired by pocket field-research notebooks. */
+
+:root.theme-field-journal {
+    --theme-name: "Field Journal";
+
+    --paper:       #f5f1e6;
+    --paper-alt:   #ede7d4;
+    --grid-line:   rgba(29, 58, 138, 0.10);
+    --ink:         #1d3a8a;
+    --ink-red:     #b91c1c;
+    --pencil:      #4a4a4a;
+    --pencil-soft: #8a8275;
+
+    --accent: var(--ink);
+
+    --viz-primary:   var(--ink);
+    --viz-secondary: var(--ink-red);
+    --viz-glow:      rgba(29, 58, 138, 0.35);
+    --viz-grid:      rgba(29, 58, 138, 0.4);
+    --viz-grid-soft: rgba(29, 58, 138, 0.18);
+
+    --viz-canvas-bg: var(--paper);
+    --viz-ink:       var(--ink);
+
+    --viz-vol-cold: 100, 130, 200;
+    --viz-vol-mid:   29,  58, 138;
+    --viz-vol-hot:  185,  28,  28;
+
+    --vu-low:  #6b8cba;
+    --vu-mid:  var(--ink);
+    --vu-high: var(--ink-red);
+
+    --tracker-bg            : var(--paper);
+    --tracker-bg-alt        : var(--paper-alt);
+    --tracker-row-highlight : #d8d2bc;
+    --tracker-fg            : var(--ink);
+    --tracker-note          : var(--ink);
+    --tracker-sample        : var(--ink-red);
+    --tracker-volume        : var(--pencil);
+    --tracker-effect        : var(--pencil-soft);
+}
+
+:root.theme-field-journal body {
+    background:
+        /* 5 mm graph paper — major (every 5th) line darker. */
+        repeating-linear-gradient(0deg,
+            transparent 0,
+            transparent 24px,
+            rgba(29, 58, 138, 0.18) 24px,
+            rgba(29, 58, 138, 0.18) 25px),
+        repeating-linear-gradient(90deg,
+            transparent 0,
+            transparent 24px,
+            rgba(29, 58, 138, 0.18) 24px,
+            rgba(29, 58, 138, 0.18) 25px),
+        repeating-linear-gradient(0deg,
+            transparent 0,
+            transparent 4.6px,
+            var(--grid-line) 4.6px,
+            var(--grid-line) 5px),
+        repeating-linear-gradient(90deg,
+            transparent 0,
+            transparent 4.6px,
+            var(--grid-line) 4.6px,
+            var(--grid-line) 5px),
+        var(--paper);
+    color: var(--ink);
+    font-family: "Caveat", "Patrick Hand", "Bradley Hand", "Marker Felt", Georgia, serif;
+}
+
+:root.theme-field-journal .app {
+    background: transparent;
+    padding: 24px;
+    border: none;
+    box-shadow: none;
+}
+
+:root.theme-field-journal .app-header h1 {
+    font-family: "Caveat", "Patrick Hand", "Bradley Hand", "Marker Felt", cursive;
+    font-weight: bold;
+    font-size: 2.4rem;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--ink-red);
+    text-underline-offset: 4px;
+    transform: rotate(-1.5deg);
+    display: inline-block;
+    letter-spacing: 0.02em;
+}
+
+:root.theme-field-journal .mod-info {
+    background: rgba(245, 241, 230, 0.7);
+    border: 1px dashed var(--ink);
+    border-radius: 2px;
+    padding: 8px 12px;
+    box-shadow: none;
+}
+:root.theme-field-journal .mod-info-box {
+    background: transparent;
+    border: 1px dashed var(--pencil-soft);
+    border-radius: 2px;
+    box-shadow: none;
+    color: var(--ink);
+    font-family: "Caveat", "Patrick Hand", cursive;
+    font-size: 14px;
+    font-weight: bold;
+}
+:root.theme-field-journal .mod-info-box:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: none;
+    box-shadow: none;
+}
+:root.theme-field-journal .mod-info-box span {
+    color: var(--ink-red);
+    font-family: "Caveat", "Patrick Hand", cursive;
+    font-size: 11px;
+    font-weight: normal;
+    text-transform: lowercase;
+    letter-spacing: 0;
+}
+
+:root.theme-field-journal .retro-button,
+:root.theme-field-journal .volume-control,
+:root.theme-field-journal .subsong-control,
+:root.theme-field-journal .viz-control,
+:root.theme-field-journal .theme-control {
+    background: rgba(245, 241, 230, 0.5);
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 12px 4px 8px 6px;  /* hand-drawn-ish irregular corners */
+    box-shadow: none;
+    font-family: "Caveat", "Patrick Hand", cursive;
+    font-size: 14px;
+    font-weight: bold;
+}
+:root.theme-field-journal .retro-button:hover {
+    background: rgba(29, 58, 138, 0.08);
+    transform: rotate(-1deg);
+    box-shadow: none;
+}
+:root.theme-field-journal .retro-button:active {
+    transform: rotate(1deg);
+}
+:root.theme-field-journal .retro-select {
+    background: rgba(245, 241, 230, 0.7);
+    color: var(--ink);
+    border: 1px dashed var(--ink);
+    border-radius: 4px;
+    font-family: "Caveat", "Patrick Hand", cursive;
+    font-size: 14px;
+}
+
+:root.theme-field-journal .tracker-container,
+:root.theme-field-journal .sample-list,
+:root.theme-field-journal .canvas-parent {
+    background: rgba(245, 241, 230, 0.6);
+    border: 1px dashed var(--ink);
+    border-radius: 4px;
+    box-shadow: none;
+}
+:root.theme-field-journal .visualization-canvas {
+    background: var(--paper);
+    border: 1px dashed var(--ink);
+    border-radius: 2px;
+}
+
+:root.theme-field-journal .channel-cell,
+:root.theme-field-journal .row-label {
+    font-family: "Courier New", "Andale Mono", monospace;
+}
+:root.theme-field-journal .channel-header {
+    font-family: "Caveat", "Patrick Hand", cursive;
+    font-weight: bold;
+    color: var(--ink);
+}

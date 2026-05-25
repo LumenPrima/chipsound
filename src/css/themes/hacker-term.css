@@ -1,0 +1,219 @@
+/* Hacker Term '93 — TUI dress-up on top of crt-green's color scheme. */
+
+:root.theme-hacker-term {
+    --theme-name: "Hacker Term '93";
+
+    --accent: #33ff33;
+
+    --viz-primary:   #33ff33;
+    --viz-secondary: #66ff66;
+    --viz-glow:      rgba(51, 255, 51, 0.5);
+    --vu-low:        #1a8b1a;
+    --vu-mid:        #33ff33;
+    --vu-high:       #aaff66;
+    --viz-grid:      rgba(51, 255, 51, 0.35);
+    --viz-grid-soft: rgba(51, 255, 51, 0.15);
+    --viz-vol-cold:  20, 80, 30;
+    --viz-vol-mid:   51, 255, 51;
+    --viz-vol-hot:   200, 255, 200;
+
+    --tracker-bg:            #000000;
+    --tracker-bg-alt:        #000000;
+    --tracker-fg:            #33ff33;
+    --tracker-row-highlight: rgba(51, 255, 51, 0.16);
+    --tracker-note:          #66ff66;
+    --tracker-sample:        #33ff33;
+    --tracker-volume:        #b0ffb0;
+    --tracker-effect:        #208a20;
+}
+
+:root.theme-hacker-term body {
+    background: #000000;
+    color: #33ff33;
+    font-family: "Consolas", "Courier New", monospace;
+}
+
+:root.theme-hacker-term .app {
+    background: #000000;
+    border: 1px solid #33ff33;
+    border-radius: 0;
+    padding: 12px;
+}
+
+/* Command-prompt header — ::before prefix lets the h1 text read as the typed command. */
+:root.theme-hacker-term .mod-info {
+    background: #000000;
+    border: 1px solid rgba(51, 255, 51, 0.4);
+    border-radius: 0;
+    padding: 8px 12px;
+    gap: 12px;
+}
+:root.theme-hacker-term .app-header h1 {
+    font-family: "Consolas", monospace;
+    font-weight: normal;
+    color: #33ff33;
+    text-transform: lowercase;
+    letter-spacing: 1px;
+    font-size: 16px;
+    text-shadow: 0 0 5px rgba(51, 255, 51, 0.5);
+}
+:root.theme-hacker-term .app-header h1::before {
+    content: "user@demo:~$ ";
+    color: #66ff66;
+}
+:root.theme-hacker-term .mod-info-box {
+    background: transparent;
+    border: 1px solid rgba(51, 255, 51, 0.35);
+    border-radius: 0;
+    color: #33ff33;
+    font-family: "Consolas", monospace;
+    font-size: 12px;
+    padding: 4px 8px;
+    text-shadow: 0 0 4px rgba(51, 255, 51, 0.4);
+}
+:root.theme-hacker-term .mod-info-box span {
+    color: #208a20;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* ASCII box-drawn frame. */
+:root.theme-hacker-term .tracker-container {
+    background: #000000;
+    border: 1px solid #33ff33;
+    border-radius: 0;
+    padding: 10px;
+    gap: 8px;
+    position: relative;
+}
+:root.theme-hacker-term .tracker-container::before {
+    content: "┌─ pattern.txt ─";
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    padding: 0 6px;
+    background: #000000;
+    color: #66ff66;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+}
+:root.theme-hacker-term .tracker-header {
+    background: #000000;
+    border-bottom: 1px solid rgba(51, 255, 51, 0.4);
+    border-radius: 0;
+}
+:root.theme-hacker-term .channel-header {
+    background: #000000;
+    color: #66ff66;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(51, 255, 51, 0.25);
+}
+:root.theme-hacker-term .channel-header:hover { background: rgba(51, 255, 51, 0.1); color: #ffffff; }
+
+:root.theme-hacker-term .tracker-grid { background: #000000; border: none; }
+:root.theme-hacker-term .channel-cell {
+    background: transparent;
+    color: #33ff33;
+    font-family: "Consolas", monospace;
+    border-right: 1px solid rgba(51, 255, 51, 0.08);
+}
+:root.theme-hacker-term .row-label {
+    background: transparent;
+    color: #208a20;
+    font-family: "Consolas", monospace;
+    border-right: 1px solid rgba(51, 255, 51, 0.3);
+}
+:root.theme-hacker-term .channel-cell.row-current,
+:root.theme-hacker-term .row-label.row-current {
+    background: rgba(51, 255, 51, 0.18);
+    color: #ffffff;
+}
+
+/* Sample list = ls -la output. */
+:root.theme-hacker-term .sample-section { padding-left: 4px; }
+:root.theme-hacker-term .sample-list {
+    background: #000000;
+    border: 1px solid rgba(51, 255, 51, 0.4);
+    border-radius: 0;
+    padding: 6px 8px;
+    scrollbar-color: #33ff33 transparent;
+    position: relative;
+}
+:root.theme-hacker-term .sample-list::before {
+    content: "$ ls -la samples/";
+    display: block;
+    padding: 0 0 6px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(51, 255, 51, 0.3);
+    color: #66ff66;
+    font-family: "Consolas", monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+:root.theme-hacker-term .sample-item {
+    background: transparent;
+    color: #33ff33;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    border-bottom: 1px dotted rgba(51, 255, 51, 0.12);
+    padding: 2px 4px;
+}
+:root.theme-hacker-term .sample-item::before { content: "-rwxr-x─── "; color: #208a20; }
+:root.theme-hacker-term .sample-item:hover { background: rgba(51, 255, 51, 0.08); color: #ffffff; }
+:root.theme-hacker-term .sample-item.highlighted {
+    background: rgba(51, 255, 51, 0.22);
+    color: #ffffff;
+}
+
+/* Command bar. */
+:root.theme-hacker-term .controls {
+    background: #000000;
+    border: 1px solid rgba(51, 255, 51, 0.4);
+    border-radius: 0;
+    padding: 8px 12px;
+    gap: 6px;
+}
+:root.theme-hacker-term .retro-button {
+    background: transparent;
+    color: #33ff33;
+    border: 1px solid #33ff33;
+    border-radius: 0;
+    font-family: "Consolas", monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+    padding: 5px 10px;
+    flex: 1 1 auto;
+    min-width: 56px;
+}
+:root.theme-hacker-term .retro-button:hover { background: rgba(51, 255, 51, 0.1); color: #ffffff; }
+:root.theme-hacker-term .retro-button:active,
+:root.theme-hacker-term .retro-button[aria-pressed="true"] {
+    background: #33ff33;
+    color: #000000;
+}
+:root.theme-hacker-term .retro-button:disabled { opacity: 0.4; }
+
+:root.theme-hacker-term .retro-select,
+:root.theme-hacker-term .subsong-control,
+:root.theme-hacker-term .viz-control,
+:root.theme-hacker-term .theme-control,
+:root.theme-hacker-term .volume-control {
+    background: transparent;
+    color: #33ff33;
+    border: 1px solid #33ff33;
+    border-radius: 0;
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: none;
+}
+:root.theme-hacker-term .retro-select { padding: 4px 8px; }
+:root.theme-hacker-term .retro-select option { background: #000000; color: #33ff33; }
+:root.theme-hacker-term .volume-control { flex: 1 1 160px; min-width: 120px; }
+:root.theme-hacker-term input[type="range"] { accent-color: #33ff33; }

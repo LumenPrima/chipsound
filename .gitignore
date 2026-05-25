@@ -1,0 +1,89 @@
+# ----- OS junk --------------------------------------------------------------
+# macOS Finder metadata, Windows Explorer thumbnails, Linux trash, etc.
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ----- Editors / IDEs -------------------------------------------------------
+# We don't share per-developer editor settings. If you ever want to ship
+# *recommended* extensions or launch configs, commit a `.vscode/extensions.json`
+# explicitly instead of un-ignoring this whole tree.
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.history/
+nbproject/
+
+# ----- Python --------------------------------------------------------------
+# Even though the project has no production Python code, contributors may
+# run ad-hoc scripts (e.g. `python -m http.server`) or experiments — keep
+# their byproducts out of the repo.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.python-version
+
+# ----- Node / front-end tooling (if/when added) ----------------------------
+# Nothing currently uses npm, but lockfiles and build outputs land in
+# predictable places — keep them out from day one so the first contributor
+# who runs `npm init` doesn't accidentally commit node_modules.
+node_modules/
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.vite/
+.next/
+.nuxt/
+.turbo/
+.eslintcache
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npmrc.local
+
+# ----- Local config & secrets -----------------------------------------------
+# Anything that looks like an .env shouldn't be committed; if you need
+# example values, ship `.env.example` (NOT ignored) alongside.
+.env
+.env.*
+!.env.example
+.secrets/
+*.pem
+*.key
+
+# ----- Browser artifacts during testing ------------------------------------
+# Lighthouse / Playwright / DevTools dumps people occasionally drop in
+# the repo root while debugging.
+*.har
+*.heapsnapshot
+*.cpuprofile
+lighthouse-report.*
+playwright-report/
+test-results/
+
+# ----- Misc -----------------------------------------------------------------
+# Backup files some editors create on save (`foo.css~`, `foo.js.bak`)
+*~
+*.bak
+*.tmp
+*.old
+dont-upload/

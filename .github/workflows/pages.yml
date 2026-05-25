@@ -1,0 +1,69 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+
+      - name: Assemble artifact (merge docs/ landing + src/ player)
+        run: |
+          set -e
+          mkdir -p _site
+
+          # Landing at root: docs/index.html, CNAME, robots.txt, sitemap.xml, third-party/, etc.
+          cp -a docs/. _site/
+
+          # Player at /player.html plus its asset tree.
+          cp src/index.html _site/player.html
+          cp -a src/css _site/
+          cp -a src/js  _site/
+          # Merge images (docs/images/favicon.svg + src/images/* — duplicate favicon resolves to same bytes).
+          mkdir -p _site/images
+          cp -a src/images/. _site/images/
+
+          # Synthesize Caddy-shape autoindex listings so the runtime discovery in
+          # js/themes.js and js/viz-engine.js sees every drop-in file. GitHub Pages
+          # does not emit directory indexes; this is the bridge.
+          for dir in _site/css/themes _site/js/visualizations; do
+            {
+              echo '<!doctype html><html><body><ul>'
+              for f in "$dir"/*; do
+                name=$(basename "$f")
+                case "$name" in
+                  _*|index.html) continue ;;
+                esac
+                echo "<li><a href=\"$name\">$name</a></li>"
+              done
+              echo '</ul></body></html>'
+            } > "$dir/index.html"
+          done
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

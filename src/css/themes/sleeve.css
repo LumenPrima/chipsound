@@ -1,0 +1,132 @@
+/* Now-playing sleeve — two-column grid: sidebar (song card + transport) + tracker. */
+
+:root.theme-sleeve {
+    --theme-name: "Now-playing sleeve";
+
+    --accent: #cbd5e1;
+
+    --tracker-bg            : #1e293b;
+    --tracker-bg-alt        : #0f172a;
+    --tracker-row-highlight : #334155;
+    --tracker-fg            : #f8fafc;
+}
+
+:root.theme-sleeve .app {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+        "header  header"
+        "sidebar tracker"
+        "sidebar tracker";
+    gap: 16px;
+}
+:root.theme-sleeve .app-header { grid-area: header; }
+:root.theme-sleeve .tracker-container { grid-area: tracker; }
+
+/* No real sidebar element — .mod-info on row 2, .controls on row 3, tracker
+   spans both rows of the sidebar column. */
+:root.theme-sleeve .mod-info,
+:root.theme-sleeve .controls {
+    grid-column: 1;
+}
+:root.theme-sleeve .mod-info { grid-row: 2; }
+:root.theme-sleeve .controls { grid-row: 3; }
+
+/* Sleeve card for the info column. */
+:root.theme-sleeve .mod-info {
+    background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+:root.theme-sleeve .mod-info-box {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    min-width: 0;
+    text-align: left;
+    transition: none;
+}
+:root.theme-sleeve .mod-info-box:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: transparent;
+}
+:root.theme-sleeve .mod-info-box span {
+    color: #94a3b8;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+:root.theme-sleeve .mod-info-box > div {
+    color: #f8fafc;
+    font-size: 14px;
+}
+
+/* Transport column. */
+:root.theme-sleeve .controls {
+    flex-direction: column;
+    align-items: stretch;
+    background: #0b1220;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 12px;
+    gap: 6px;
+}
+:root.theme-sleeve .controls > * { flex: 0 0 auto; }
+:root.theme-sleeve .retro-button { justify-content: flex-start; width: 100%; }
+
+:root.theme-sleeve .retro-button,
+:root.theme-sleeve .volume-control,
+:root.theme-sleeve .subsong-control,
+:root.theme-sleeve .viz-control,
+:root.theme-sleeve .theme-control {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    box-shadow: none;
+    color: #f8fafc;
+}
+
+/* Picker labels share the muted micro-label tone; <select> stays bright. */
+:root.theme-sleeve .volume-control,
+:root.theme-sleeve .subsong-control,
+:root.theme-sleeve .viz-control,
+:root.theme-sleeve .theme-control {
+    color: #94a3b8;
+}
+
+:root.theme-sleeve .retro-select {
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #f8fafc;
+}
+
+:root.theme-sleeve .retro-button:hover {
+    background: #334155;
+    border-color: #475569;
+    transform: none;
+    box-shadow: none;
+}
+:root.theme-sleeve .retro-button:active {
+    background: #475569;
+    transform: none;
+    box-shadow: none;
+}
+
+:root.theme-sleeve .retro-button[disabled],
+:root.theme-sleeve .retro-button[aria-disabled="true"] {
+    box-shadow: none;
+}
+:root.theme-sleeve .retro-button[disabled]:hover,
+:root.theme-sleeve .retro-button[aria-disabled="true"]:hover {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: none;
+    transform: none;
+}

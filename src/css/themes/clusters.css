@@ -1,0 +1,7 @@
+/* Clusters — default theme. 2-row split of the info boxes. */
+
+:root.theme-clusters {
+    --theme-name: "Clusters";
+}
+
+:root.theme-clusters .mod-info { row-gap: 6px; }

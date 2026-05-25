@@ -1,0 +1,231 @@
+/* Subway Dot-Matrix — transit-station LED panel: black backplate + amber glyphs. */
+
+:root.theme-subway {
+    --theme-name: "Subway Dot-Matrix";
+
+    --accent: #ffb000;
+
+    --viz-primary:   #ffb000;
+    --viz-secondary: #ff5500;
+    --viz-glow:      rgba(255, 176, 0, 0.55);
+    --viz-grid:      rgba(255, 176, 0, 0.4);
+    --viz-grid-soft: rgba(255, 176, 0, 0.18);
+    --viz-vol-cold: 120,  60,  0;
+    --viz-vol-mid:  255, 130,  0;
+    --viz-vol-hot:  255, 220, 90;
+
+    --vu-low:  #663300;
+    --vu-mid:  #ffb000;
+    --vu-high: #ff3300;
+
+    --tracker-bg            : #0a0a0a;
+    --tracker-bg-alt        : #050505;
+    --tracker-row-highlight : #4a2c00;
+    --tracker-fg            : #ffb000;
+    --tracker-note          : #ffb000;
+    --tracker-sample        : #ff7700;
+    --tracker-volume        : #ff3300;
+    --tracker-effect        : #ffe600;
+}
+
+/* LED panel. */
+:root.theme-subway body {
+    background: #050505;
+    color: #ffb000;
+    font-family: 'Courier New', 'Consolas', monospace;
+}
+
+/* Dot-matrix overlay — fixed so dots don't slide with content scroll. */
+:root.theme-subway body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255, 176, 0, 0.06) 1px, transparent 1.2px);
+    background-size: 4px 4px;
+    background-attachment: fixed;
+    z-index: 0;
+    mix-blend-mode: screen;
+}
+:root.theme-subway .app { position: relative; z-index: 1; padding: 14px; gap: 8px; }
+
+/* Matte-bronze panel housing. */
+:root.theme-subway .app-header,
+:root.theme-subway .mod-info,
+:root.theme-subway .controls,
+:root.theme-subway .tracker-container,
+:root.theme-subway .sample-section {
+    background: #050505;
+    border: 2px solid #2a1a00;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px #1a1000;
+}
+
+:root.theme-subway .app-header { padding: 8px 14px; position: relative; }
+:root.theme-subway .app-header h1 {
+    color: #ffb000;
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-weight: bold;
+    letter-spacing: 6px;
+    text-shadow: 0 0 4px rgba(255, 176, 0, 0.5);
+    text-transform: uppercase;
+}
+/* "M5" line badge. */
+:root.theme-subway .app-header::after {
+    content: 'M5';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #ff3300;
+    color: #050505;
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    text-shadow: none;
+}
+
+/* Mod-info. */
+:root.theme-subway .mod-info {
+    padding: 10px;
+    gap: 8px;
+}
+:root.theme-subway .mod-info-box {
+    background: transparent;
+    border: 1px dashed rgba(255, 176, 0, 0.3);
+    border-radius: 2px;
+    box-shadow: none;
+    padding: 6px 10px;
+    color: #ffb000;
+    font-family: 'Courier New', 'Consolas', monospace;
+    transition: none;
+    min-width: 0;
+}
+:root.theme-subway .mod-info-box:hover {
+    transform: none;
+    border-color: rgba(255, 176, 0, 0.7);
+    background: rgba(255, 176, 0, 0.06);
+}
+:root.theme-subway .mod-info-box span {
+    color: #ff7700;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+:root.theme-subway .mod-info-box > div {
+    color: #ffb000;
+    font-weight: bold;
+    text-shadow: 0 0 4px rgba(255, 176, 0, 0.45);
+}
+
+:root.theme-subway .controls { padding: 8px; gap: 6px; }
+
+:root.theme-subway .retro-button {
+    background: #050505;
+    border: 1px solid #663300;
+    border-radius: 2px;
+    color: #ffb000;
+    font-family: 'Courier New', 'Consolas', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 3px rgba(255, 176, 0, 0.4);
+    box-shadow: none;
+    transition: none;
+}
+:root.theme-subway .retro-button:hover {
+    background: rgba(255, 176, 0, 0.1);
+    border-color: #ffb000;
+}
+:root.theme-subway .retro-button:active,
+:root.theme-subway .retro-button[aria-pressed="true"] {
+    background: #ffb000;
+    color: #050505;
+    text-shadow: none;
+}
+:root.theme-subway .retro-button:disabled {
+    color: rgba(255, 176, 0, 0.25);
+    border-color: rgba(255, 176, 0, 0.15);
+    opacity: 1;
+}
+
+:root.theme-subway .retro-select,
+:root.theme-subway .subsong-control,
+:root.theme-subway .viz-control,
+:root.theme-subway .theme-control,
+:root.theme-subway .volume-control {
+    background: #050505;
+    border: 1px solid #663300;
+    border-radius: 2px;
+    color: #ffb000;
+    font-family: 'Courier New', 'Consolas', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+:root.theme-subway input[type="range"] { accent-color: #ffb000; }
+
+/* Tracker = departure board. */
+:root.theme-subway .tracker-container { padding: 6px; gap: 6px; }
+:root.theme-subway .tracker-header {
+    background: #0a0a0a;
+    border-bottom: 1px solid #663300;
+    border-radius: 2px;
+}
+/* .channel-header must stay opaque — sticky parent lets rows scroll behind. */
+:root.theme-subway .channel-header {
+    background: #0a0a0a;
+    color: #ff7700;
+    font-family: 'Courier New', 'Consolas', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 4px rgba(255, 119, 0, 0.5);
+    border-right: 1px dotted rgba(255, 176, 0, 0.18);
+}
+:root.theme-subway .channel-header:hover { background: rgba(255, 176, 0, 0.1); }
+
+:root.theme-subway .tracker-grid {
+    background: #0a0a0a;
+    border-radius: 2px;
+}
+:root.theme-subway .channel-cell {
+    background: transparent;
+    color: #ffb000;
+    font-family: 'Courier New', 'Consolas', monospace;
+    border-right: 1px dotted rgba(255, 176, 0, 0.1);
+}
+:root.theme-subway .row-label {
+    background: #0a0a0a;
+    color: #ff7700;
+    font-family: 'Courier New', 'Consolas', monospace;
+    border-right: 1px solid rgba(255, 176, 0, 0.25);
+}
+:root.theme-subway .channel-cell.row-current,
+:root.theme-subway .row-label.row-current {
+    background: rgba(255, 176, 0, 0.18);
+    color: #fff7d6;
+}
+
+/* Sample list = next-train sidebar. */
+:root.theme-subway .sample-section { padding: 6px; }
+:root.theme-subway .sample-list {
+    background: #0a0a0a;
+    border: none;
+    border-radius: 2px;
+    padding: 6px;
+    scrollbar-color: #663300 #0a0a0a;
+}
+:root.theme-subway .sample-item {
+    color: #ffb000;
+    font-family: 'Courier New', 'Consolas', monospace;
+    border-bottom: 1px dashed rgba(255, 176, 0, 0.12);
+    border-radius: 2px;
+}
+:root.theme-subway .sample-item:hover { background: rgba(255, 176, 0, 0.1); }
+:root.theme-subway .sample-item.highlighted {
+    background: #ffb000;
+    color: #050505;
+    text-shadow: none;
+}

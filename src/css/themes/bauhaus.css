@@ -1,0 +1,210 @@
+/* Bauhaus — white background, black lines, Mondrian primaries. */
+
+:root.theme-bauhaus {
+    --theme-name: "Bauhaus";
+
+    --accent: #d62828;
+
+    --viz-primary:   #d62828;
+    --viz-secondary: #1d4ed8;
+    --viz-glow:      rgba(214, 40, 40, 0.45);
+    --vu-low:        #1d4ed8;
+    --vu-mid:        #facc15;
+    --vu-high:       #d62828;
+    --viz-grid:      rgba(0, 0, 0, 0.4);
+    --viz-grid-soft: rgba(0, 0, 0, 0.18);
+    /* Near-black ink so viz primitives stay visible on the white tracker-bg. */
+    --viz-ink:       #1a1a1a;
+    --viz-vol-cold:  29, 78, 216;
+    --viz-vol-mid:   234, 179, 8;
+    --viz-vol-hot:   214, 40, 40;
+
+    --tracker-bg:            #ffffff;
+    --tracker-bg-alt:        #000000;
+    --tracker-fg:            #000000;
+    --tracker-row-highlight: #eab308;
+    --tracker-note:          #000000;
+    --tracker-sample:        #d62828;
+    --tracker-volume:        #1d4ed8;
+    --tracker-effect:        #000000;
+}
+
+:root.theme-bauhaus body {
+    background: #ffffff;
+    color: #000000;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
+:root.theme-bauhaus .app {
+    background: #ffffff;
+    border: 4px solid #000000;
+    border-radius: 0;
+    padding: 12px;
+}
+
+/* Mod-info: red rectangle. */
+:root.theme-bauhaus .mod-info {
+    background: #d62828;
+    border: 4px solid #000000;
+    border-radius: 0;
+    padding: 10px 16px;
+    gap: 16px;
+}
+:root.theme-bauhaus .app-header h1 {
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    font-weight: 900;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 22px;
+}
+:root.theme-bauhaus .mod-info-box {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: bold;
+    font-size: 13px;
+}
+:root.theme-bauhaus .mod-info-box span {
+    color: #ffd57a;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Color-block tracker grid. */
+:root.theme-bauhaus .tracker-container {
+    background: #ffffff;
+    border: 4px solid #000000;
+    border-radius: 0;
+    padding: 0;
+    gap: 0;
+}
+:root.theme-bauhaus .tracker-header {
+    background: #1d4ed8;
+    border: none;
+    border-bottom: 4px solid #000000;
+    border-radius: 0;
+}
+:root.theme-bauhaus .channel-header {
+    background: #1d4ed8;
+    color: #ffffff;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-right: 2px solid #000000;
+}
+:root.theme-bauhaus .channel-header:hover { background: #ffd57a; color: #000000; }
+
+:root.theme-bauhaus .tracker-grid {
+    background: #ffffff;
+    border: none;
+}
+:root.theme-bauhaus .channel-cell {
+    background: #ffffff;
+    color: #000000;
+    font-family: "Consolas", "Courier New", monospace;
+    font-weight: bold;
+    border-right: 1px solid #000000;
+}
+:root.theme-bauhaus .row-label {
+    background: #000000;
+    color: #ffffff;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 900;
+    border-right: 2px solid #000000;
+}
+:root.theme-bauhaus .channel-cell.row-current,
+:root.theme-bauhaus .row-label.row-current {
+    background: #eab308;
+    color: #000000;
+}
+
+:root.theme-bauhaus .sample-section { padding-left: 4px; }
+:root.theme-bauhaus .sample-list {
+    background: #eab308;
+    border: 4px solid #000000;
+    border-radius: 0;
+    padding: 6px 8px;
+    scrollbar-color: #000000 #eab308;
+}
+:root.theme-bauhaus .sample-list::before {
+    content: "SAMPLES";
+    display: block;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    background: #000000;
+    color: #ffffff;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-align: center;
+}
+:root.theme-bauhaus .sample-item {
+    background: transparent;
+    color: #000000;
+    font-family: "Consolas", monospace;
+    font-weight: bold;
+    font-size: 11px;
+    border-bottom: 1px solid #000000;
+    border-radius: 0;
+    padding: 2px 4px;
+}
+:root.theme-bauhaus .sample-item:hover { background: #ffffff; }
+:root.theme-bauhaus .sample-item.highlighted {
+    background: #d62828;
+    color: #ffffff;
+}
+
+:root.theme-bauhaus .controls {
+    background: #ffffff;
+    border: 4px solid #000000;
+    border-radius: 0;
+    padding: 8px 12px;
+    gap: 8px;
+}
+:root.theme-bauhaus .retro-button {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #000000;
+    border-radius: 0;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+    padding: 4px 10px;
+    flex: 1 1 auto;
+    min-width: 56px;
+}
+:root.theme-bauhaus .retro-button:hover { background: #eab308; }
+:root.theme-bauhaus .retro-button:active,
+:root.theme-bauhaus .retro-button[aria-pressed="true"] {
+    background: #d62828;
+    color: #ffffff;
+}
+:root.theme-bauhaus .retro-button:disabled { opacity: 0.4; }
+
+:root.theme-bauhaus .retro-select,
+:root.theme-bauhaus .subsong-control,
+:root.theme-bauhaus .viz-control,
+:root.theme-bauhaus .theme-control,
+:root.theme-bauhaus .volume-control {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #000000;
+    border-radius: 0;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+:root.theme-bauhaus .retro-select { padding: 4px 8px; }
+:root.theme-bauhaus .retro-select option { background: #ffffff; color: #000000; }
+:root.theme-bauhaus .volume-control { flex: 1 1 160px; min-width: 120px; }
+:root.theme-bauhaus input[type="range"] { accent-color: #d62828; }
