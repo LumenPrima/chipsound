@@ -15,11 +15,15 @@ A lightweight in-browser player for the tracker music formats that powered the d
 Under the hood: Chipsound doesn't decode anything itself. [libopenmpt](https://lib.openmpt.org/libopenmpt/) (compiled to WebAssembly via [Chiptune.js](https://github.com/DrSnuggles/chiptune)) does the audio, and this project reads the playback state — channel volumes, current order/row, instrument data — to draw the pattern view, the off-thread per-channel visualizations, the mute/solo overlays, and the subsong picker. Add to that the themes, shareable `?load=<url>` links, keyboard shortcuts, and the performance work to keep everything running without glitching the audio.
 
 <p align="center">
-  <img src="docs/images/theme-skinplayer.jpg" alt="Skinplayer theme" title="Skinplayer" width="49%">
-  <img src="docs/images/theme-mixtape.jpg" alt="Mixtape theme" title="Mixtape" width="49%">
+  <img src="docs/images/theme-skinplayer.jpg" alt="Skinplayer theme" title="Skinplayer" width="24%">
+  <img src="docs/images/theme-mixtape.jpg" alt="Mixtape theme" title="Mixtape" width="24%">
+  <img src="docs/images/theme-crt-green.jpg" alt="CRT Green theme" title="CRT Green" width="24%">
+  <img src="docs/images/theme-field-journal.jpg" alt="Field Journal theme" title="Field Journal" width="24%">
   <br>
-  <img src="docs/images/theme-crt-green.jpg" alt="CRT Green theme" title="CRT Green" width="49%">
-  <img src="docs/images/theme-field-journal.jpg" alt="Field Journal theme" title="Field Journal" width="49%">
+  <img src="docs/images/theme-foundry.jpg" alt="Foundry theme" title="Foundry" width="24%">
+  <img src="docs/images/theme-newspaper.jpg" alt="Newspaper theme" title="Newspaper" width="24%">
+  <img src="docs/images/theme-pocket.jpg" alt="Pocket theme" title="Pocket" width="24%">
+  <img src="docs/images/theme-subway.jpg" alt="Subway theme" title="Subway" width="24%">
 </p>
 
 ## Who is it for?
