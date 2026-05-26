@@ -40,6 +40,23 @@ jobs:
           cp src/favicon.ico _site/favicon.ico
           cp -a src/css _site/
           cp -a src/js  _site/
+
+          # Inject GA4 into the public player only. src/index.html stays untracked
+          # so self-hosted (Docker / clone) deployments remain analytics-free.
+          awk '
+              /<\/head>/ {
+                  print "    <!-- Google Analytics 4 (injected at deploy; source is untracked) -->"
+                  print "    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-MQKBFSDZ5Q\"></script>"
+                  print "    <script>"
+                  print "        window.dataLayer = window.dataLayer || [];"
+                  print "        function gtag(){dataLayer.push(arguments);}"
+                  print "        gtag(\"js\", new Date());"
+                  print "        gtag(\"config\", \"G-MQKBFSDZ5Q\");"
+                  print "    </script>"
+              }
+              { print }
+          ' _site/player.html > _site/player.html.new
+          mv _site/player.html.new _site/player.html
           # Merge images (docs/images/favicon.svg + src/images/* — duplicate favicon resolves to same bytes).
           mkdir -p _site/images
           cp -a src/images/. _site/images/
