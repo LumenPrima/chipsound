@@ -14,12 +14,18 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# Opt every JS action into the Node 24 runtime so the Pages-specific actions
+# (upload-pages-artifact, deploy-pages) don't trip the Node 20 deprecation warning
+# while their own majors catch up.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
+      - uses: actions/checkout@v5
+      - uses: actions/configure-pages@v6
 
       - name: Assemble artifact (merge docs/ landing + src/ player)
         run: |
@@ -31,6 +37,7 @@ jobs:
 
           # Player at /player.html plus its asset tree.
           cp src/index.html _site/player.html
+          cp src/favicon.ico _site/favicon.ico
           cp -a src/css _site/
           cp -a src/js  _site/
           # Merge images (docs/images/favicon.svg + src/images/* — duplicate favicon resolves to same bytes).
