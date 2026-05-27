@@ -32,6 +32,7 @@ import { installResizeHandler } from './layout.js';
 import { applyTheme, currentTheme, wireThemePicker, prefetchOtherThemes, initThemes } from './themes.js';
 import { placeholderMeta } from './placeholder.js';
 import { installDiagnostics } from './diagnostics.js';
+import { installMediaSession, setMediaSessionMetadata } from './media-session.js';
 
 let rafId = -1;
 
@@ -102,6 +103,7 @@ function bootstrapPlayer() {
         renderTracker(meta);
         refreshSubsongSelector(meta.song);
         setControlsAvailable(true);
+        setMediaSessionMetadata({ title: meta.title, fileName: playerState.fileName });
         requestAnimationFrame(() => {
             clearVisualizations(meta.song, getCurrentVisualizations());
         });
@@ -128,11 +130,17 @@ function bootstrapPlayer() {
     });
 
     player.onError(err => {
-        // chiptune3.load() reports 'Load' on fetch failure; others are playback.
+        // chiptune3.load() reports 'Load' on fetch failure; 'WorkletLoad' is
+        // emitted when audioWorklet.addModule() fails (restrictive browsers /
+        // content blockers / embedded webviews); others are playback.
         const reason = err?.type ?? 'unknown';
-        if (String(reason).toLowerCase() === 'load') {
+        const kind = String(reason).toLowerCase();
+        if (kind === 'load') {
             const name = playerState.fileName || 'module';
             toast(`Could not load: ${name}`, { variant: 'error', duration: 5000 });
+        } else if (kind === 'workletload') {
+            toast('Could not load audio engine. Try reloading the page, or check that no extension is blocking it.',
+                  { variant: 'error', duration: 8000 });
         } else {
             toast(`Playback error: ${reason}`, { variant: 'error', duration: 5000 });
         }
@@ -166,6 +174,7 @@ async function init() {
     // Start audio early — 1.7 MB worklet download begins now.
     bootstrapPlayer();
     installAudioUnlock();
+    installMediaSession();
 
     // Placeholder BEFORE the discovery awaits so the user sees structure immediately.
     playerState.meta = placeholderMeta();

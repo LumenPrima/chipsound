@@ -151,12 +151,14 @@ export function applyTheme(id, { silent = true } = {}) {
     });
 }
 
-// Cycle through themes alphabetically (T keyboard shortcut).
-export function cycleTheme() {
+// Cycle through themes alphabetically (T keyboard shortcut). Shift+T cycles
+// backward — without it, 14 themes means up to 13 taps to revisit one.
+export function cycleTheme(backward = false) {
     if (themes.length === 0) return;
     const idx = themes.findIndex(t => t.id === currentTheme());
-    const next = themes[(idx + 1) % themes.length];
-    applyTheme(next.id, { silent: false });
+    const delta = backward ? -1 : 1;
+    const nextIdx = (idx + delta + themes.length) % themes.length;
+    applyTheme(themes[nextIdx].id, { silent: false });
 }
 
 export function wireThemePicker() {

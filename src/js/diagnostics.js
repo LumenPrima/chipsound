@@ -1,4 +1,5 @@
 import { getPatternCacheSize, getRenderQueueSize } from './tracker.js';
+import { playerState } from './state.js';
 
 const PREFIX = '[diag]';
 
@@ -33,7 +34,44 @@ export function installDiagnostics() {
     installLongTaskObserver();
     installPeriodicSnapshot();
     installRafJitterWatchdog();
+    installAudioStateLogger();
     return true;
+}
+
+// AudioContext state ("suspended" / "running" / "interrupted" / "closed") is
+// the single biggest predictor of "Play does nothing" reports — especially
+// on mobile, where the OS interrupts the context for file pickers, app
+// backgrounding, lockscreen, audio-route changes, etc. We log the initial
+// state and every transition so the user can debug from the page itself
+// without a USB tether. Hooked up via queueMicrotask because installDiagnostics
+// runs before bootstrapPlayer; by the time the microtask fires playerState.player
+// is set.
+function installAudioStateLogger() {
+    queueMicrotask(() => {
+        const ctx = playerState.player?.context;
+        if (!ctx) {
+            console.warn(`${PREFIX} audio context not available; state logging off.`);
+            return;
+        }
+        console.warn(`${PREFIX} audio context state (initial) = ${ctx.state}`);
+        ctx.addEventListener('statechange', () => {
+            console.warn(`${PREFIX} audio context state \u2192 ${ctx.state}`);
+        });
+    });
+}
+
+function readAudioState() {
+    return playerState.player?.context?.state ?? 'n/a';
+}
+
+// AudioContext.state stays "running" across stop/pause — that's by design (we
+// want zero warm-up on the next Play). To make the snapshot debuggable we also
+// surface the player's logical state, so a wedge ("audio=suspended play=playing")
+// is distinguishable from a quiet idle ("audio=running play=stopped").
+function readPlayState() {
+    if (playerState.isPlaying) return 'playing';
+    if (playerState.isPaused)  return 'paused';
+    return 'stopped';
 }
 
 function installLongTaskObserver() {
@@ -88,6 +126,8 @@ function installPeriodicSnapshot() {
             `cache=${cache}`,
             `queue=${queue}`,
             `dom=${nodes}${nodeDelta != null ? ` (Δ${nodeDelta >= 0 ? '+' : ''}${nodeDelta})` : ''}`,
+            `audio=${readAudioState()}`,
+            `play=${readPlayState()}`,
         ];
         console.log(parts.join(' | '));
 

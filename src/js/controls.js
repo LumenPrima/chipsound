@@ -15,6 +15,7 @@ import {
 } from './tracker.js';
 import { clearVisualizations, availableVisualizations, visualizationNames } from './viz-engine.js';
 import { openHelp } from './help.js';
+import { setMediaSessionPlaybackState } from './media-session.js';
 
 const ACCEPTED_EXTENSIONS = ['.mod', '.s3m', '.xm', '.it'];
 
@@ -92,11 +93,19 @@ function updateButtonsUI(state) {
     setEnabled($('#stop'), state !== STOPPED);
 }
 
+// MediaSession's vocab is a 3-way that maps cleanly onto our own.
+const MEDIA_SESSION_STATE = {
+    [PLAYING]: 'playing',
+    [PAUSED]: 'paused',
+    [STOPPED]: 'none',
+};
+
 // Single source of truth for playback transitions.
 export function setPlaybackState(next) {
     playerState.isPlaying = next === PLAYING;
     playerState.isPaused = next === PAUSED;
     updateButtonsUI(next);
+    setMediaSessionPlaybackState(MEDIA_SESSION_STATE[next] ?? 'none');
 
     if (next === PLAYING) {
         onPlayStart();
@@ -160,6 +169,11 @@ export function loadFile(file, { autoPlay = true } = {}) {
         return;
     }
 
+    // Supersede any in-flight URL load — without this, a slow Modarchive
+    // fetch (or its scheduled retry) keeps running in the background and
+    // would later overwrite the file the user just picked.
+    abortInFlightUrlLoad();
+
     // Only flip to STOPPED when we genuinely won't be playing. If autoPlay is
     // true, holding the prior PLAYING state through the worklet hand-off
     // avoids a misleading STOPPED flash while the old song is still rendering.
@@ -181,77 +195,166 @@ export function loadFile(file, { autoPlay = true } = {}) {
 // libopenmpt format-sniffs the bytes, so URL extension is not gated.
 const MAX_URL_LOAD_BYTES = 32 * 1024 * 1024;
 const URL_LOAD_TIMEOUT_MS = 45_000;
+const FETCH_RETRY_DELAY_MS = 500;
+const TOAST_URL_MAX_LEN = 64;
 
 function isAbortLike(e) {
     return e?.name === 'TimeoutError' || e?.name === 'AbortError';
 }
 
+// Shrinks a long URL down to "host #id" (urlDisplayLabel) when possible,
+// otherwise to a head…tail ellipsis so the loading toast stays readable on
+// narrow mobile viewports. Full URL still goes to the console / address bar.
+function urlForToast(url) {
+    const label = urlDisplayLabel(url);
+    if (label) return label;
+    if (url.length <= TOAST_URL_MAX_LEN) return url;
+    const head = Math.floor((TOAST_URL_MAX_LEN - 1) * 0.6);
+    const tail = TOAST_URL_MAX_LEN - 1 - head;
+    return url.slice(0, head) + '\u2026' + url.slice(-tail);
+}
+
+// Tracks any in-flight URL load so a subsequent loadFile / loadFromUrl /
+// drag-drop aborts it. Without this, a slow upstream (e.g. Modarchive at
+// peak) can outrun the user's next action and overwrite the new selection
+// when its bytes finally arrive — the more annoying half of which is the
+// retry below still ticking 21 + 0.5 + 21 seconds in the background.
+let urlLoadAbort = null;
+
+function abortInFlightUrlLoad() {
+    if (!urlLoadAbort) return;
+    urlLoadAbort.abort();
+    urlLoadAbort = null;
+}
+
+// Promise that resolves after `ms` or rejects with AbortError when `signal`
+// fires. Used by fetchWithRetry's between-attempts wait so a superseding load
+// cancels the retry instead of forcing the user to wait through another 21s
+// TCP timeout for an attempt nobody cares about anymore.
+function abortableDelay(ms, signal) {
+    return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(new DOMException('Aborted', 'AbortError'));
+            return;
+        }
+        const timer = setTimeout(() => {
+            signal?.removeEventListener('abort', onAbort);
+            resolve();
+        }, ms);
+        const onAbort = () => {
+            clearTimeout(timer);
+            reject(new DOMException('Aborted', 'AbortError'));
+        };
+        signal?.addEventListener('abort', onAbort, { once: true });
+    });
+}
+
+// One-shot retry on transient network errors. Timeout / explicit aborts are
+// NOT retried — those are user-visible budget exceeded. HTTP error statuses
+// are not retried either (they're deterministic; the caller surfaces them).
+async function fetchWithRetry(url, signal) {
+    try {
+        return await fetch(url, { signal });
+    } catch (e) {
+        if (isAbortLike(e)) throw e;
+        if (signal.aborted) throw e;
+        await abortableDelay(FETCH_RETRY_DELAY_MS, signal);
+        return await fetch(url, { signal });
+    }
+}
+
 export async function loadFromUrl(url, { autoPlay = true } = {}) {
     if (!url) return;
 
-    // Sticky info toast for the duration of the fetch. Any error toast below
-    // supersedes it; hideToast() is called once the buffer reaches the worklet.
-    toast(`Loading: ${url}`, { variant: 'info', duration: 0 });
+    // Supersede any previous in-flight URL load.
+    abortInFlightUrlLoad();
 
-    const signal = AbortSignal.timeout(URL_LOAD_TIMEOUT_MS);
+    // Two reasons we'd abort: user moved on (silent) and timeout (toast).
+    // Distinguishing them after the fact is awkward (both surface as
+    // AbortError), so we set a flag from the timeout path.
+    const controller = new AbortController();
+    urlLoadAbort = controller;
+    let timedOut = false;
+    const timeoutTimer = setTimeout(() => { timedOut = true; controller.abort(); }, URL_LOAD_TIMEOUT_MS);
 
-    let response;
-    try {
-        response = await fetch(url, { signal });
-    } catch (e) {
-        toast(isAbortLike(e) ? `URL load timed out` : `Could not load URL`,
+    const isCurrent = () => urlLoadAbort === controller;
+    // Superseded loads stay silent — the new load already owns the toast.
+    const surfaceAbort = (e, fallback) => {
+        if (e?.name === 'AbortError' && !timedOut) return;
+        toast((timedOut || isAbortLike(e)) ? 'URL load timed out' : fallback,
               { variant: 'error', duration: 5000 });
-        return;
-    }
-    if (!response.ok) {
-        toast(`Could not load URL (HTTP ${response.status})`, { variant: 'error', duration: 5000 });
-        return;
-    }
+    };
 
-    const ctype = (response.headers.get('Content-Type') || '').toLowerCase();
-    if (ctype.startsWith('text/html') || ctype.startsWith('text/plain') || ctype.startsWith('application/json')) {
-        toast(`URL did not return a module (${ctype || 'unknown type'})`, { variant: 'warn' });
-        return;
-    }
-
-    const declared = parseInt(response.headers.get('Content-Length') || '0', 10);
-    if (declared > MAX_URL_LOAD_BYTES) {
-        toast(`File too large: ${(declared / 1024 / 1024).toFixed(1)} MB`, { variant: 'warn' });
-        return;
-    }
-
-    let buffer;
+    // Single try/finally so the timer + tracker are released on every exit
+    // path — including future edits that introduce a new early return or
+    // throw. Without this, every `return` would have to remember to call
+    // cleanup() and any miss leaks the controller + a 45s setTimeout.
     try {
-        buffer = await response.arrayBuffer();
-    } catch (e) {
-        toast(isAbortLike(e) ? `URL load timed out` : `Connection lost while loading URL`,
-              { variant: 'error', duration: 5000 });
-        return;
+        // Sticky info toast for the duration of the fetch. Any error toast below
+        // supersedes it; hideToast() is called once the buffer reaches the worklet.
+        toast(`Loading: ${urlForToast(url)}`, { variant: 'info', duration: 0 });
+
+        let response;
+        try {
+            response = await fetchWithRetry(url, controller.signal);
+        } catch (e) {
+            surfaceAbort(e, 'Could not load URL');
+            return;
+        }
+        if (!isCurrent()) return;
+        if (!response.ok) {
+            toast(`Could not load URL (HTTP ${response.status})`, { variant: 'error', duration: 5000 });
+            return;
+        }
+
+        const ctype = (response.headers.get('Content-Type') || '').toLowerCase();
+        if (ctype.startsWith('text/html') || ctype.startsWith('text/plain') || ctype.startsWith('application/json')) {
+            toast(`URL did not return a module (${ctype || 'unknown type'})`, { variant: 'warn' });
+            return;
+        }
+
+        const declared = parseInt(response.headers.get('Content-Length') || '0', 10);
+        if (declared > MAX_URL_LOAD_BYTES) {
+            toast(`File too large: ${(declared / 1024 / 1024).toFixed(1)} MB`, { variant: 'warn' });
+            return;
+        }
+
+        let buffer;
+        try {
+            buffer = await response.arrayBuffer();
+        } catch (e) {
+            surfaceAbort(e, 'Connection lost while loading URL');
+            return;
+        }
+        if (!isCurrent()) return;
+
+        if (buffer.byteLength > MAX_URL_LOAD_BYTES) {
+            toast(`File too large: ${(buffer.byteLength / 1024 / 1024).toFixed(1)} MB`, { variant: 'warn' });
+            return;
+        }
+
+        // Resolve a *meaningful* filename. Accept the source's own name only when
+        // it looks like a module file (right extension); otherwise fall back to a
+        // URL-derived host+id label so the Filename field stays informative even
+        // for endpoint URLs (e.g. Modarchive hides Content-Disposition behind CORS
+        // and the path is just "/downloads.php").
+        const headerName = filenameFromContentDisposition(response.headers.get('Content-Disposition'));
+        const urlName = filenameFromUrl(url);
+        const filename = (headerName && isAcceptedFile(headerName)) ? headerName
+                       : (urlName && isAcceptedFile(urlName))       ? urlName
+                       : urlDisplayLabel(url);
+
+        if (!autoPlay) setPlaying(false);
+        setControlsAvailable(false);
+        playerState.fileName = filename;
+        setText('#fileName', filename);
+        autoPlayOnNextLoad = autoPlay;
+        hideToast();
+        playerState.player.loadBuffer(buffer);
+    } finally {
+        clearTimeout(timeoutTimer);
+        if (urlLoadAbort === controller) urlLoadAbort = null;
     }
-
-    if (buffer.byteLength > MAX_URL_LOAD_BYTES) {
-        toast(`File too large: ${(buffer.byteLength / 1024 / 1024).toFixed(1)} MB`, { variant: 'warn' });
-        return;
-    }
-
-    // Resolve a *meaningful* filename. Accept the source's own name only when
-    // it looks like a module file (right extension); otherwise fall back to a
-    // URL-derived host+id label so the Filename field stays informative even
-    // for endpoint URLs (e.g. Modarchive hides Content-Disposition behind CORS
-    // and the path is just "/downloads.php").
-    const headerName = filenameFromContentDisposition(response.headers.get('Content-Disposition'));
-    const urlName = filenameFromUrl(url);
-    const filename = (headerName && isAcceptedFile(headerName)) ? headerName
-                   : (urlName && isAcceptedFile(urlName))       ? urlName
-                   : urlDisplayLabel(url);
-
-    if (!autoPlay) setPlaying(false);
-    setControlsAvailable(false);
-    playerState.fileName = filename;
-    setText('#fileName', filename);
-    autoPlayOnNextLoad = autoPlay;
-    hideToast();
-    playerState.player.loadBuffer(buffer);
 }
 
 export function flushPendingLoad() {
@@ -389,12 +492,14 @@ function navigateOrder(delta) {
     clearVisualizations(song, getCurrentVisualizations());
 }
 
-// V key. Gates on picker disabled state.
-export function cycleVisualization() {
+// V key. Gates on picker disabled state. Shift+V cycles backward.
+export function cycleVisualization(backward = false) {
     if (availableVisualizations.length === 0) return;
     const picker = $('#vizPicker');
     if (picker && picker.disabled) return;
-    selectVisualization((currentVizIndex + 1) % availableVisualizations.length);
+    const delta = backward ? -1 : 1;
+    const n = availableVisualizations.length;
+    selectVisualization((currentVizIndex + delta + n) % n);
 }
 
 function selectVisualization(index) {

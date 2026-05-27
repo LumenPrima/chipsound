@@ -44,7 +44,10 @@ export class ChiptuneJsPlayer {
 				this.processNode.connect(this.gain)
 				if (this.destination) this.gain.connect(this.destination)	// also connect to output if no gainNode was given
 			})
-			.catch(e => console.error(e))
+			.catch(e => {
+				console.error(e)
+				this.fireEvent('onError', { type: 'WorkletLoad' })
+			})
 	}
 
 	// msg from worklet

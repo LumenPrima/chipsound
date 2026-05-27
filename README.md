@@ -1,7 +1,7 @@
 # Chipsound
 
 [![GitHub Stars](https://img.shields.io/github/stars/gamosoft/chipsound)](https://github.com/gamosoft/chipsound/stargazers)
-[![License](https://img.shields.io/github/license/gamosoft/chipsound)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Vanilla JS](https://img.shields.io/badge/JS-vanilla-yellow)
 
 <p align="center">
@@ -89,6 +89,8 @@ Then open <http://localhost:8765/>.
 
 > Python's server caches aggressively. Hard-reload with `Ctrl + Shift + R`, or use `npx http-server -c-1` which sets `Cache-Control: no-store`.
 
+> **Themes & visualizations are auto-discovered from directory listings.** On startup the player fetches `./css/themes/` and `./js/visualizations/` and parses the HTML index to find all `*.css` / `*.js` files. The three servers above all enable directory listings by default. If you deploy behind a static host that disables them (some CDNs, GitHub Pages with a hand-rolled config, certain nginx setups), the picker will fall back to a single built-in theme + visualization. Either enable directory listing for those two folders, or fork in a static manifest.
+
 ### Load a module by URL
 
 The player accepts a `?load=<url>` query parameter pointing to any HTTP(S) URL:
@@ -111,9 +113,9 @@ https://chipsound.com/player.html?load=https%3A%2F%2Fapi.modarchive.org%2Fdownlo
 | `L` | Open file… |
 | `←` / `→` | Previous / next order |
 | `E` | Toggle effects (visualizations on/off) |
-| `V` | Cycle visualization |
+| `V` / `Shift` + `V` | Cycle visualization forward / backward |
 | `I` | Toggle samples panel |
-| `T` | Cycle theme |
+| `T` / `Shift` + `T` | Cycle theme forward / backward |
 | `?` | Show this help |
 | `Esc` | Close this help |
 | Click header | Toggle channel mute |
