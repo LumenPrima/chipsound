@@ -329,9 +329,17 @@ function wireButtons() {
             playerState.player.pause();
             setPlaybackState(PAUSED);
         } else if (playerState.isPaused) {
+            // Synchronous resume() in the gesture — iOS Safari interrupts the
+            // AudioContext across the file picker / background and resume from
+            // the capture-phase unlock is async; calling here too guarantees
+            // the worklet has a running context before we flip paused=false.
+            const ctx = playerState.player?.context;
+            if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
             playerState.player.unpause();
             setPlaybackState(PLAYING);
         } else {
+            const ctx = playerState.player?.context;
+            if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
             playerState.player.play();
             setPlaybackState(PLAYING);
         }

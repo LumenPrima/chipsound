@@ -141,14 +141,21 @@ function bootstrapPlayer() {
     });
 }
 
-// Capture-phase one-shot resume() — arms BEFORE feature listeners.
+// Capture-phase resume() — arms BEFORE feature listeners and STAYS armed.
+// Mobile (especially iOS Safari) routinely interrupts the AudioContext mid-
+// session: opening the native file picker, backgrounding the tab, locking the
+// device, even some volume / route changes all flip the context back to a
+// non-running state. A one-shot unlock would miss those subsequent resumes —
+// the user would see Play depress with no audio and no pattern motion (the
+// worklet's process() only runs while the context is "running"). resume() is
+// idempotent when the context is already running, so the per-event cost is
+// effectively a state read.
 function installAudioUnlock() {
     const events = ['keydown', 'click', 'touchstart', 'drop'];
-    const opts = { capture: true };
+    const opts = { capture: true, passive: true };
     const handler = () => {
-        for (const ev of events) document.removeEventListener(ev, handler, opts);
         const ctx = playerState.player?.context;
-        if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+        if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
     };
     for (const ev of events) document.addEventListener(ev, handler, opts);
 }
