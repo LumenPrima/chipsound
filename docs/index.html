@@ -318,6 +318,42 @@
             border-color: var(--primary);
         }
 
+        /* ===== Sample tracks (under the hero CTA) ===== */
+        .samples {
+            margin-top: 28px;
+            text-align: center;
+        }
+        .samples-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            margin-bottom: 12px;
+        }
+        .samples-list {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .sample-link {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            white-space: nowrap;
+            transition: color .15s, border-color .15s, background .15s;
+        }
+        .sample-link:hover {
+            color: var(--primary);
+            border-color: var(--border-bright);
+            background: var(--bg-surface);
+        }
+
         /* ===== Section base ===== */
         section.block {
             padding: 64px 0;
@@ -654,6 +690,14 @@
             <div class="cta-row">
                 <a class="btn btn-primary" href="./player.html">▶ Launch the Player</a>
                 <a class="btn btn-secondary" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">View on GitHub</a>
+            </div>
+            <div class="samples" aria-label="Sample tracks from The Mod Archive">
+                <p class="samples-label">— or jump into a sample track —</p>
+                <div class="samples-list">
+                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=212083#2nd_pm.s3m">▶ 2nd_pm.s3m</a>
+                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=212701#inside_out.s3m">▶ inside_out.s3m</a>
+                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=48357#MINIMUM.S3M">▶ MINIMUM.S3M</a>
+                </div>
             </div>
         </section>
 

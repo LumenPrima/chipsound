@@ -42,6 +42,13 @@ Under the hood: Chipsound doesn't decode anything itself. [libopenmpt](https://l
   <a href="https://ko-fi.com/gamosoft"><img src="docs/images/support-button.svg" alt="Support on Ko-fi" height="44"></a>
 </p>
 
+<p align="center">
+  <sub>No module handy? Jump into a sample track:
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212083#2nd_pm.s3m">2nd_pm.s3m</a> ·
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212701#inside_out.s3m">inside_out.s3m</a> ·
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=48357#MINIMUM.S3M">MINIMUM.S3M</a></sub>
+</p>
+
 ## Why Chipsound?
 
 | | Chipsound | Other Players |
