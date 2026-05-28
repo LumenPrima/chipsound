@@ -72,7 +72,7 @@ Drop a `.mod`, `.s3m`, `.xm`, or `.it` file on the page and it plays. Tens of th
 
 ### Run it locally
 
-The app is pure static HTML/CSS/JS in [`src/`](src/). Browsers require `AudioWorklet`s to be served over HTTP (not `file://`), so pick any static server:
+The app is pure static HTML/CSS/JS in [`src/`](src/). Browsers require `AudioWorklet`s to be served over HTTP from `localhost` (not `file://`), so pick any static server:
 
 ```bash
 # Python 3
@@ -86,6 +86,8 @@ docker build -t chipsound . && docker run --rm -p 8765:80 chipsound
 ```
 
 Then open <http://localhost:8765/>.
+
+> Want to open it from another device (phone, tablet, second computer)? You'll need [HTTPS](https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/audioWorklet), put the server behind a reverse proxy or a tunnel.
 
 > Python's server caches aggressively. Hard-reload with `Ctrl + Shift + R`, or use `npx http-server -c-1` which sets `Cache-Control: no-store`.
 
