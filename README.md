@@ -43,13 +43,13 @@ Under the hood: Chipsound doesn't decode anything itself. [libopenmpt](https://l
 </p>
 
 <p align="center">
-  <sub>No module handy? Jump into a sample track:
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212083#2nd_pm.s3m">UnreaL ][</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212701#inside_out.s3m">Insideout</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=48357#MINIMUM.S3M">Minimum Velocity</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=39987#crystald.s3m">Crystal Dragon</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=32382#AQUA.S3M">Aquaphobia</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=34654#CTGOBLIN.S3M">Catch that goblin!!</a></sub>
+  <strong>No module handy?</strong> Jump straight into a sample track:<br>
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212083#2nd_pm.s3m">▶ UnreaL ][</a> ·
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212701#inside_out.s3m">▶ Insideout</a> ·
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=48357#MINIMUM.S3M">▶ Minimum Velocity</a> ·
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=39987#crystald.s3m">▶ Crystal Dragon</a> ·
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=32382#AQUA.S3M">▶ Aquaphobia</a> ·
+  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=34654#CTGOBLIN.S3M">▶ Catch that goblin!!</a>
 </p>
 
 ## Why Chipsound?
