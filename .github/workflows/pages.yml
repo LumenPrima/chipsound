@@ -43,17 +43,27 @@ jobs:
 
           # Inject GA4 into the public landing + player pages at deploy time.
           # Both repo sources stay GA-free so self-hosted (Docker / clone)
-          # deployments remain analytics-free.
+          # deployments remain analytics-free, and the injected snippet itself
+          # is hostname-gated to chipsound.com (+ subdomains) so forks that
+          # enable Pages with this workflow don't ping our property either.
           for page in _site/index.html _site/player.html; do
             awk '
                 /<\/head>/ {
-                    print "    <!-- Google Analytics 4 (injected at deploy; source is untracked) -->"
-                    print "    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-MQKBFSDZ5Q\"></script>"
+                    print "    <!-- Google Analytics 4 (chipsound.com only; injected at deploy, source untracked) -->"
                     print "    <script>"
-                    print "        window.dataLayer = window.dataLayer || [];"
-                    print "        function gtag(){dataLayer.push(arguments);}"
-                    print "        gtag(\"js\", new Date());"
-                    print "        gtag(\"config\", \"G-MQKBFSDZ5Q\");"
+                    print "        (function () {"
+                    print "            var h = location.hostname;"
+                    print "            if (h !== \"chipsound.com\" && !h.endsWith(\".chipsound.com\")) return;"
+                    print "            var s = document.createElement(\"script\");"
+                    print "            s.async = true;"
+                    print "            s.src = \"https://www.googletagmanager.com/gtag/js?id=G-MQKBFSDZ5Q\";"
+                    print "            document.head.appendChild(s);"
+                    print "            window.dataLayer = window.dataLayer || [];"
+                    print "            function gtag(){ dataLayer.push(arguments); }"
+                    print "            window.gtag = gtag;"
+                    print "            gtag(\"js\", new Date());"
+                    print "            gtag(\"config\", \"G-MQKBFSDZ5Q\");"
+                    print "        })();"
                     print "    </script>"
                 }
                 { print }
