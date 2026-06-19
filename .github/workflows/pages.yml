@@ -46,6 +46,9 @@ jobs:
           # deployments remain analytics-free, and the injected snippet itself
           # is hostname-gated to chipsound.com (+ subdomains) so forks that
           # enable Pages with this workflow don't ping our property either.
+          # The same block also installs a single delegated click listener for
+          # data-track / data-track-* attributes — it's only registered when
+          # the hostname check passes, so off-prod incurs zero per-click cost.
           for page in _site/index.html _site/player.html; do
             awk '
                 /<\/head>/ {
@@ -53,16 +56,32 @@ jobs:
                     print "    <script>"
                     print "        (function () {"
                     print "            var h = location.hostname;"
-                    print "            if (h !== \"chipsound.com\" && !h.endsWith(\".chipsound.com\")) return;"
+                    print "            window.__analyticsEnabled = (h === \"chipsound.com\" || h.endsWith(\".chipsound.com\"));"
+                    print "            if (!window.__analyticsEnabled) return;"
+                    print ""
                     print "            var s = document.createElement(\"script\");"
                     print "            s.async = true;"
                     print "            s.src = \"https://www.googletagmanager.com/gtag/js?id=G-MQKBFSDZ5Q\";"
                     print "            document.head.appendChild(s);"
+                    print ""
                     print "            window.dataLayer = window.dataLayer || [];"
-                    print "            function gtag(){ dataLayer.push(arguments); }"
-                    print "            window.gtag = gtag;"
+                    print "            window.gtag = function gtag(){ dataLayer.push(arguments); };"
                     print "            gtag(\"js\", new Date());"
                     print "            gtag(\"config\", \"G-MQKBFSDZ5Q\");"
+                    print ""
+                    print "            // Declarative click tracking: data-track=\"<event>\" + any data-track-<key>=\"<val>\"."
+                    print "            document.addEventListener(\"click\", function (e) {"
+                    print "                var el = e.target.closest(\"[data-track]\");"
+                    print "                if (!el) return;"
+                    print "                var params = { transport_type: \"beacon\" };"
+                    print "                for (var i = 0; i < el.attributes.length; i++) {"
+                    print "                    var a = el.attributes[i];"
+                    print "                    if (a.name.indexOf(\"data-track-\") === 0) {"
+                    print "                        params[a.name.slice(\"data-track-\".length)] = a.value;"
+                    print "                    }"
+                    print "                }"
+                    print "                gtag(\"event\", el.dataset.track, params);"
+                    print "            });"
                     print "        })();"
                     print "    </script>"
                 }

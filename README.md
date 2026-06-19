@@ -135,6 +135,12 @@ https://chipsound.com/player.html?load=https%3A%2F%2Fapi.modarchive.org%2Fdownlo
 | Click grip icon in header | Toggle ALL channels |
 | Drop file | Load and auto-play |
 
+## Privacy & telemetry
+
+The repository source is telemetry-free. There's no analytics module, no Google Analytics snippet, and no JavaScript that reads the `data-track="..."` markers on the playbar buttons in [`src/index.html`](src/index.html). Those are inert HTML attributes — browsers ignore them unless a click listener is explicitly registered to read them, and the source code never registers one.
+
+Google Analytics 4 only runs on the public site at [chipsound.com](https://chipsound.com): both the loader script and the single delegated listener that reads `data-track` are injected at deploy time by [`.github/workflows/pages.yml`](.github/workflows/pages.yml), and the injected snippet itself checks `location.hostname` before firing anything. Self-hosted deployments (Docker, Caddy, `python -m http.server`, anything you run yourself) fire zero requests to Google — easy to verify in DevTools → Network.
+
 ## License
 
 [MIT-licensed](LICENSE) — free to use, modify, fork, embed, and redistribute. Copyright © 2026 Gamosoft.
