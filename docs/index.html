@@ -659,9 +659,9 @@
                 <span class="brand-name">CHIPSOUND</span>
             </a>
             <nav class="site-nav" aria-label="Primary">
-                <a href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">Donate</a>
-                <a class="cta" href="./player.html">▶ Launch</a>
+                <a data-track="github_clicked" data-track-placement="nav" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">GitHub</a>
+                <a data-track="kofi_clicked" data-track-placement="nav" href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">Donate</a>
+                <a class="cta" data-track="launch_clicked" data-track-placement="nav" href="./player.html">▶ Launch</a>
             </nav>
         </div>
     </header>
@@ -679,18 +679,18 @@
                 <span class="chip">.IT</span>
             </div>
             <div class="cta-row">
-                <a class="btn btn-primary" href="./player.html">▶ Launch the Player</a>
-                <a class="btn btn-secondary" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">View on GitHub</a>
+                <a class="btn btn-primary" data-track="launch_clicked" data-track-placement="hero" href="./player.html">▶ Launch the Player</a>
+                <a class="btn btn-secondary" data-track="github_clicked" data-track-placement="hero" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">View on GitHub</a>
             </div>
             <div class="samples" aria-label="Sample tracks from The Mod Archive">
                 <p class="samples-label">— or jump into a sample track —</p>
                 <div class="samples-list">
-                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=212083#2nd_pm.s3m">▶ UnreaL ][</a>
-                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=212701#inside_out.s3m">▶ Insideout</a>
-                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=48357#MINIMUM.S3M">▶ Minimum Velocity</a>
-                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=39987#crystald.s3m">▶ Crystal Dragon</a>
-                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=32382#AQUA.S3M">▶ Aquaphobia</a>
-                    <a class="sample-link" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=34654#CTGOBLIN.S3M">▶ Catch that goblin!!</a>
+                    <a class="sample-link" data-track="sample_link_clicked" data-track-name="UnreaL ][" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=212083#2nd_pm.s3m">▶ UnreaL ][</a>
+                    <a class="sample-link" data-track="sample_link_clicked" data-track-name="Insideout" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=212701#inside_out.s3m">▶ Insideout</a>
+                    <a class="sample-link" data-track="sample_link_clicked" data-track-name="Minimum Velocity" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=48357#MINIMUM.S3M">▶ Minimum Velocity</a>
+                    <a class="sample-link" data-track="sample_link_clicked" data-track-name="Crystal Dragon" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=39987#crystald.s3m">▶ Crystal Dragon</a>
+                    <a class="sample-link" data-track="sample_link_clicked" data-track-name="Aquaphobia" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=32382#AQUA.S3M">▶ Aquaphobia</a>
+                    <a class="sample-link" data-track="sample_link_clicked" data-track-name="Catch that goblin!!" href="./player.html?load=https://api.modarchive.org/downloads.php?moduleid=34654#CTGOBLIN.S3M">▶ Catch that goblin!!</a>
                 </div>
             </div>
         </section>
@@ -703,7 +703,7 @@
                     Chipsound is a lightweight, in-browser player for the tracker music formats that powered the demoscene, the Amiga, and a generation of PC games. Open a URL, drop a module on the page, and it plays. No install, no upload, no account. Everything runs client-side &mdash; your files never leave your browser, and the entire UI is yours to theme.
                 </p>
                 <div class="cta-row" style="justify-content: flex-start;">
-                    <a class="btn btn-primary" href="./player.html">▶ Try it now</a>
+                    <a class="btn btn-primary" data-track="launch_clicked" data-track-placement="what_is" href="./player.html">▶ Try it now</a>
                 </div>
             </div>
         </section>
@@ -853,12 +853,12 @@
                     <div class="support-card">
                         <h3>★ Star it on GitHub</h3>
                         <p>The source code is fully open. Read it, fork it, contribute themes and visualizations. Stars help discovery a lot.</p>
-                        <a class="btn btn-secondary" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">github.com/gamosoft/chipsound</a>
+                        <a class="btn btn-secondary" data-track="github_clicked" data-track-placement="support_card" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">github.com/gamosoft/chipsound</a>
                     </div>
                     <div class="support-card">
                         <h3>☕ Buy me a coffee</h3>
                         <p>If Chipsound played back a <code>.mod</code> you hadn't heard since 1994, consider tossing a few euros at Ko-fi. No obligation, no paywall.</p>
-                        <a class="btn btn-secondary" href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">ko-fi.com/gamosoft</a>
+                        <a class="btn btn-secondary" data-track="kofi_clicked" data-track-placement="support_card" href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">ko-fi.com/gamosoft</a>
                     </div>
                 </div>
             </div>
@@ -867,10 +867,10 @@
 
     <footer>
         <div class="footer-links">
-            <a href="./player.html">Launch Player</a>
-            <a href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">GitHub</a>
+            <a data-track="launch_clicked" data-track-placement="footer" href="./player.html">Launch Player</a>
+            <a data-track="github_clicked" data-track-placement="footer" href="https://github.com/gamosoft/chipsound" target="_blank" rel="noopener">GitHub</a>
             <a href="https://github.com/gamosoft/chipsound/blob/main/LICENSE" target="_blank" rel="noopener">License (MIT)</a>
-            <a href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">Donate</a>
+            <a data-track="kofi_clicked" data-track-placement="footer" href="https://ko-fi.com/gamosoft" target="_blank" rel="noopener">Donate</a>
             <a href="https://modarchive.org" target="_blank" rel="noopener">Find modules at The Mod Archive</a>
         </div>
         <p class="credit">

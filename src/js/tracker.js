@@ -278,7 +278,7 @@ function renderHeaders(channels) {
         el('button', {
             type: 'button',
             class: 'header-label muteable',
-            dataset: { channel: 'all' },
+            dataset: { channel: 'all', track: 'mute_all_clicked' },
             title: 'Click to mute or unmute all channels',
             'aria-label': 'Toggle all channels',
             'aria-pressed': 'false',
@@ -290,7 +290,7 @@ function renderHeaders(channels) {
         const button = el('button', {
             type: 'button',
             class: 'channel-cell channel-header muteable',
-            dataset: { channel: col },
+            dataset: { channel: col, track: 'mute_channel_clicked', trackChannel: col },
             'aria-label': `Toggle mute on channel ${col + 1}`,
             'aria-pressed': 'false',
         }, `
