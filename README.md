@@ -44,12 +44,12 @@ Under the hood: Chipsound doesn't decode anything itself. [libopenmpt](https://l
 
 <p align="center">
   <strong>No module handy?</strong> Jump straight into a sample track:<br>
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212083#2nd_pm.s3m">▶ UnreaL ][</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=212701#inside_out.s3m">▶ Insideout</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=48357#MINIMUM.S3M">▶ Minimum Velocity</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=39987#crystald.s3m">▶ Crystal Dragon</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=32382#AQUA.S3M">▶ Aquaphobia</a> ·
-  <a href="https://chipsound.com/player.html?load=https://api.modarchive.org/downloads.php?moduleid=34654#CTGOBLIN.S3M">▶ Catch that goblin!!</a>
+  <a href="https://chipsound.com/player.html?modarchive=212083">▶ UnreaL ][</a> ·
+  <a href="https://chipsound.com/player.html?modarchive=212701">▶ Insideout</a> ·
+  <a href="https://chipsound.com/player.html?modarchive=48357">▶ Minimum Velocity</a> ·
+  <a href="https://chipsound.com/player.html?modarchive=39987">▶ Crystal Dragon</a> ·
+  <a href="https://chipsound.com/player.html?modarchive=32382">▶ Aquaphobia</a> ·
+  <a href="https://chipsound.com/player.html?modarchive=34654">▶ Catch that goblin!!</a>
 </p>
 
 ## Why Chipsound?
@@ -111,6 +111,12 @@ The player accepts a `?load=<url>` query parameter pointing to any HTTP(S) URL:
 https://chipsound.com/player.html?load=./tracks/awesome.s3m
 https://chipsound.com/player.html?load=https://example.com/cool.mod
 https://chipsound.com/player.html?load=https%3A%2F%2Fapi.modarchive.org%2Fdownloads.php%3Fmoduleid%3D212083
+```
+
+For The Mod Archive — the most common source for tracker music — there's a shorter form: `?modarchive=N` expands internally to the same `downloads.php?moduleid=N` URL, no percent-encoding needed:
+
+```text
+https://chipsound.com/player.html?modarchive=212083
 ```
 
 > **Loading from The Mod Archive.** Modarchive's `downloads.php` endpoint sends the right CORS headers and works directly, but the `?` inside the inner URL must be percent-encoded (`%3F`), otherwise the outer query parser splits the URL in two:

@@ -74,6 +74,15 @@ function stopTicker() {
     if (song) clearVisualizations(song, getCurrentVisualizations());
 }
 
+// Expand the ?modarchive=<n> shortcut into a Modarchive download URL. Strict
+// digits-only validation guards against junk smuggled into shared links;
+// real fetch failures (e.g. unknown ID) are surfaced by the existing URL
+// load error path.
+function modArchiveUrl(id) {
+    if (!id || !/^\d+$/.test(id)) return null;
+    return `https://api.modarchive.org/downloads.php?moduleid=${id}`;
+}
+
 function bootstrapPlayer() {
     const player = new ChiptuneJsPlayer();
     playerState.player = player;
@@ -84,12 +93,15 @@ function bootstrapPlayer() {
 
         flushPendingLoad();
 
-        // Direct-link sharing via ?load=<URL>. Only http(s)/same-origin works.
-        // Autoplay is suppressed here because the page just loaded with no
-        // user gesture: the AudioContext is suspended, so play() would show
-        // the Pause icon without producing sound. The first Space / click
-        // both unlocks audio and starts playback.
-        const loadUrl = new URLSearchParams(location.search).get('load');
+        // Direct-link sharing. Two URL forms supported:
+        //   ?load=<full URL>     any http(s) URL
+        //   ?modarchive=<n>      shortcut, expanded to a Modarchive download URL
+        // `load` wins if both are present. Autoplay is suppressed here because
+        // the page just loaded with no user gesture: the AudioContext is
+        // suspended, so play() would show the Pause icon without producing
+        // sound. The first Space / click both unlocks audio and starts playback.
+        const params = new URLSearchParams(location.search);
+        const loadUrl = params.get('load') || modArchiveUrl(params.get('modarchive'));
         if (loadUrl) loadFromUrl(loadUrl, { autoPlay: false });
     });
 
