@@ -21,6 +21,37 @@
 	@html path / /index.html
 	header @html Cache-Control "no-cache"
 
+	# Mod Archive proxy for the Library's "Mod Archive" tab (charts, search,
+	# random pick). modarchive.org sends no CORS headers, so the browser can't
+	# read its pages directly; this forwards a strict allowlist of read-only
+	# requests. Delete the block to disable the tab — it degrades gracefully.
+	@modarchive {
+		path /api/modarchive
+		query request=view_chart request=search request=view_top_favourites
+	}
+	handle @modarchive {
+		rewrite * /index.php?{http.request.uri.query}
+		reverse_proxy https://modarchive.org {
+			header_up Host modarchive.org
+			header_up -Cookie
+			header_down -Set-Cookie
+			header_down Cache-Control "public, max-age=600"
+		}
+	}
+	@modarchive_random {
+		path /api/modarchive
+		query request=view_random
+	}
+	handle @modarchive_random {
+		rewrite * /index.php?{http.request.uri.query}
+		reverse_proxy https://modarchive.org {
+			header_up Host modarchive.org
+			header_up -Cookie
+			header_down -Set-Cookie
+			header_down Cache-Control "no-store"
+		}
+	}
+
 	# `precompressed` serves the build-time .br / .zst sibling at zero runtime
 	# CPU cost. `browse` is required for runtime theme + viz directory
 	# discovery (src/js/themes.js, src/js/viz-engine.js parse the HTML listing).

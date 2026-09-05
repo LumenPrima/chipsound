@@ -1,0 +1,23 @@
+/* Fork-only: Mod Archive tab for the Library (src/js/library-modarchive.js). */
+
+.library-ma-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.library-ma-bar select { flex: 0 1 180px; padding: 6px 8px; }
+.library-ma-bar input[type="search"] { flex: 1 1 180px; min-width: 140px; padding: 6px 8px; box-sizing: border-box; }
+.library-ma-bar .retro-button { flex: 0 0 auto; }
+.library-pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--popup-border);
+}
+.library-pager[hidden] { display: none; }
+.library-pager-label { color: var(--popup-muted); font-size: 12px; }
