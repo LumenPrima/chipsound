@@ -822,3 +822,73 @@ kbd {
 :root:not(.theme-hifi-deck) .controls > .retro-button {
     align-items: center;
 }
+
+
+/* ========== Mixer panel (playback parameters) ========== */
+
+.mixer-panel {
+    background: #2a2a2a;
+    border: 2px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #ffffff;
+    box-shadow: 2px 2px 0 #000;
+}
+.mixer-panel[hidden] { display: none; }
+
+.mixer-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+.mixer-title {
+    font-weight: bold;
+    color: var(--accent);
+}
+.mixer-note {
+    flex: 1;
+    opacity: 0.6;
+    font-size: 11px;
+}
+.mixer-reset { flex: 0 0 auto; }
+
+.mixer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 6px 24px;
+}
+
+.mixer-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 72px;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0;
+}
+.mixer-label { white-space: nowrap; }
+.mixer-row input[type="range"] {
+    width: 100%;
+    min-width: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+.mixer-row .retro-select { width: 100%; }
+.mixer-value {
+    text-align: right;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+#toggle-mixer.active {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+@media (max-width: 640px) {
+    #toggle-mixer { display: none; }
+    .mixer-row { grid-template-columns: 100px 1fr 60px; }
+}
