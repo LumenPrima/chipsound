@@ -74,6 +74,7 @@ Other things worth mentioning:
 - Subsong picker for modules that ship multiple subsongs
 - The samples pane starts **automatic**: as wide as the longest sample name (floor 120px, cap 40% of the row). Drag the handle on its inner edge to set a width for this browser; double-click the handle (or Home with it focused) to go back to automatic
 - Press `M` for the mixer (stereo, tempo, pitch, gain and other live playback parameters). Settings are remembered in this browser
+- Render the loaded module to a WAV file with the current mixer settings and channel mutes (Mixer → Render to file)
 - `?` opens the full keyboard shortcut list
 
 ## Quick start
@@ -137,7 +138,7 @@ https://chipsound.com/player.html?modarchive=212083
 | `E` | Toggle effects (visualizations on/off) |
 | `V` / `Shift` + `V` | Cycle visualization forward / backward |
 | `I` | Toggle samples panel |
-| `M` | Toggle mixer (playback parameters) |
+| `M` | Toggle mixer (playback parameters + render to file) |
 | `T` / `Shift` + `T` | Cycle theme forward / backward |
 | `?` | Show this help |
 | `Esc` | Close this help |
