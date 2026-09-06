@@ -74,6 +74,7 @@ Other things worth mentioning:
 - Subsong picker for modules that ship multiple subsongs
 - Press `M` for the Mixer: live stereo separation, Amiga resampler, interpolation, volume ramping, tempo, pitch (semitones), gain and loop settings, all applied by libopenmpt on the fly and remembered between sessions. Drag for coarse and hold `Shift` at any point for fine, use the wheel or arrow keys to nudge, click a value to type it, double-click to reset
 - Render the loaded module to a WAV, FLAC or Opus file with the current mixer settings and channel mutes (Mixer → Render to file)
+- Press `B` for the Library: the chipsound.com sample tracks, your recent URLs, a browsable local folder (serve your modules as `./tracks/`) and a URL / Mod Archive id box
 - `?` opens the full keyboard shortcut list
 
 ## Quick start
@@ -131,6 +132,7 @@ https://chipsound.com/player.html?modarchive=212083
 | `Space` / `P` | Play / Pause |
 | `S` | Stop |
 | `L` | Open file… |
+| `B` | Library (curated / recent / local / URL) |
 | `←` / `→` | Previous / next order |
 | `E` | Toggle effects (visualizations on/off) |
 | `V` / `Shift` + `V` | Cycle visualization forward / backward |
