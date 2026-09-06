@@ -4,6 +4,8 @@ import { $, isTypingTarget } from './dom.js';
 import { cycleTheme } from './themes.js';
 import { cycleVisualization } from './controls.js';
 import { toggleMixer } from './mixer.js';
+import { toggleGhostOrders } from './tracker.js';
+import { toast } from './toast.js';
 
 // ENTER belongs to focused button-likes; SPACE stays global Play/Pause.
 function isActivatableTarget(target) {
@@ -26,6 +28,10 @@ export const SHORTCUTS = [
     { codes: ['KeyI'],          keys: ['I'],             label: 'Toggle samples',          run: () => $('#toggle-samples').click() },
     { codes: ['KeyM'],          keys: ['M'],             label: 'Toggle mixer (playback parameters)', run: () => toggleMixer() },
     { codes: ['KeyT'],          keys: ['T'],             label: 'Cycle theme (Shift: reverse)', run: (e) => cycleTheme(e?.shiftKey) },
+    { codes: ['KeyG'],          keys: ['G'],             label: 'Toggle ghost orders (continuous scroll)', run: () => {
+        const on = toggleGhostOrders();
+        toast(`Ghost orders: ${on ? 'on' : 'off'}`, { variant: 'info', duration: 1500 });
+    } },
     // Handle-focused — pane-resize.js owns these; listed here for the help overlay.
     { codes: [], keys: ['Handle', '← / →'], joiner: ' + ', label: 'Nudge samples pane (Shift: 40px)' },
     { codes: [], keys: ['Handle', 'Home'], joiner: ' + ',  label: 'Reset samples pane to automatic width' },
