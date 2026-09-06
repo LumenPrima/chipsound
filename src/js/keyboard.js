@@ -3,6 +3,8 @@
 import { $, isTypingTarget } from './dom.js';
 import { cycleTheme } from './themes.js';
 import { cycleVisualization } from './controls.js';
+import { toggleGhostOrders } from './tracker.js';
+import { toast } from './toast.js';
 
 // ENTER belongs to focused button-likes; SPACE stays global Play/Pause.
 function isActivatableTarget(target) {
@@ -24,6 +26,10 @@ export const SHORTCUTS = [
     { codes: ['KeyV'],          keys: ['V'],             label: 'Cycle visualization (Shift: reverse)', run: (e) => cycleVisualization(e?.shiftKey) },
     { codes: ['KeyI'],          keys: ['I'],             label: 'Toggle samples',          run: () => $('#toggle-samples').click() },
     { codes: ['KeyT'],          keys: ['T'],             label: 'Cycle theme (Shift: reverse)', run: (e) => cycleTheme(e?.shiftKey) },
+    { codes: ['KeyG'],          keys: ['G'],             label: 'Toggle ghost orders (continuous scroll)', run: () => {
+        const on = toggleGhostOrders();
+        toast(`Ghost orders: ${on ? 'on' : 'off'}`, { variant: 'info', duration: 1500 });
+    } },
     // Mouse-only — listed for docs, no key binding.
     { codes: [], keys: ['Click header'],                           label: 'Toggle channel mute' },
     { codes: [], keys: ['Ctrl', 'Click header'], joiner: ' + ',    label: 'Solo channel (mute others)' },
