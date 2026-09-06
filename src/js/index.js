@@ -37,6 +37,7 @@ import { installMediaSession, setMediaSessionMetadata } from './media-session.js
 import { initMixer, savedRenderConfig } from './mixer.js';
 import { refreshRenderAvailability } from './render.js';
 import { initLibrary, modArchiveDownloadUrl } from './library.js';
+import { installModArchiveTab } from './library-modarchive.js';   // fork-only
 
 let rafId = -1;
 
@@ -205,6 +206,7 @@ async function init() {
     });
     initMixer();
     initLibrary();
+    installModArchiveTab();
     installKeyboardShortcuts();
     installHelpEscape();
     installResizeHandler();

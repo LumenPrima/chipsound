@@ -76,6 +76,7 @@ Other things worth mentioning:
 - Render the loaded module to a WAV, FLAC or Opus file with the current mixer settings and channel mutes (Mixer → Render to file)
 - Press `B` for the Library: the chipsound.com sample tracks, your recent URLs, a browsable local folder (serve your modules as `./tracks/`) and a URL / Mod Archive id box
 - The samples pane fits its content; drag its inner edge to resize it (double-click to go back to automatic)
+- Press `B` for the Library: the chipsound.com sample tracks, your recent URLs, a browsable local folder (serve your modules as `./tracks/`), a URL / Mod Archive id box, and The Mod Archive's charts, search and random pick (needs the small proxy described below)
 - `?` opens the full keyboard shortcut list
 
 ## Quick start
@@ -92,6 +93,9 @@ The app is pure static HTML/CSS/JS in [`src/`](src/). Browsers require `AudioWor
 # Python 3
 cd src && python -m http.server 8765
 
+# Python 3, plus the Mod Archive proxy the Library tab uses (see below)
+python3 tools/dev-server.py 8765
+
 # Node + npx
 npx http-server src -p 8765 -c-1
 
@@ -106,6 +110,10 @@ Then open <http://localhost:8765/>.
 > Python's server caches aggressively. Hard-reload with `Ctrl + Shift + R`, or use `npx http-server -c-1` which sets `Cache-Control: no-store`.
 
 > **Themes & visualizations are auto-discovered from directory listings.** On startup the player fetches `./css/themes/` and `./js/visualizations/` and parses the HTML index to find all `*.css` / `*.js` files. The three servers above all enable directory listings by default. If you deploy behind a static host that disables them (some CDNs, GitHub Pages with a hand-rolled config, certain nginx setups), the picker will fall back to a single built-in theme + visualization. Either enable directory listing for those two folders, or fork in a static manifest.
+
+### Mod Archive tab (optional proxy)
+
+The Library's **Mod Archive** tab browses [The Mod Archive](https://modarchive.org)'s featured / top-scored / most-downloaded / top-favourites charts, searches by title or filename, and picks random modules. modarchive.org sends no CORS headers, so the page can't read those listings directly; instead the tab calls `./api/modarchive?…` on the same origin and expects the server to forward a strict allowlist of read-only requests. The `Caddyfile` ships with that route (so the Docker image has it), and `python3 tools/dev-server.py` provides it for local development. Without the proxy the tab explains what's missing and everything else keeps working. Module downloads themselves go straight to `api.modarchive.org`, which does allow cross-origin requests.
 
 ### Load a module by URL
 
