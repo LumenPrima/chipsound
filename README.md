@@ -147,6 +147,7 @@ https://chipsound.com/player.html?modarchive=212083
 | `I` | Toggle samples panel |
 | `M` | Toggle mixer (playback parameters + render to file) |
 | `T` / `Shift` + `T` | Cycle theme forward / backward |
+| `G` | Toggle ghost orders (the previous and next order shown dimmed around the current pattern, so the view scrolls continuously) |
 | `?` | Show this help |
 | `Esc` | Close this help |
 | Click header | Toggle channel mute |
