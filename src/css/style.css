@@ -309,6 +309,45 @@ html.samples-hidden .sample-section    { display: none; }
     background: var(--tracker-bg);
 }
 
+/* Three grids (previous / current / next order) stack inside #trackerPatterns.
+   Only the outermost visible grid keeps the frame's vertical padding, border
+   and corner radius, so the stack reads as one continuous pattern. */
+#trackerPatterns .tracker-grid:not(.grid-top) {
+    padding-top: 0;
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+#trackerPatterns .tracker-grid:not(.grid-bottom) {
+    padding-bottom: 0;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Order-break line at the top of every grid; one row tall (set by tracker.js). */
+.grid-break {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    overflow: hidden;
+    background: var(--tracker-bg);
+    color: var(--tracker-fg);
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--tracker-fg) 30%, transparent);
+}
+
+/* Ghosted neighbours: the previous and next order, dimmed. */
+.tracker-grid.ghost .row-label,
+.tracker-grid.ghost .channel-cell,
+.tracker-grid.ghost .grid-break {
+    opacity: 0.45;
+}
+
 .channel-cell {
     background: var(--tracker-bg);
     color: var(--tracker-fg);
