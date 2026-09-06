@@ -134,6 +134,7 @@ https://chipsound.com/player.html?modarchive=212083
 | `V` / `Shift` + `V` | Cycle visualization forward / backward |
 | `I` | Toggle samples panel |
 | `T` / `Shift` + `T` | Cycle theme forward / backward |
+| `G` | Toggle ghost orders (off by default: shows the previous and next order dimmed around the current pattern, so the view scrolls continuously) |
 | `?` | Show this help |
 | `Esc` | Close this help |
 | Click header | Toggle channel mute |

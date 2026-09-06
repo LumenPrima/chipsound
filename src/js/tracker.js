@@ -3,6 +3,7 @@
 import { $, $$, el, show } from './dom.js';
 import { hb, padNumber, renderNote } from './format.js';
 import { playerState } from './state.js';
+import { prefs } from './prefs.js';
 import {
     registerCanvas,
     clearCanvasCache,
@@ -23,6 +24,9 @@ let pendingSampleIds = new Set();
 // without rebuilding it. A grid with order === -1 is unassigned (hidden)
 // but may still cache a pattern's DOM for reuse.
 const grids = [];
+// Off by default: only the active grid is shown (classic one-pattern view); the
+// neighbours are still prefetched so the boundary swap stays hot.
+let ghostOrders = false;
 let prevGrid   = null;
 let activeGrid = null;
 let nextGrid   = null;
@@ -159,6 +163,24 @@ export function jumpToOrder(song, targetOrder) {
 
 export function getCurrentOrder() {
     return currentOrder;
+}
+
+// Public: show or hide the previous/next order around the current pattern.
+export function setGhostOrdersVisible(visible) {
+    ghostOrders = !!visible;
+    if (!activeGrid) return;
+    applyRoles();
+    measureGeometry();
+    applyGeometry();
+    if (lastDrawnRow >= 0) centerRow(lastDrawnRow);
+}
+
+// Public: keyboard toggle — flips the pref and returns the new state.
+export function toggleGhostOrders() {
+    const visible = !prefs.ghostOrders;
+    prefs.ghostOrders = visible;
+    setGhostOrdersVisible(visible);
+    return visible;
 }
 
 // Public: diagnostics — bounded by design (always 0–3). See ?diag.
@@ -472,11 +494,11 @@ function assignGrids(song, order, patternIndex) {
 
 // Visibility, ghost/edge classes and spacer heights for the current roles.
 function applyRoles() {
-    const shown = [prevGrid, activeGrid, nextGrid].filter(g => g.order !== -1);
+    const shown = [prevGrid, activeGrid, nextGrid].filter(isGridShown);
     const topGrid = shown[0];
     const bottomGrid = shown[shown.length - 1];
     for (const g of grids) {
-        const isShown = g.order !== -1;
+        const isShown = isGridShown(g);
         const display = isShown ? 'grid' : 'none';
         if (g.el.style.display !== display) g.el.style.display = display;
         g.el.classList.toggle('ghost', g !== activeGrid);
@@ -484,6 +506,10 @@ function applyRoles() {
         g.el.classList.toggle('grid-bottom', g === bottomGrid);
     }
     applyGeometry();
+}
+
+function isGridShown(g) {
+    return g.order !== -1 && (g === activeGrid || ghostOrders);
 }
 
 // Layout reads. Only from cold loads and relayouts — never the swap path.
@@ -513,7 +539,7 @@ function measureGeometry() {
 // on that side, its rows count towards the padding and the spacer shrinks.
 function applyGeometry() {
     const off = scrollOffset || 18;
-    const breakH = off;
+    const breakH = ghostOrders ? off : 0;
     const half = (viewMetrics.viewportH - viewMetrics.headerH) / 2 - off / 2;
     const needTop    = Math.max(80, Math.floor(half - gridPadTop - breakH));
     const needBottom = Math.max(80, Math.floor(half - gridPadBottom));
@@ -526,11 +552,11 @@ function applyGeometry() {
     if (!activeGrid || activeGrid.order === -1) return;
 
     let prevTop = 0, activeTop = needTop, activeBottom = needBottom, nextBottom = 0;
-    if (prevGrid.order !== -1) {
+    if (isGridShown(prevGrid)) {
         prevTop = Math.max(0, needTop - breakH - prevGrid.rowCount * off);
         activeTop = 0;
     }
-    if (nextGrid.order !== -1) {
+    if (isGridShown(nextGrid)) {
         nextBottom = Math.max(0, needBottom - breakH - nextGrid.rowCount * off);
         activeBottom = 0;
     }
@@ -567,7 +593,7 @@ function showPattern(song, patternIndex, order) {
     syncSampleListHeight();
 }
 
-//   y_of_row = headerH + padTop + [prev block] + activeTop + breakH
+//   y_of_row = headerH + padTop + [prev block] + activeTop + breakH (0 when ghosts are off)
 //              + R*offset + offset/2
 //   scrollTop = y_of_row - (headerH + viewportH) / 2
 function centerRow(row) {
@@ -579,9 +605,10 @@ function centerRow(row) {
     viewMetrics.viewportH = viewportH;
 
     const off = scrollOffset;
+    const breakH = ghostOrders ? off : 0;
     let y = headerH + gridPadTop;
-    if (prevGrid.order !== -1) y += prevGrid.topPx + off + prevGrid.rowCount * off;
-    y += activeGrid.topPx + off + row * off + off / 2;
+    if (isGridShown(prevGrid)) y += prevGrid.topPx + breakH + prevGrid.rowCount * off;
+    y += activeGrid.topPx + breakH + row * off + off / 2;
     main.scrollTop = y - (headerH + viewportH) / 2;
 }
 
@@ -615,7 +642,7 @@ function schedulePrefetch(song) {
         if (populateGrid(item.grid, song, pattern, item.order)) {
             applyRoles();
             // A ghost appearing above shifts the active rows down: re-centre.
-            if (item.grid === prevGrid && lastDrawnRow >= 0) centerRow(lastDrawnRow);
+            if (item.grid === prevGrid && ghostOrders && lastDrawnRow >= 0) centerRow(lastDrawnRow);
         }
         schedulePrefetch(song);
     };
