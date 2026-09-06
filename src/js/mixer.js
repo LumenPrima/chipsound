@@ -30,12 +30,12 @@ export const PARAMS = [
     {
         key: 'amigaResampler', label: 'Amiga resampler', type: 'select', def: 'a1200',
         options: [['off', 'Off'], ['auto', 'Auto'], ['a500', 'A500'], ['a1200', 'A1200'], ['unfiltered', 'Unfiltered']],
-        hint: 'Paula emulation for Amiga-style modules (MOD etc.). Off = use the interpolation filter below.',
+        hint: 'Paula emulation for Amiga-style modules (MOD etc.). A500 is the darkest, Unfiltered the brightest; Off = use the interpolation filter below. Easiest to hear on a MOD with bright samples.',
     },
     {
         key: 'interpolationFilter', label: 'Interpolation', type: 'select', def: 0,
         options: [[0, 'Default'], [1, 'None (nearest)'], [2, 'Linear'], [4, 'Cubic'], [8, 'Sinc (8-tap)']],
-        hint: 'Sample interpolation. Ignored for Amiga modules while the Amiga resampler is on.',
+        hint: 'Sample interpolation. Default = 8-tap sinc. None is the audible one (aliasing on low-rate samples); cubic vs sinc is subtle. Ignored for Amiga modules while the Amiga resampler is on.',
     },
     {
         key: 'volumeRamping', label: 'Volume ramping', type: 'range',
@@ -74,6 +74,36 @@ export const PARAMS = [
 let panelEl = null;
 let toggleBtn = null;
 const controls = new Map();   // key -> { input, field, value }
+const rows = new Map();       // key -> row element
+
+// libopenmpt only runs the Amiga (Paula) resampler for modules flagged as
+// Amiga-style; these are the format ids (metadata "type") that get the flag.
+const AMIGA_TYPES = new Set(['mod', 'm15', 'stk', 'nst', 'wow', 'pt36', 'okt', 'digi', 'sfx', 'sfx2', 'med', 'mmd0', 'mmd1', 'mmd2', 'mmd3', 'stp']);
+let moduleType = null;
+
+// Some rows can't affect the current module: say so instead of letting the
+// user hunt for a difference that isn't there.
+function refreshInert() {
+    const amigaModule = moduleType ? AMIGA_TYPES.has(moduleType) : null;
+    const amigaOn = controls.get('amigaResampler')?.value !== 'off';
+    const mark = (key, reason) => {
+        const row = rows.get(key);
+        if (!row) return;
+        row.classList.toggle('inert', Boolean(reason));
+        let tag = row.querySelector('.mixer-inert');
+        if (reason) {
+            if (!tag) { tag = document.createElement('span'); tag.className = 'mixer-inert'; row.appendChild(tag); }
+            tag.textContent = reason;
+        } else tag?.remove();
+    };
+    mark('amigaResampler', amigaModule === false ? `no effect: ${moduleType.toUpperCase()} isn't an Amiga format` : '');
+    mark('interpolationFilter', amigaModule && amigaOn ? 'ignored while the Amiga resampler is on' : '');
+}
+
+export function setModuleType(type) {
+    moduleType = type ? String(type).toLowerCase() : null;
+    refreshInert();
+}
 
 const toEngine = (p, v) => (p.toEngine ? p.toEngine(v) : v);
 const fromEngine = (p, v) => (p.fromEngine ? p.fromEngine(v) : v);
@@ -129,6 +159,7 @@ function setParam(p, value, { save = true } = {}) {
     if (c.field && document.activeElement !== c.field) c.field.value = fmt(p, value);
     playerState.player?.setRenderParam(p.key, toEngine(p, value));
     if (save) persist();
+    if (p.key === 'amigaResampler') refreshInert();
 }
 
 function nudge(p, dir, fine) {
@@ -343,6 +374,7 @@ function buildRow(p, current) {
     const row = document.createElement('div');
     row.className = `mixer-row mixer-${p.type}`;
     row.title = p.hint || '';
+    rows.set(p.key, row);
 
     const label = document.createElement('label');
     label.className = 'mixer-label';
@@ -380,6 +412,7 @@ function buildPanel() {
         grid.appendChild(buildRow(p, ui));
     }
     panelEl.appendChild(grid);
+    refreshInert();
 }
 
 export function resetAll() {
@@ -412,4 +445,8 @@ export function initMixer() {
     buildPanel();
     toggleBtn?.addEventListener('click', toggleMixer);
     setMixerOpen(Boolean(prefs.showMixer));
+    // Mark rows that can't affect the loaded module (metadata "type").
+    playerState.player?.onMetadata(meta => setModuleType(meta?.type));
+    if (playerState.meta?.type) setModuleType(playerState.meta.type);
+    refreshInert();
 }

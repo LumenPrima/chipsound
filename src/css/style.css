@@ -891,6 +891,14 @@ kbd {
 }
 .mixer-row input[type="range"].fine-drag { filter: brightness(1.3); }
 .mixer-row .retro-select { width: 100%; }
+.mixer-row.inert > :not(.mixer-label):not(.mixer-inert) { opacity: 0.4; }
+.mixer-row.inert { grid-template-rows: auto auto; }
+.mixer-inert {
+    grid-column: 2 / -1;
+    font-size: 10px;
+    color: var(--popup-muted);
+    margin-top: -4px;
+}
 
 /* Linked numeric field: looks like a readout, behaves like an input. */
 .mixer-value {
