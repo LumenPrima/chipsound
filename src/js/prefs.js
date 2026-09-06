@@ -31,7 +31,7 @@ export const prefs = {
     set showSamples(value) { write('showSamples', value); },
 
     // Continuous pattern scroll: previous/next order shown dimmed around the current one.
-    get ghostOrders() { return read('ghostOrders', true); },
+    get ghostOrders() { return read('ghostOrders', false); },
     set ghostOrders(value) { write('ghostOrders', value); },
 
     get volume() { return read('volume', 100); },

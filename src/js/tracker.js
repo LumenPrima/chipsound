@@ -24,9 +24,9 @@ let pendingSampleIds = new Set();
 // without rebuilding it. A grid with order === -1 is unassigned (hidden)
 // but may still cache a pattern's DOM for reuse.
 const grids = [];
-// When false only the active grid is shown (classic one-pattern view); the
+// Off by default: only the active grid is shown (classic one-pattern view); the
 // neighbours are still prefetched so the boundary swap stays hot.
-let ghostOrders = true;
+let ghostOrders = false;
 let prevGrid   = null;
 let activeGrid = null;
 let nextGrid   = null;
