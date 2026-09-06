@@ -54,4 +54,7 @@ export const prefs = {
 
     get libraryPath() { return read('libraryPath', './tracks/'); },
     set libraryPath(value) { write('libraryPath', value); },
+    // Samples pane width in px; null = fit to content.
+    get samplesWidth() { return read('samplesWidth', null); },
+    set samplesWidth(value) { write('samplesWidth', value); },
 };
