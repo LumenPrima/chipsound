@@ -1,82 +1,99 @@
-// Fork-only: Mod Archive browser tab for the Library (charts, search,
-// random). Kept out of the upstream PRs because it needs a server-side
-// proxy (see README → "Mod Archive tab"). Self-contained: registers itself
-// through registerLibraryTab() and loads its own stylesheet, so the only
-// touch on shared code is the install call in index.js.
+// Fork-only: Mod Archive tab for the Library, built on The Mod Archive's XML
+// API (https://modarchive.org/index.php?xml-api). The API needs a key, which
+// never reaches the browser: the tab calls ./api/modarchive?… on its own
+// origin and the proxy (Caddyfile / tools/dev-server.py) adds the key and
+// forwards to api.modarchive.org/xml-tools.php. Self-contained: registers
+// itself through registerLibraryTab() and loads its own stylesheet, so the
+// only touch on shared code is the install call in index.js.
 
 import { registerLibraryTab, modArchiveDownloadUrl } from './library.js';
 
-// ---------- Mod Archive (charts, search, random) ----------
-//
-// modarchive.org has no CORS headers, so listings go through a same-origin
-// proxy at ./api/modarchive that forwards an allowlist of read-only
-// requests (Caddyfile / tools/dev-server.py). The HTML comes back as-is and
-// is parsed here; the download itself goes straight to api.modarchive.org.
-
 const MA_PROXY = './api/modarchive';
-const MA_CHARTS = [
-    { id: 'featured',   label: 'Featured',        params: { request: 'view_chart', query: 'featured' } },
-    { id: 'topscore',   label: 'Top scored',      params: { request: 'view_chart', query: 'topscore' } },
-    { id: 'tophits',    label: 'Most downloaded', params: { request: 'view_chart', query: 'tophits' } },
-    { id: 'favourites', label: 'Top favourites',  params: { request: 'view_top_favourites' } },
+
+// Level 3 keys (the free tier) get the browse lists; the charts need level 5.
+// A chart on a level 3 key comes back as an API error, shown as such.
+const MA_LISTS = [
+    { id: 'featured', group: 'Charts', label: 'Featured',        params: { request: 'chart', query: 'featured' } },
+    { id: 'topscore', group: 'Charts', label: 'Top scored',      params: { request: 'chart', query: 'topscore' } },
+    { id: 'tophits',  group: 'Charts', label: 'Most downloaded', params: { request: 'chart', query: 'tophits' } },
+    { id: 'rated10',  group: 'Browse', label: 'Reviewed 10/10',  params: { request: 'view_by_rating_reviews', query: '10' } },
+    { id: 'rated9',   group: 'Browse', label: 'Reviewed 9/10',   params: { request: 'view_by_rating_reviews', query: '9' } },
+    { id: 'rated8',   group: 'Browse', label: 'Reviewed 8/10',   params: { request: 'view_by_rating_reviews', query: '8' } },
+    ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => ({
+        id: `alpha-${l}`, group: 'By filename', label: l, params: { request: 'view_by_list', query: l },
+    })),
 ];
-const maState = { chart: 'featured', page: 1, search: '' };
+const MA_FORMATS = [
+    { id: '',    label: 'Any format' },
+    { id: 'mod', label: 'MOD' },
+    { id: 'xm',  label: 'XM' },
+    { id: 's3m', label: 'S3M' },
+    { id: 'it',  label: 'IT' },
+];
+const maState = { list: 'featured', format: '', page: 1, search: '' };
 
+// Proxy → XML document. Distinguishes "no proxy" (404), "no key" (503) and
+// API-level errors (<error> in the body) so the tab can say what's missing.
 async function maFetch(params) {
-    const fresh = params.request === 'view_random';
-    const res = await fetch(`${MA_PROXY}?${new URLSearchParams(params)}`, { headers: { Accept: 'text/html' }, cache: fresh ? 'no-store' : 'default' });
+    const fresh = params.request === 'random';
+    const query = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== '' && v != null));
+    const res = await fetch(`${MA_PROXY}?${query}`, { headers: { Accept: 'text/xml' }, cache: fresh ? 'no-store' : 'default' });
     if (res.status === 404) throw new Error('NO_PROXY');
+    if (res.status === 503) throw new Error('NO_KEY');
     if (!res.ok) throw new Error(`proxy returned HTTP ${res.status}`);
-    const html = await res.text();
-    return new DOMParser().parseFromString(html, 'text/html');
+    const doc = new DOMParser().parseFromString(await res.text(), 'application/xml');
+    if (doc.querySelector('parsererror')) throw new Error('unreadable reply from the API');
+    const err = doc.querySelector('error');
+    if (err) throw new Error(`The Mod Archive API said: ${err.textContent.trim()}`);
+    return doc;
 }
 
-function maIdFrom(href) {
-    const m = String(href || '').match(/(?:module\.php\?|moduleid=|query=)(\d+)/);
-    return m ? m[1] : null;
-}
-
-// Chart pages: <a class="chart-listing-title" href="module.php?ID">Title</a>
-// … <span class="chart-listing">file.ext</span> … info line after an
-// "information.png" icon. Search pages: table rows with a .format-icon and
-// <a href="…view_by_moduleid&query=ID" title="Song title">file.ext</a>.
-function maParseList(doc) {
-    const items = [];
-    for (const a of doc.querySelectorAll('a.chart-listing-title')) {
-        const id = maIdFrom(a.getAttribute('href'));
-        if (!id) continue;
-        const table = a.closest('table');
-        const file = table?.querySelector('span.chart-listing')?.textContent.trim() || '';
-        const info = table?.querySelector('img[alt="info"] + a')?.textContent.trim() || '';
-        items.push({ id, title: a.textContent.trim(), file, info });
-    }
-    if (!items.length) {
-        for (const a of doc.querySelectorAll('a[href*="view_by_moduleid"]')) {
-            const id = maIdFrom(a.getAttribute('href'));
-            if (!id) continue;
-            const row = a.closest('tr');
-            items.push({ id, title: a.getAttribute('title')?.trim() || a.textContent.trim(), file: a.textContent.trim(),
-                         info: row?.querySelector('.format-icon')?.textContent.trim() || '' });
+// One <module> element → plain object. Field names follow the XML tool's
+// module record (filename, songtitle, format, channels, size, id, artist_info).
+function maModule(el) {
+    const text = (tag, root = el) => root.getElementsByTagName(tag)[0]?.textContent.trim() ?? '';
+    const artistInfo = el.getElementsByTagName('artist_info')[0];
+    let artist = '';
+    if (artistInfo) {
+        const a = artistInfo.getElementsByTagName('artist')[0];
+        artist = a ? text('alias', a) : '';
+        if (!artist) {
+            const g = artistInfo.getElementsByTagName('guessed_artists')[0];
+            artist = g ? text('alias', g) : '';
         }
     }
-    let pages = 1;
-    for (const el of doc.querySelectorAll('a[href*="page="], select[name="page"] option')) {
-        const raw = el.hasAttribute('href') ? el.getAttribute('href').match(/[?&;]page=(\d+)/)?.[1] : el.getAttribute('value');
-        const n = Number(raw);
-        if (Number.isFinite(n) && n > pages && n < 100000) pages = n;
-    }
+    return {
+        id: text('id'),
+        file: text('filename'),
+        title: text('songtitle'),
+        format: text('format').toUpperCase(),
+        channels: text('channels'),
+        size: text('size'),
+        artist,
+    };
+}
+
+function maParseList(doc) {
+    const items = [...doc.getElementsByTagName('module')].map(maModule).filter(m => m.id);
+    const pages = Number(doc.getElementsByTagName('totalpages')[0]?.textContent) || 1;
     return { items, pages };
 }
 
-function maItemToEntry(it) {
-    const ext = (it.file.split('.').pop() || '').toUpperCase();
+function maItemToEntry(m) {
+    const title = m.title || m.file;
     return {
-        title: it.title || it.file,
-        subtitle: it.file && it.file !== it.title ? it.file : '',
-        meta: [ext, it.info !== ext ? it.info : ''].filter(Boolean).join(' · '),
-        url: modArchiveDownloadUrl(it.id),
-        name: it.file || undefined,
+        title,
+        subtitle: [m.artist, m.file !== title ? m.file : ''].filter(Boolean).join(' · '),
+        meta: [m.format, m.channels ? `${m.channels} ch` : '', m.size].filter(Boolean).join(' · '),
+        url: modArchiveDownloadUrl(m.id),
+        name: m.file || undefined,
     };
+}
+
+function maErrorText(err) {
+    if (err.message === 'NO_PROXY') return 'This server has no Mod Archive proxy (./api/modarchive). The Caddy config ships with one; for local development run `python3 tools/dev-server.py`. See README → Mod Archive tab.';
+    if (err.message === 'NO_KEY') return 'This server has no Mod Archive API key (MODARCHIVE_API_KEY is not set). Keys are granted by The Mod Archive on application; see README → Mod Archive tab.';
+    return `Could not reach The Mod Archive: ${err.message}`;
 }
 
 const modArchiveTab = {
@@ -85,15 +102,27 @@ const modArchiveTab = {
         const bar = document.createElement('form');
         bar.className = 'library-ma-bar';
         bar.innerHTML = `
-            <select class="retro-select" name="chart" aria-label="Chart"></select>
+            <select class="retro-select" name="list" aria-label="List"></select>
+            <select class="retro-select library-ma-format" name="format" aria-label="Format"></select>
             <input type="search" class="retro-select" name="q" placeholder="Search title or filename…" spellcheck="false" autocomplete="off" aria-label="Search The Mod Archive">
             <button type="submit" class="retro-button retro-button-icon" title="Search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
             <button type="button" class="retro-button retro-button-icon ma-random" title="Play a random module"><i class="fa-solid fa-dice" aria-hidden="true"></i> <span class="btn-label">Random</span></button>`;
-        const chartSel = bar.elements.chart;
-        for (const c of MA_CHARTS) {
-            const o = document.createElement('option'); o.value = c.id; o.textContent = c.label; chartSel.appendChild(o);
+        const listSel = bar.elements.list;
+        let group = null;
+        for (const l of MA_LISTS) {
+            if (!group || group.label !== l.group) {
+                group = document.createElement('optgroup');
+                group.label = l.group;
+                listSel.appendChild(group);
+            }
+            const o = document.createElement('option'); o.value = l.id; o.textContent = l.label; group.appendChild(o);
         }
-        chartSel.value = maState.chart;
+        listSel.value = maState.list;
+        const formatSel = bar.elements.format;
+        for (const f of MA_FORMATS) {
+            const o = document.createElement('option'); o.value = f.id; o.textContent = f.label; formatSel.appendChild(o);
+        }
+        formatSel.value = maState.format;
         bar.elements.q.value = maState.search;
         body.appendChild(bar);
 
@@ -116,11 +145,13 @@ const modArchiveTab = {
         const load = async () => {
             holder.textContent = 'Loading…';
             pager.hidden = true;
-            const chart = MA_CHARTS.find(c => c.id === maState.chart) || MA_CHARTS[0];
+            const list = MA_LISTS.find(l => l.id === maState.list) || MA_LISTS[0];
             const params = maState.search
-                ? { request: 'search', query: maState.search, submit: 'Find', search_type: 'filename_or_songtitle', page: maState.page }
-                : { ...chart.params, page: maState.page };
-            status.textContent = maState.search ? `Search results for “${maState.search}”` : `${chart.label} on The Mod Archive`;
+                ? { request: 'search', type: 'filename_or_songtitle', query: maState.search, page: maState.page, format: maState.format }
+                : { ...list.params, page: maState.page, format: maState.format };
+            status.textContent = maState.search
+                ? `Search results for “${maState.search}”`
+                : `${list.group === 'By filename' ? `Filenames starting with ${list.label}` : list.label} on The Mod Archive`;
             let parsed;
             try {
                 parsed = maParseList(await maFetch(params));
@@ -128,9 +159,7 @@ const modArchiveTab = {
                 holder.innerHTML = '';
                 const p = document.createElement('p');
                 p.className = 'library-error';
-                p.textContent = err.message === 'NO_PROXY'
-                    ? 'This server has no Mod Archive proxy (./api/modarchive). The Caddy config ships with one; for local development run `python3 tools/dev-server.py`. See README → Mod Archive tab.'
-                    : `Could not reach The Mod Archive: ${err.message}`;
+                p.textContent = maErrorText(err);
                 holder.appendChild(p);
                 return;
             }
@@ -143,7 +172,8 @@ const modArchiveTab = {
             pager.querySelector('[data-dir="1"]').disabled = maState.page >= pages;
         };
 
-        chartSel.addEventListener('change', () => { maState.chart = chartSel.value; maState.search = ''; bar.elements.q.value = ''; maState.page = 1; load(); });
+        listSel.addEventListener('change', () => { maState.list = listSel.value; maState.search = ''; bar.elements.q.value = ''; maState.page = 1; load(); });
+        formatSel.addEventListener('change', () => { maState.format = formatSel.value; maState.page = 1; load(); });
         bar.addEventListener('submit', e => { e.preventDefault(); maState.search = bar.elements.q.value.trim(); maState.page = 1; load(); });
         bar.elements.q.addEventListener('search', () => { if (!bar.elements.q.value) { maState.search = ''; maState.page = 1; load(); } });
         pager.addEventListener('click', e => {
@@ -155,14 +185,13 @@ const modArchiveTab = {
         bar.querySelector('.ma-random').addEventListener('click', async () => {
             status.textContent = 'Picking a random module…';
             try {
-                const doc = await maFetch({ request: 'view_random' });
-                const link = doc.querySelector('a[href*="downloads.php?moduleid="]')?.getAttribute('href') || '';
-                const id = maIdFrom(link);
-                if (!id) throw new Error('no module in the response');
-                const file = link.split('#')[1];
-                api.load(modArchiveDownloadUrl(id), { name: file ? decodeURIComponent(file) : undefined });
+                const doc = await maFetch({ request: 'random', format: maState.format });
+                const m = maParseList(doc).items[0];
+                if (!m) throw new Error('no module in the reply');
+                status.textContent = `Random pick: ${m.title || m.file}`;
+                api.load(modArchiveDownloadUrl(m.id), { name: m.file || undefined });
             } catch (err) {
-                status.textContent = `Random pick failed: ${err.message === 'NO_PROXY' ? 'no proxy on this server' : err.message}`;
+                status.textContent = `Random pick failed: ${maErrorText(err)}`;
             }
         });
 

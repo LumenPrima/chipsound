@@ -21,18 +21,20 @@
 	@html path / /index.html
 	header @html Cache-Control "no-cache"
 
-	# Mod Archive proxy for the Library's "Mod Archive" tab (charts, search,
-	# random pick). modarchive.org sends no CORS headers, so the browser can't
-	# read its pages directly; this forwards a strict allowlist of read-only
-	# requests. Delete the block to disable the tab — it degrades gracefully.
+	# Mod Archive XML API proxy for the Library's "Mod Archive" tab. The API
+	# (https://modarchive.org/index.php?xml-api) needs a per-application key,
+	# read here from the MODARCHIVE_API_KEY environment variable so it never
+	# reaches the browser. Only read-only request types are forwarded. Leave the
+	# variable unset (or delete the block) to disable the tab — it degrades
+	# gracefully and explains what's missing.
 	@modarchive {
 		path /api/modarchive
-		query request=view_chart request=search request=view_top_favourites
+		query request=search request=chart request=view_by_moduleid request=view_by_list request=view_by_rating_reviews request=view_by_rating_comments
 	}
 	handle @modarchive {
-		rewrite * /index.php?{http.request.uri.query}
-		reverse_proxy https://modarchive.org {
-			header_up Host modarchive.org
+		rewrite * /xml-tools.php?key={env.MODARCHIVE_API_KEY}&{http.request.uri.query}
+		reverse_proxy https://api.modarchive.org {
+			header_up Host api.modarchive.org
 			header_up -Cookie
 			header_down -Set-Cookie
 			header_down Cache-Control "public, max-age=600"
@@ -40,12 +42,12 @@
 	}
 	@modarchive_random {
 		path /api/modarchive
-		query request=view_random
+		query request=random
 	}
 	handle @modarchive_random {
-		rewrite * /index.php?{http.request.uri.query}
-		reverse_proxy https://modarchive.org {
-			header_up Host modarchive.org
+		rewrite * /xml-tools.php?key={env.MODARCHIVE_API_KEY}&{http.request.uri.query}
+		reverse_proxy https://api.modarchive.org {
+			header_up Host api.modarchive.org
 			header_up -Cookie
 			header_down -Set-Cookie
 			header_down Cache-Control "no-store"
