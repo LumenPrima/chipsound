@@ -54,6 +54,16 @@
 		}
 	}
 
+	# Scene tab: proxy to a Scene Browser instance (the fork's Demozoo-backed
+	# music index, see README → Scene tab). No key; set SCENE_API_URL to where
+	# it runs. Without one the tab reports the 502 and explains itself.
+	@scene path /api/scene/*
+	handle @scene {
+		uri strip_prefix /api/scene
+		rewrite * /api{uri}
+		reverse_proxy {$SCENE_API_URL:127.0.0.1:8770}
+	}
+
 	# `precompressed` serves the build-time .br / .zst sibling at zero runtime
 	# CPU cost. `browse` is required for runtime theme + viz directory
 	# discovery (src/js/themes.js, src/js/viz-engine.js parse the HTML listing).

@@ -1,6 +1,7 @@
 """Chipsound dev server: static src/ (with the directory listings the
 theme / visualization / Library discovery need) plus the /api/modarchive proxy
-for the Library's Mod Archive tab.
+for the Library's Mod Archive tab and the /api/scene proxy for its Scene tab
+(SCENE_API_URL, default http://127.0.0.1:8770, a local Scene Browser).
 
     MODARCHIVE_API_KEY=… python3 tools/dev-server.py [port] [--bind 127.0.0.1]
 
@@ -23,6 +24,8 @@ import urllib.request
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src')
 UPSTREAM = 'https://api.modarchive.org/xml-tools.php'
+SCENE_API = os.environ.get('SCENE_API_URL', 'http://127.0.0.1:8770').rstrip('/')
+SCENE_PATHS = {'music', 'search', 'random', 'config'}
 API_KEY = os.environ.get('MODARCHIVE_API_KEY', '').strip()
 ALLOWED_REQUEST = {
     'search', 'chart', 'random', 'view_by_moduleid',
@@ -66,6 +69,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlsplit(self.path)
         if parsed.path == '/api/modarchive':
             return self.proxy(parsed.query)
+        if parsed.path.startswith('/api/scene/'):
+            return self.scene_proxy(parsed.path[len('/api/scene/'):], parsed.query)
         return super().do_GET()
 
     def proxy(self, query):
@@ -102,6 +107,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def scene_proxy(self, name, query):
+        """Forward ./api/scene/<name>?… to the Scene Browser's /api/<name> (local
+        service, no key; see README → Scene tab). 502 when it's not running."""
+        if name not in SCENE_PATHS or len(query) > 2000:
+            self.send_error(404, 'Unknown Scene Browser endpoint')
+            return
+        url = f'{SCENE_API}/api/{name}' + (f'?{query}' if query else '')
+        req = urllib.request.Request(url, headers={'Accept': 'application/json'})
+        try:
+            with urllib.request.urlopen(req, timeout=25) as r:
+                body = r.read()
+                ctype = r.headers.get('Content-Type', 'application/json')
+        except urllib.error.HTTPError as e:
+            self.send_error(e.code, f'Scene Browser said HTTP {e.code}')
+            return
+        except urllib.error.URLError as e:
+            self.send_error(502, f'Scene Browser unreachable at {SCENE_API}: {getattr(e, "reason", e)}')
+            return
+        self.send_response(200)
+        self.send_header('Content-Type', ctype)
+        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Cache-Control', 'no-store' if name == 'random' else 'private, max-age=60')
+        self.end_headers()
+        self.wfile.write(body)
+
     def log_message(self, fmt, *args):
         sys.stderr.write('%s - %s\n' % (self.address_string(), fmt % args))
 
@@ -112,7 +142,7 @@ def main():
     ap.add_argument('--bind', default='127.0.0.1')
     args = ap.parse_args()
     server = http.server.ThreadingHTTPServer((args.bind, args.port), Handler)
-    print(f'Chipsound dev server on http://{args.bind}:{args.port}/ (root {os.path.abspath(ROOT)}; /api/modarchive proxy {"on" if API_KEY else "needs MODARCHIVE_API_KEY"})')
+    print(f'Chipsound dev server on http://{args.bind}:{args.port}/ (root {os.path.abspath(ROOT)}; /api/modarchive proxy {"on" if API_KEY else "needs MODARCHIVE_API_KEY"}; /api/scene → {SCENE_API})')
     try:
         server.serve_forever()
     except KeyboardInterrupt:
