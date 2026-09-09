@@ -678,6 +678,47 @@ body.drag-over #dropZone { opacity: 1; }
     color: var(--popup-fg);
 }
 
+/* Shortcuts with an action are buttons: the touch path to every feature.
+   Styled as the plain label with a tap-sized hit area and a state pill. */
+.help-run {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 28px;
+    margin: -4px 0;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.help-run:hover { background: var(--popup-surface); }
+.help-run:focus-visible { outline: 2px solid var(--popup-accent); outline-offset: -1px; }
+.help-run-label { flex: 1; }
+.help-state {
+    flex: none;
+    font-size: 11px;
+    line-height: 1;
+    padding: 3px 7px;
+    border-radius: 999px;
+    border: 1px solid var(--popup-border);
+    color: var(--popup-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.help-run[aria-pressed="true"] .help-state {
+    color: var(--popup-accent);
+    border-color: var(--popup-accent);
+}
+@media (pointer: coarse) {
+    .help-list { row-gap: 10px; }
+    .help-run { min-height: 40px; }
+}
+
 .help-credits {
     margin-top: 16px;
     padding-top: 10px;
@@ -781,10 +822,11 @@ kbd {
     /* Show only Title (2nd child). */
     .mod-info-box:not(:nth-child(2)) { display: none; }
 
+    /* #show-help stays: on a touch screen the ? panel is the only way to
+       reach the keyboard-bound toggles (its rows are buttons). */
     #subsongControl,
     #toggle-visualizations,
     #toggle-samples,
-    #show-help,
     .volume-control {
         display: none;
     }
@@ -831,11 +873,6 @@ kbd {
         flex: 1 1 calc(20% - 8px) !important;
         min-width: 0 !important;
     }
-}
-
-/* Hide help (?) below 1024 px — `?` keyboard shortcut still works. */
-@media (min-width: 641px) and (max-width: 1024px) {
-    #show-help { display: none; }
 }
 
 

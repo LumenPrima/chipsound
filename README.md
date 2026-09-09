@@ -126,6 +126,8 @@ https://chipsound.com/player.html?modarchive=212083
 
 ## Keyboard shortcuts
 
+Every shortcut with an action is also a button in the `?` panel, so on a phone or tablet that panel is the way to reach the toggles (effects, samples, and so on); toggles show whether they're on.
+
 | Key | Action |
 |---|---|
 | `Space` / `P` | Play / Pause |
