@@ -311,7 +311,7 @@ html.samples-hidden .sample-section    { display: none; }
 }
 
 .tracker-grid {
-    display: none;
+    display: grid;
     gap: 0 2px;
     background: var(--tracker-bg-alt);
     padding: 4px;
@@ -319,6 +319,28 @@ html.samples-hidden .sample-section    { display: none; }
     min-width: var(--grid-min-width, 100%);
     /* Paint/layout island — hidden prefetched grid isolated from the visible one. */
     contain: content;
+    position: relative;
+}
+
+/* Prefetched / unassigned grids: still display:grid so their cells are laid
+   out while idle, but collapsed to zero height. `contain: paint` above clips
+   them, so nothing shows. Deliberately no visibility:hidden (inherited: its
+   toggle would recalc style on every cell) and no overflow:hidden (makes the
+   grid a scroll container: its toggle relayouts every cell). Showing one is
+   then a change to the grid box alone. */
+.tracker-grid.grid-hidden {
+    height: 0;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+/* The three grids are ordered with CSS `order` (tracker.js), never moved. */
+#trackerPatterns {
+    display: flex;
+    flex-direction: column;
 }
 
 /* Spacers above row 0 and below last row — heights set by tracker.js. */
@@ -359,11 +381,17 @@ html.samples-hidden .sample-section    { display: none; }
     box-shadow: inset 0 1px 0 color-mix(in srgb, var(--tracker-fg) 30%, transparent);
 }
 
-/* Ghosted neighbours: the previous and next order, dimmed. */
-.tracker-grid.ghost .row-label,
-.tracker-grid.ghost .channel-cell,
-.tracker-grid.ghost .grid-break {
-    opacity: 0.45;
+/* Ghosted neighbours: the previous and next order, dimmed by one veil over
+   the grid rather than an opacity on every cell (toggling .ghost then costs
+   one element's style, not thousands). */
+.tracker-grid.ghost::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--tracker-bg);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .channel-cell {
