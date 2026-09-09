@@ -521,6 +521,15 @@ html.samples-hidden .pane-resizer { display: none; }
 .volume  { color: var(--tracker-volume); }
 .effect  { color: var(--tracker-effect); }
 
+/* Effect families (classified in format.js). Themes opt in with the
+   --tracker-fx-* tokens; without them every family keeps the plain effect
+   colour, so untouched themes look exactly as before. */
+.effect.fx-pitch,  .volume.fx-pitch  { color: var(--tracker-fx-pitch,  var(--tracker-effect)); }
+.effect.fx-volume, .volume.fx-volume { color: var(--tracker-fx-volume, var(--tracker-effect)); }
+.effect.fx-pan,    .volume.fx-pan    { color: var(--tracker-fx-pan,    var(--tracker-effect)); }
+.effect.fx-flow,   .volume.fx-flow   { color: var(--tracker-fx-flow,   var(--tracker-effect)); }
+.effect.fx-sample, .volume.fx-sample { color: var(--tracker-fx-sample, var(--tracker-effect)); }
+
 /* ========== Toast ========== */
 
 #toast {
