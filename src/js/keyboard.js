@@ -1,6 +1,7 @@
 // SHORTCUTS is the single source of truth — help overlay reads from it too.
 
 import { $, isTypingTarget } from './dom.js';
+import { prefs } from './prefs.js';
 import { cycleTheme } from './themes.js';
 import { cycleVisualization } from './controls.js';
 import { toggleMixer } from './mixer.js';
@@ -35,7 +36,7 @@ export const SHORTCUTS = [
     { codes: ['KeyR'],          keys: ['R'],             label: 'Toggle roll overlay (pitch ribbons per channel)', run: () => {
         const on = toggleRoll();
         toast(`Roll overlay: ${on ? 'on' : 'off'}`, { variant: 'info', duration: 1500 });
-    } },
+    }, state: () => prefs.rollOverlay },
     // Handle-focused — pane-resize.js owns these; listed here for the help overlay.
     { codes: [], keys: ['Handle', '← / →'], joiner: ' + ', label: 'Nudge samples pane (Shift: 40px)' },
     { codes: [], keys: ['Handle', 'Home'], joiner: ' + ',  label: 'Reset samples pane to automatic width' },
