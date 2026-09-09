@@ -34,6 +34,10 @@ export const prefs = {
     get ghostOrders() { return read('ghostOrders', false); },
     set ghostOrders(value) { write('ghostOrders', value); },
 
+    // Roll overlay: pitch ribbons per channel drawn from the pattern data.
+    get rollOverlay() { return read('rollOverlay', false); },
+    set rollOverlay(value) { write('rollOverlay', value); },
+
     get volume() { return read('volume', 100); },
     set volume(value) { write('volume', value); },
 

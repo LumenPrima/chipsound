@@ -140,6 +140,7 @@ https://chipsound.com/player.html?modarchive=212083
 | `M` | Toggle mixer (playback parameters) |
 | `T` / `Shift` + `T` | Cycle theme forward / backward |
 | `G` | Toggle ghost orders (off by default: shows the previous and next order dimmed around the current pattern, so the view scrolls continuously) |
+| `R` | Toggle roll overlay (off by default: draws each channel's notes as pitch ribbons beside the text, shaped by the effects — portamento leans, vibrato wobbles, volume slides taper) |
 | `?` | Show this help |
 | `Esc` | Close this help |
 | Click header | Toggle channel mute |

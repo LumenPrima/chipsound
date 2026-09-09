@@ -319,7 +319,22 @@ html.samples-hidden .sample-section    { display: none; }
     min-width: var(--grid-min-width, 100%);
     /* Paint/layout island — hidden prefetched grid isolated from the visible one. */
     contain: content;
+    position: relative;   /* anchors the roll overlay canvas */
 }
+
+/* Roll overlay (R): one canvas per grid, laid over the rows. tracker.js
+   sets its top to follow the spacers; the lanes are read from the cells. */
+.roll-canvas { display: none; }
+.tracker-main.roll .roll-canvas {
+    display: block;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+.tracker-grid.ghost .roll-canvas { opacity: 0.45; }
+/* Wide lanes: text sits left, ribbons take the rest of the lane. */
+.tracker-main.roll-beside .channel-cell:not(.channel-header) { justify-content: flex-start; }
 
 /* Spacers above row 0 and below last row — heights set by tracker.js. */
 .grid-spacer {
