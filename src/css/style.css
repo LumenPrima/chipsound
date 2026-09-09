@@ -407,8 +407,35 @@ html.samples-hidden .sample-section    { display: none; }
 
 .channel-label {
     font-size: 0.85rem;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* "Now playing" readout: last note + instrument seen on the channel. The
+   whole line flashes to full opacity on each note-on (tracker.js). */
+.channel-now {
+    display: flex;
+    gap: 0.5ch;
+    width: 100%;
+    margin-bottom: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.2;
+    opacity: 0.7;
+}
+.channel-now .now-note {
+    flex: none;
+    color: var(--tracker-note);
+}
+.channel-now .now-inst {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    color: var(--tracker-sample);
 }
 
 .canvas-parent {

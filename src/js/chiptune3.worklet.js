@@ -377,6 +377,13 @@ class MPT extends AudioWorkletProcessor {
 		const chNum = libopenmpt._openmpt_module_get_num_channels(this.modulePtr);
 		this.channels = chNum;
 		song.channels = chNum;
+		// Channel names (IT / XM / MPTM set them; other formats yield '').
+		song.channelNames = [];
+		for (let i = 0; i < chNum; i++) {
+			const namePtr = libopenmpt._openmpt_module_get_channel_name(this.modulePtr, i);
+			song.channelNames.push(libopenmpt.UTF8ToString(namePtr).trim());
+			libopenmpt._openmpt_free_string(namePtr);
+		}
 		// instruments
 		for (let i = 0, e = libopenmpt._openmpt_module_get_num_instruments(this.modulePtr); i < e; i++) {
 			song.instruments.push(libopenmpt.UTF8ToString(libopenmpt._openmpt_module_get_instrument_name(this.modulePtr, i)));

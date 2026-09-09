@@ -88,16 +88,23 @@ export function hb(n) {
     return n.toString(16).padStart(2, '0').toUpperCase();
 }
 
+// Display name for a pattern pitch byte: '' for none, '===' note off,
+// '^^.' note cut, otherwise e.g. 'C#4'.
+export function noteName(pitch) {
+    return (
+        pitch === 0 ? '' :
+        pitch === 255 ? '===' :
+        pitch === 254 ? '^^.' :
+        NOTES[(pitch - 1) % 12] + (Math.floor((pitch - 1) / 12) - 1)
+    );
+}
+
 // note[0]=pitch, [1]=sample, [2]=vol-effect, [3]=effect, [4]=vol, [5]=param.
 function getNote(note) {
     const volcmd = note[2];
     const effect = note[3];
     return {
-        note:
-            note[0] === 0 ? '' :
-            note[0] === 255 ? '===' :
-            note[0] === 254 ? '^^.' :
-            NOTES[(note[0] - 1) % 12] + (Math.floor((note[0] - 1) / 12) - 1),
+        note: noteName(note[0]),
         sample: note[1] === 0 ? '' : hb(note[1]),
         // A volume-column command with a zero argument (v00, p00, …) is still
         // a command; only an empty column is blank.
