@@ -44,7 +44,7 @@ export function installSamplesResizer() {
 
     handle = document.createElement('div');
     handle.className = 'pane-resizer';
-    handle.title = 'Drag to resize the samples pane · double-click for automatic width';
+    handle.title = 'Drag to resize the samples pane · click then ←/→ to nudge · double-click for automatic width';
     handle.setAttribute('role', 'separator');
     handle.setAttribute('aria-orientation', 'vertical');
     handle.setAttribute('aria-label', 'Resize samples pane');
@@ -89,18 +89,22 @@ export function installSamplesResizer() {
     });
     handle.addEventListener('dblclick', resetSamplesWidth);
     handle.addEventListener('keydown', e => {
-        const left = pane.classList.contains('samples-left');
         const dir = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
-        if (dir) {
-            e.preventDefault();
-            const w = pane.getBoundingClientRect().width + dir * (left ? 1 : -1) * (e.shiftKey ? 40 : 10);
-            const maxPx = container.getBoundingClientRect().width * MAX_FRACTION;
-            const clamped = Math.min(maxPx, Math.max(MIN_PX, w));
-            prefs.samplesWidth = Math.round(clamped);
-            applyWidth(clamped);
-        } else if (e.key === 'Home' || e.key === 'Backspace' || e.key === 'Delete') {
-            e.preventDefault();
+        const reset = e.key === 'Home' || e.key === 'Backspace' || e.key === 'Delete';
+        if (!dir && !reset) return;
+        // Keep Previous/Next order (and Backspace-as-history) from seeing these.
+        e.preventDefault();
+        e.stopPropagation();
+        syncHandleSide();
+        if (reset) {
             resetSamplesWidth();
+            return;
         }
+        const left = pane.classList.contains('samples-left');
+        const w = pane.getBoundingClientRect().width + dir * (left ? 1 : -1) * (e.shiftKey ? 40 : 10);
+        const maxPx = container.getBoundingClientRect().width * MAX_FRACTION;
+        const clamped = Math.min(maxPx, Math.max(MIN_PX, w));
+        prefs.samplesWidth = Math.round(clamped);
+        applyWidth(clamped);
     });
 }

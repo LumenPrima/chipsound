@@ -24,6 +24,9 @@ export const SHORTCUTS = [
     { codes: ['KeyV'],          keys: ['V'],             label: 'Cycle visualization (Shift: reverse)', run: (e) => cycleVisualization(e?.shiftKey) },
     { codes: ['KeyI'],          keys: ['I'],             label: 'Toggle samples',          run: () => $('#toggle-samples').click() },
     { codes: ['KeyT'],          keys: ['T'],             label: 'Cycle theme (Shift: reverse)', run: (e) => cycleTheme(e?.shiftKey) },
+    // Handle-focused — pane-resize.js owns these; listed here for the help overlay.
+    { codes: [], keys: ['Handle', '← / →'], joiner: ' + ', label: 'Nudge samples pane (Shift: 40px)' },
+    { codes: [], keys: ['Handle', 'Home'], joiner: ' + ',  label: 'Reset samples pane to automatic width' },
     // Mouse-only — listed for docs, no key binding.
     { codes: [], keys: ['Click header'],                           label: 'Toggle channel mute' },
     { codes: [], keys: ['Ctrl', 'Click header'], joiner: ' + ',    label: 'Solo channel (mute others)' },
@@ -42,6 +45,7 @@ for (const entry of SHORTCUTS) {
 export function installKeyboardShortcuts() {
     document.addEventListener('keydown', e => {
         if (isTypingTarget(e.target)) return;
+        if (e.target?.classList?.contains('pane-resizer')) return;
         if (e.code === 'Enter' && isActivatableTarget(e.target)) return;
         const handler = codeHandlers.get(e.code);
         if (!handler) return;
