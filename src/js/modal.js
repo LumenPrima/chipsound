@@ -4,8 +4,8 @@
 //
 //   - lazy build on first open, content supplied by `build(body, modal)`
 //   - Esc and backdrop click close; only one modal is open at a time
-//   - focus moves into the dialog on open, is trapped inside (Tab cycles)
-//     and returns to the previously focused element on close
+//   - focus moves to Close on open (onOpen can move it), Tab is trapped
+//     inside, and focus returns to the previously focused element on close
 //   - aria: role=dialog, aria-modal, labelled by the title
 //
 // createModal({ id, title, className, width, build, onOpen, onClose })
@@ -54,10 +54,10 @@ export function createModal({ id, title, className = '', width = null, build, on
             restoreFocus = document.activeElement;
             el.classList.add('visible');
             current = modal;
+            // Close is the default so a footer link doesn't steal focus and
+            // scroll the body. onOpen can move it into a field afterwards.
+            el.querySelector('.modal-close')?.focus({ preventScroll: true });
             onOpen?.(modal);
-            // Prefer the first control in the body; fall back to the close button.
-            const target = body.querySelector(FOCUSABLE) || el.querySelector('.modal-close');
-            target?.focus({ preventScroll: true });
         },
         close() {
             if (!el || current !== modal) return;

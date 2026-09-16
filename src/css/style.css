@@ -557,7 +557,7 @@ html.samples-hidden .pane-resizer { display: none; }
 #dropZone {
     position: fixed;
     inset: 0;
-    background: rgba(19, 4, 27, 0.78);
+    background: var(--popup-backdrop);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -694,7 +694,7 @@ body.drag-over #dropZone { opacity: 1; }
 }
 .help-credits a:hover,
 .help-credits a:focus-visible {
-    color: var(--help-accent);
+    color: var(--popup-accent);
     border-bottom-color: currentColor;
 }
 .help-credits-license { color: var(--popup-faint); }
@@ -714,7 +714,7 @@ body.drag-over #dropZone { opacity: 1; }
     font-size: 13px;
     font-weight: bold;
     letter-spacing: 0.02em;
-    color: var(--help-accent);
+    color: var(--popup-accent);
     border-bottom: none;
     transition: transform 0.15s ease, filter 0.15s ease;
 }
