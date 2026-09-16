@@ -72,7 +72,7 @@ Other things worth mentioning:
 - Press `T` to cycle themes, `V` to cycle visualizations
 - Click a channel header to mute it; Ctrl-click to solo
 - Subsong picker for modules that ship multiple subsongs
-- The samples pane fits its content; drag its inner edge to resize it (double-click to go back to automatic)
+- The samples pane starts **automatic**: as wide as the longest sample name (floor 120px, cap 40% of the row). Drag the handle on its inner edge to set a width for this browser; double-click the handle (or Home with it focused) to go back to automatic
 - `?` opens the full keyboard shortcut list
 
 ## Quick start
@@ -131,6 +131,8 @@ https://chipsound.com/player.html?modarchive=212083
 | `S` | Stop |
 | `L` | Open file… |
 | `←` / `→` | Previous / next order |
+| Handle + `←` / `→` | Nudge samples pane width (Shift: 40px) |
+| Handle + `Home` | Reset samples pane to automatic |
 | `E` | Toggle effects (visualizations on/off) |
 | `V` / `Shift` + `V` | Cycle visualization forward / backward |
 | `I` | Toggle samples panel |
