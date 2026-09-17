@@ -54,6 +54,7 @@ body { overflow: hidden; }
     --popup-faint:   color-mix(in srgb, var(--tracker-fg) 35%, transparent);
     --popup-shadow:  color-mix(in srgb, var(--tracker-fg) 35%, transparent);
     --popup-backdrop: color-mix(in srgb, var(--tracker-bg) 55%, rgba(0, 0, 0, 0.55));
+    --popup-danger:  var(--vu-high);
 }
 
 
@@ -1025,7 +1026,7 @@ kbd {
 }
 .library-blurb { margin: 0 0 10px; color: var(--popup-muted); font-size: 11px; line-height: 1.5; }
 .library-blurb a { color: var(--popup-fg); }
-.library-error { color: #ef4444; }
+.library-error { color: var(--popup-danger); }
 
 .library-list {
     list-style: none;
