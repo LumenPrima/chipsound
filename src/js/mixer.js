@@ -88,8 +88,10 @@ function refreshInert() {
     const amigaOn = controls.get('amigaResampler')?.value !== 'off';
     const mark = (key, reason) => {
         const row = rows.get(key);
+        const c = controls.get(key);
         if (!row) return;
         row.classList.toggle('inert', Boolean(reason));
+        if (c?.input) c.input.disabled = Boolean(reason);
         let tag = row.querySelector('.mixer-inert');
         if (reason) {
             if (!tag) { tag = document.createElement('span'); tag.className = 'mixer-inert'; row.appendChild(tag); }
@@ -427,8 +429,6 @@ export function isMixerOpen() {
 export function setMixerOpen(open) {
     if (!panelEl) return;
     panelEl.hidden = !open;
-    toggleBtn?.setAttribute('aria-pressed', String(open));
-    toggleBtn?.classList.toggle('active', open);
     prefs.showMixer = open;
     // Panel height changes the space left for the tracker grid.
     requestAnimationFrame(() => relayoutTracker());

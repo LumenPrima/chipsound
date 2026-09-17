@@ -73,7 +73,7 @@ Other things worth mentioning:
 - Click a channel header to mute it; Ctrl-click to solo
 - Subsong picker for modules that ship multiple subsongs
 - The samples pane starts **automatic**: as wide as the longest sample name (floor 120px, cap 40% of the row). Drag the handle on its inner edge to set a width for this browser; double-click the handle (or Home with it focused) to go back to automatic
-- Press `M` for the Mixer: live stereo separation, Amiga resampler, interpolation, volume ramping, tempo, pitch (semitones), gain and loop settings, all applied by libopenmpt on the fly and remembered between sessions. Drag for coarse and hold `Shift` at any point for fine, use the wheel or arrow keys to nudge, click a value to type it, double-click to reset
+- Press `M` for the mixer (stereo, tempo, pitch, gain and other live playback parameters). Settings are remembered in this browser
 - `?` opens the full keyboard shortcut list
 
 ## Quick start
