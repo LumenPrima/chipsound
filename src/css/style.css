@@ -1082,7 +1082,8 @@ kbd {
 .library-clear { margin-top: 10px; flex: 0 0 auto; }
 
 @media (max-width: 640px) {
-    #browse .btn-label { display: none; }
+    /* No room in the phone transport row; same call as #toggle-mixer. */
+    #browse { display: none; }
     .library-item { grid-template-columns: 20px 1fr auto; }
     .library-item-sub { display: none; }
 }
