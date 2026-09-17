@@ -5,6 +5,7 @@ import { cycleTheme } from './themes.js';
 import { cycleVisualization } from './controls.js';
 import { toggleMixer } from './mixer.js';
 import { toggleLibrary } from './library.js';
+import { isAnyModalOpen } from './modal.js';
 
 // ENTER belongs to focused button-likes; SPACE stays global Play/Pause.
 function isActivatableTarget(target) {
@@ -49,6 +50,8 @@ for (const entry of SHORTCUTS) {
 export function installKeyboardShortcuts() {
     document.addEventListener('keydown', e => {
         if (isTypingTarget(e.target)) return;
+        // A dialog owns the keyboard while it is open (its own keys, Esc, Tab).
+        if (isAnyModalOpen()) return;
         if (e.target?.classList?.contains('pane-resizer')) return;
         if (e.code === 'Enter' && isActivatableTarget(e.target)) return;
         const handler = codeHandlers.get(e.code);

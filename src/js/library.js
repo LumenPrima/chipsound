@@ -340,8 +340,14 @@ export function isLibraryOpen() { return modal.isOpen(); }
 export function initLibrary() {
     for (const t of [curatedTab, recentTab, localTab, urlTab]) if (!tabs.includes(t)) tabs.push(t);
     $('#browse')?.addEventListener('click', () => toggleLibrary());
-    // Esc is handled by the modal primitive; ←/→ switch tabs.
+    // Esc is handled by the modal primitive; ←/→ switch tabs. Global shortcuts
+    // are off while a dialog is open, so B closes the Library from here.
     document.addEventListener('keydown', e => {
+        if (modal.isOpen() && !isTypingTarget(e.target) && e.code === 'KeyB') {
+            e.preventDefault();
+            modal.close();
+            return;
+        }
         if (modal.isOpen() && !isTypingTarget(e.target) && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
             const i = tabs.findIndex(t => t.id === activeTab);
             const n = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
