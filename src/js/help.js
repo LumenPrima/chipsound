@@ -1,6 +1,8 @@
 // Help overlay. Lazy-built on the shared modal primitive (modal.js).
-// Shortcut list: keyboard.js#SHORTCUTS. Credits mirror /NOTICE and
-// docs/licenses.md.
+// Shortcut list: keyboard.js#SHORTCUTS. Every entry with a `run` is a
+// button here, so anything the keyboard can do is one tap away on a phone;
+// toggles show their current state and refresh after each tap.
+// Credits mirror /NOTICE and docs/licenses.md.
 
 import { isTypingTarget } from './dom.js';
 import { SHORTCUTS } from './keyboard.js';
@@ -12,16 +14,34 @@ const CREDITS = [
     { name: 'Font Awesome',  url: 'https://fontawesome.com/license/free',         license: 'CC BY 4.0' },
 ];
 
+function refreshStates(body) {
+    for (const btn of body.querySelectorAll('.help-run[data-shortcut]')) {
+        const entry = SHORTCUTS[Number(btn.dataset.shortcut)];
+        if (!entry?.state) continue;
+        const on = Boolean(entry.state());
+        btn.setAttribute('aria-pressed', String(on));
+        const pill = btn.querySelector('.help-state');
+        if (pill) pill.textContent = on ? 'on' : 'off';
+    }
+}
+
 const help = createModal({
     id: 'helpOverlay',
-    title: 'Keyboard shortcuts',
+    title: 'Shortcuts',
     className: 'modal-help',
+    onOpen(modal) { refreshStates(modal.body); },
     build(body) {
         let rows = '';
-        for (const { keys, label, joiner = ' / ' } of SHORTCUTS) {
+        SHORTCUTS.forEach(({ keys, label, joiner = ' / ', run, state }, i) => {
             const kbds = keys.map(k => `<kbd>${k}</kbd>`).join(joiner);
-            rows += `<dt>${kbds}</dt><dd>${label}</dd>`;
-        }
+            const text = run
+                ? `<button type="button" class="help-run" data-shortcut="${i}"${state ? ' aria-pressed="false"' : ''}>`
+                  + `<span class="help-run-label">${label}</span>`
+                  + (state ? `<span class="help-state" aria-hidden="true">off</span>` : '')
+                  + `</button>`
+                : label;
+            rows += `<dt>${kbds}</dt><dd>${text}</dd>`;
+        });
         const creditLinks = CREDITS
             .map(c => `<a href="${c.url}" target="_blank" rel="noopener">${c.name}</a> <span class="help-credits-license">(${c.license})</span>`)
             .join(' · ');
@@ -40,6 +60,16 @@ const help = createModal({
                 </div>
                 Built on ${creditLinks}.
             </footer>`;
+        body.addEventListener('click', e => {
+            const btn = e.target.closest('.help-run[data-shortcut]');
+            if (!btn) return;
+            const entry = SHORTCUTS[Number(btn.dataset.shortcut)];
+            if (!entry?.run) return;
+            entry.run(e);
+            // The action may have closed this overlay (opened another modal);
+            // if it's still up, show the new toggle states.
+            if (help.isOpen()) refreshStates(body);
+        });
     },
 });
 

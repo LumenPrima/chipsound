@@ -1,6 +1,7 @@
 // SHORTCUTS is the single source of truth — help overlay reads from it too.
 
 import { $, isTypingTarget } from './dom.js';
+import { prefs } from './prefs.js';
 import { cycleTheme } from './themes.js';
 import { cycleVisualization } from './controls.js';
 import { toggleMixer } from './mixer.js';
@@ -17,6 +18,9 @@ function isActivatableTarget(target) {
 
 // `joiner`: ' / ' for alternative keys, ' + ' for chorded inputs.
 // `run` receives the keydown event so handlers can branch on e.shiftKey etc.
+// Entries with `run` are also tappable in the help overlay (the only way to
+// reach them on a touch screen); `state` (optional, () => boolean) marks a
+// toggle and lets the overlay show whether it's on.
 export const SHORTCUTS = [
     { codes: ['Space', 'KeyP'], keys: ['Space', 'P'],    label: 'Play / Pause',            run: () => $('#play').click() },
     { codes: ['KeyS'],          keys: ['S'],             label: 'Stop',                    run: () => $('#stop').click() },
@@ -24,9 +28,9 @@ export const SHORTCUTS = [
     { codes: ['KeyB'],          keys: ['B'],             label: 'Library (curated / recent / local / URL)', run: () => toggleLibrary() },
     { codes: ['ArrowLeft'],     keys: ['←'],             label: 'Previous order',          run: () => $('#previous').click() },
     { codes: ['ArrowRight'],    keys: ['→'],             label: 'Next order',              run: () => $('#next').click() },
-    { codes: ['KeyE'],          keys: ['E'],             label: 'Toggle effects (viz on/off)', run: () => $('#toggle-visualizations').click() },
+    { codes: ['KeyE'],          keys: ['E'],             label: 'Toggle effects (viz on/off)', run: () => $('#toggle-visualizations').click(), state: () => prefs.showVisualizations },
     { codes: ['KeyV'],          keys: ['V'],             label: 'Cycle visualization (Shift: reverse)', run: (e) => cycleVisualization(e?.shiftKey) },
-    { codes: ['KeyI'],          keys: ['I'],             label: 'Toggle samples',          run: () => $('#toggle-samples').click() },
+    { codes: ['KeyI'],          keys: ['I'],             label: 'Toggle samples',          run: () => $('#toggle-samples').click(), state: () => prefs.showSamples },
     { codes: ['KeyM'],          keys: ['M'],             label: 'Toggle mixer (playback parameters)', run: () => toggleMixer() },
     { codes: ['KeyT'],          keys: ['T'],             label: 'Cycle theme (Shift: reverse)', run: (e) => cycleTheme(e?.shiftKey) },
     // Handle-focused — pane-resize.js owns these; listed here for the help overlay.
