@@ -156,6 +156,7 @@ Every shortcut with an action is also a button in the `?` panel, so on a phone o
 | `M` | Toggle mixer (playback parameters + render to file) |
 | `T` / `Shift` + `T` | Cycle theme forward / backward |
 | `G` | Toggle ghost orders (off by default: shows the previous and next order dimmed around the current pattern, so the view scrolls continuously) |
+| `R` | Toggle roll overlay (off by default: draws each channel's notes as pitch ribbons beside the text, shaped by the effects — portamento leans, vibrato wobbles, volume slides taper) |
 | `?` | Show this help |
 | `Esc` | Close this help |
 | Click header | Toggle channel mute |

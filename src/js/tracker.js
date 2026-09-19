@@ -9,6 +9,7 @@ import {
     clearCanvasCache,
     invalidateCanvasSizes,
 } from './viz-engine.js';
+import { buildRollModel, drawRoll } from './roll.js';
 
 // Two Sets so updateUsedSamples can swap roles each tick (no per-frame alloc).
 let sampleItemsById = {};
@@ -30,6 +31,17 @@ let ghostOrders = false;
 let prevGrid   = null;
 let activeGrid = null;
 let nextGrid   = null;
+
+// Roll overlay (R): per-order tick model built lazily for the loaded song,
+// one canvas per grid, redrawn only when its pattern/order or the lane
+// geometry changes. rollGeom is measured alongside the other layout reads.
+let rollVisible = false;
+let rollModel = null;
+let rollModelSong = null;
+let rollGeom = null;
+let rollGeomFp = '';
+let gridPadLeft = 4;
+let gridPaddingTop = 4;
 
 // Ghost prefetch: [{ grid, order }], drained one item per idle callback.
 let prefetchQueue = [];
@@ -92,6 +104,8 @@ export function renderTracker(meta) {
 
     resetGrids(song);
     clearCanvasCache();
+    rollModel = null;
+    rollModelSong = null;
     renderHeaders(song);
     renderSamples(song);
     refreshMutedChannelsAttribute();
@@ -184,6 +198,28 @@ export function setGhostOrdersVisible(visible) {
     if (lastDrawnRow >= 0) centerRow(lastDrawnRow);
 }
 
+// Public: show or hide the roll overlay (pitch ribbons per channel).
+export function setRollVisible(visible) {
+    rollVisible = !!visible;
+    const main = getTrackerMain();
+    if (!main) return;
+    main.classList.toggle('roll', rollVisible);
+    if (!rollVisible) { main.classList.remove('roll-beside'); return; }
+    if (!activeGrid || activeGrid.order === -1) return;
+    measureGeometry();
+    applyGeometry();
+    for (const g of grids) g.rollDirty = true;
+    syncRoll();
+}
+
+// Public: keyboard toggle — flips the pref and returns the new state.
+export function toggleRoll() {
+    const visible = !prefs.rollOverlay;
+    prefs.rollOverlay = visible;
+    setRollVisible(visible);
+    return visible;
+}
+
 // Public: keyboard toggle — flips the pref and returns the new state.
 export function toggleGhostOrders() {
     const visible = !prefs.ghostOrders;
@@ -274,6 +310,7 @@ export function relayoutTracker() {
 
     measureGeometry();
     applyGeometry();
+    syncRoll();
     invalidateCanvasSizes();
 
     if (activeGrid && activeGrid.patternIndex !== -1 && lastDrawnRow >= 0) {
@@ -293,6 +330,7 @@ export function refreshMutedChannelsAttribute() {
     let out = '';
     for (const ch of muted) out += (out ? ' ' : '') + ch;
     main.dataset.muted = out;
+    if (rollVisible) { for (const g of grids) g.rollDirty = true; syncRoll(); }
 }
 
 // 64 = libopenmpt channel ceiling for our formats.
@@ -390,6 +428,8 @@ function createEmptyGrid() {
         topPx: 0,
         bottomPx: 0,
         buildToken: 0,      // bumped by every (re)build; stale chunked builds stop
+        roll: null,         // overlay canvas (child of el), see syncRoll
+        rollDirty: false,
     };
 }
 
@@ -484,6 +524,11 @@ function finishGrid(target, song, patternIndex, order, rowCount) {
     target.topSpacer    = target.el.firstChild;
     target.breakEl      = target.topSpacer.nextSibling;
     target.bottomSpacer = target.el.lastChild;
+    // Overlay canvas goes last so the row/cell child indexing below holds.
+    target.roll = document.createElement('canvas');
+    target.roll.className = 'roll-canvas';
+    target.el.appendChild(target.roll);
+    target.rollDirty = true;
     target.topPx        = 0;
     target.bottomPx     = 0;
     target.patternIndex = patternIndex;
@@ -505,6 +550,7 @@ function finishGrid(target, song, patternIndex, order, rowCount) {
 // Same pattern, different order: keep the DOM, rewrite the break line.
 function relabelGrid(target, song, order) {
     target.order = order;
+    target.rollDirty = true;   // the roll is per order: replayer state differs
     if (target.breakEl) target.breakEl.textContent = breakLabel(song, order, target.patternIndex);
 }
 
@@ -589,6 +635,34 @@ function applyRoles() {
         g.el.classList.toggle('grid-bottom', g === bottomGrid);
     }
     applyGeometry();
+    syncRoll();
+}
+
+// Draw every assigned grid whose roll is stale. Cheap: one canvas paint
+// per pattern build / relabel / relayout, nothing per frame.
+function syncRoll() {
+    if (!rollVisible || !rollGeom) return;
+    const song = playerState.meta?.song;
+    if (!song) return;
+    if (rollModel === null || rollModelSong !== song) {
+        rollModel = buildRollModel(song, playerState.meta?.type);
+        rollModelSong = song;
+    }
+    const beside = rollGeom.laneW - rollGeom.textW >= 56;
+    getTrackerMain()?.classList.toggle('roll-beside', beside);
+    for (const g of grids) {
+        if (!g.rollDirty || !g.roll || g.order === -1 || g.patternIndex === -1) continue;
+        drawRoll(g.roll, rollModel, g.order, { ...rollGeom, beside }, playerState.mutedChannels);
+        g.rollDirty = false;
+    }
+}
+
+// The canvas sits over the rows: below the top spacer and the break line.
+function positionRoll(g, breakH) {
+    if (!g.roll) return;
+    const top = (g.el.classList.contains('grid-top') ? gridPaddingTop : 0) + g.topPx + breakH;
+    const px = top + 'px';
+    if (g.roll.style.top !== px) g.roll.style.top = px;
 }
 
 function isGridShown(g) {
@@ -606,7 +680,10 @@ function measureGeometry() {
     if (topEl) {
         const cs = getComputedStyle(topEl);
         gridPadTop = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.borderTopWidth) || 0);
+        gridPaddingTop = parseFloat(cs.paddingTop) || 0;
+        gridPadLeft = parseFloat(cs.paddingLeft) || 0;
     }
+    if (rollVisible) measureRollGeometry();
     if (bottomEl) {
         const cs = getComputedStyle(bottomEl);
         gridPadBottom = (parseFloat(cs.paddingBottom) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
@@ -615,6 +692,38 @@ function measureGeometry() {
         headerH: getTrackerHeader()?.offsetHeight ?? 0,
         viewportH: getTrackerMain()?.offsetHeight ?? window.innerHeight,
     };
+}
+
+// Lane positions for the roll overlay, read off the active grid's first row.
+// offsetLeft is relative to the grid's padding edge, where the canvas sits.
+function measureRollGeometry() {
+    const first = activeGrid?.rows.get(0);
+    if (!first || first.length < 2) return;
+    const cell = first[1];
+    if (!cell.offsetWidth) return;
+    const laneX = [];
+    for (let c = 1; c < first.length; c++) laneX.push(first[c].offsetLeft);
+    let left = Infinity, right = 0;
+    for (const span of cell.children) {
+        if (!span.offsetWidth) continue;
+        left = Math.min(left, span.offsetLeft);
+        right = Math.max(right, span.offsetLeft + span.offsetWidth);
+    }
+    const cs = getComputedStyle(activeGrid.el);
+    const geom = {
+        width: activeGrid.el.clientWidth,
+        laneX,
+        laneW: cell.offsetWidth,
+        textW: right > left ? right - left + 2 * (parseFloat(getComputedStyle(cell).paddingLeft) || 4) : 0,
+        rowH: scrollOffset,
+        fg: cs.getPropertyValue('--tracker-fg').trim() || '#ffffff',
+        cut: cs.getPropertyValue('--tracker-fx-flow').trim() || '#ff6b6b',
+    };
+    const fp = JSON.stringify(geom);
+    if (fp === rollGeomFp) return;
+    rollGeomFp = fp;
+    rollGeom = geom;
+    for (const g of grids) g.rollDirty = true;
 }
 
 // Writes only: break-line heights and the spacers that let row 0 / the last
@@ -646,6 +755,7 @@ function applyGeometry() {
     setSpacers(prevGrid, prevTop, 0);
     setSpacers(activeGrid, activeTop, activeBottom);
     setSpacers(nextGrid, 0, nextBottom);
+    for (const g of grids) positionRoll(g, breakH);
 }
 
 function setSpacers(g, topPx, bottomPx) {

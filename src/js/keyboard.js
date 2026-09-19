@@ -7,7 +7,7 @@ import { cycleVisualization } from './controls.js';
 import { toggleMixer } from './mixer.js';
 import { toggleLibrary } from './library.js';
 import { isAnyModalOpen } from './modal.js';
-import { toggleGhostOrders } from './tracker.js';
+import { toggleGhostOrders, toggleRoll } from './tracker.js';
 import { toast } from './toast.js';
 
 // ENTER belongs to focused button-likes; SPACE stays global Play/Pause.
@@ -39,6 +39,10 @@ export const SHORTCUTS = [
         const on = toggleGhostOrders();
         toast(`Ghost orders: ${on ? 'on' : 'off'}`, { variant: 'info', duration: 1500 });
     }, state: () => prefs.ghostOrders },
+    { codes: ['KeyR'],          keys: ['R'],             label: 'Toggle roll overlay (pitch ribbons per channel)', run: () => {
+        const on = toggleRoll();
+        toast(`Roll overlay: ${on ? 'on' : 'off'}`, { variant: 'info', duration: 1500 });
+    }, state: () => prefs.rollOverlay },
     // Handle-focused — pane-resize.js owns these; listed here for the help overlay.
     { codes: [], keys: ['Handle', '← / →'], joiner: ' + ', label: 'Nudge samples pane (Shift: 40px)' },
     { codes: [], keys: ['Handle', 'Home'], joiner: ' + ',  label: 'Reset samples pane to automatic width' },

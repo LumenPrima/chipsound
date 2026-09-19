@@ -10,6 +10,7 @@ import {
     resetTracker,
     toggleSamplesVisible,
     setGhostOrdersVisible,
+    setRollVisible,
     toggleVisualizationsVisible,
     refreshMutedChannelsAttribute,
     jumpToOrder,
@@ -704,4 +705,5 @@ function applyInitialToggles() {
     toggleVisualizationsVisible(prefs.showVisualizations);
     toggleSamplesVisible(prefs.showSamples);
     setGhostOrdersVisible(prefs.ghostOrders);
+    setRollVisible(prefs.rollOverlay);
 }
