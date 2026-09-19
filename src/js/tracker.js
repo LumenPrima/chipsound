@@ -1,7 +1,7 @@
 // Tracker UI: channel headers, pattern grid (double-buffered), sample list.
 
 import { $, $$, el, show } from './dom.js';
-import { hb, padNumber, renderNote } from './format.js';
+import { hb, padNumber, renderNote, noteName } from './format.js';
 import { playerState } from './state.js';
 import {
     registerCanvas,
@@ -25,6 +25,14 @@ let prefetchIdleHandle = -1;
 
 let lastDrawnPattern = -1;
 let lastDrawnRow = -1;
+
+// Per-channel "now playing" readout in the header: last note and
+// instrument seen on each channel, written only when they change.
+let channelNow = [];
+const reducedMotion = typeof matchMedia === 'function'
+    && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NOTE_FLASH = [{ opacity: 1 }, { opacity: 1, offset: 0.4 }, { opacity: 0.7 }];
+const NOTE_FLASH_OPTS = { duration: 400, easing: 'ease-out' };
 
 // Throttle the sample-list highlight on unchanged rows (~20 Hz).
 const SAMPLE_THROTTLE_DIVISOR = 3;
@@ -64,7 +72,7 @@ export function renderTracker(meta) {
 
     resetGrids(song);
     clearCanvasCache();
-    renderHeaders(song.channels);
+    renderHeaders(song);
     renderSamples(song);
     refreshMutedChannelsAttribute();
 
@@ -183,6 +191,15 @@ export function updateTrackerFrame(song, pos, volumes) {
         schedulePrefetch(song, pos.order);
     }
 
+    // Same pattern, moved forward: cover the rows the position feed skipped.
+    // New pattern: cover it from the top. Otherwise (loop / jump back) just
+    // this row.
+    const fromRow =
+        pos.pattern !== lastDrawnPattern ? 0 :
+        pos.row > lastDrawnRow ? lastDrawnRow + 1 :
+        pos.row;
+    updateChannelReadout(song, pos.pattern, fromRow, pos.row);
+
     updateCurrentRow(pos.pattern, pos.row);
     if (typeof pos.order === 'number') currentOrder = pos.order;
     writeIfChanged('#order', `${padNumber((pos.order ?? 0) + 1)} / ${padNumber(song.totalOrders)}`);
@@ -266,10 +283,13 @@ function ensureChannelMuteRules() {
 
 // ---- header / canvas registration --------------------------------------
 
-function renderHeaders(channels) {
+function renderHeaders(song) {
+    const channels = song.channels;
+    const names = song.channelNames || [];
     const header = $('#trackerHeader');
     header.replaceChildren();
     header.style.display = 'none';
+    channelNow = new Array(channels);
 
     // Synchronous so the next RAF measures the correct per-channel width.
     header.style.gridTemplateColumns = gridTemplate(channels);
@@ -287,19 +307,29 @@ function renderHeaders(channels) {
 
     for (let col = 0; col < channels; col++) {
         const id = `canvas${col}`;
+        const name = names[col] || '';
+        const label = escapeHtml(name || `CH${col + 1}`);
         const button = el('button', {
             type: 'button',
             class: 'channel-cell channel-header muteable',
             dataset: { channel: col, track: 'mute_channel_clicked', trackChannel: col },
-            'aria-label': `Toggle mute on channel ${col + 1}`,
+            'aria-label': `Toggle mute on channel ${col + 1}${name ? ` (${name})` : ''}`,
             'aria-pressed': 'false',
+            title: name || null,
         }, `
-            <span data-col="${col}" class="channel-label">CH${col + 1}</span>
+            <span data-col="${col}" class="channel-label">${label}</span>
+            <span class="channel-now" aria-hidden="true"><span class="now-note">&nbsp;</span><span class="now-inst"></span></span>
             <div class="canvas-parent">
                 <canvas class="visualization-canvas" id="${id}" width="100%" height="100%"></canvas>
             </div>
         `);
         header.append(button);
+        channelNow[col] = {
+            note: button.querySelector('.now-note'),
+            inst: button.querySelector('.now-inst'),
+            lastNote: '',
+            lastInst: '',
+        };
     }
 
     header.style.display = 'grid';
@@ -652,6 +682,60 @@ function renderSamples(song) {
     channelSampleId = new Array(song.channels).fill(null);
     highlightedSampleIds.clear();
     pendingSampleIds.clear();
+}
+
+// ---- per-channel "now playing" readout ---------------------------------
+
+function escapeHtml(text) {
+    return text.replace(/[&<>"]/g, c => (
+        c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : '&quot;'
+    ));
+}
+
+function instrumentLabel(song, id) {
+    const names = song.instruments.length ? song.instruments : song.samples;
+    const name = names[id - 1];
+    return name && name.trim() ? name.trim() : hb(id);
+}
+
+// Scan rows [fromRow, toRow] of the pattern and push each channel's latest
+// note / instrument into its header readout. Rows are scanned as a range
+// because the 60 Hz position feed skips rows on fast songs, and a note-on
+// on a skipped row still deserves to be shown.
+function updateChannelReadout(song, pattern, fromRow, toRow) {
+    const rows = song.patterns[pattern];
+    if (!rows || channelNow.length !== song.channels) return;
+
+    for (let row = fromRow; row <= toRow; row++) {
+        const cells = rows[row];
+        if (!cells) continue;
+        for (let col = 0; col < cells.length; col++) {
+            const cell = cells[col];
+            const slot = channelNow[col];
+            if (!slot) continue;
+
+            const inst = cell[1];
+            if (inst > 0) {
+                const text = instrumentLabel(song, inst);
+                if (slot.lastInst !== text) {
+                    slot.lastInst = text;
+                    slot.inst.textContent = text;
+                }
+            }
+
+            const pitch = cell[0];
+            if (pitch > 0) {
+                const text = noteName(pitch);
+                if (slot.lastNote !== text) {
+                    slot.lastNote = text;
+                    slot.note.textContent = text;
+                }
+                if (pitch < 254 && !reducedMotion) {
+                    slot.note.parentNode.animate(NOTE_FLASH, NOTE_FLASH_OPTS);
+                }
+            }
+        }
+    }
 }
 
 // ---- current row + sample highlighting ---------------------------------

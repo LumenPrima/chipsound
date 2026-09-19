@@ -2,6 +2,13 @@
 
 :root.theme-clusters {
     --theme-name: "Clusters";
+
+    /* Effect families in the pattern view (see style.css). */
+    --tracker-fx-pitch  : #88FF88;
+    --tracker-fx-volume : #FFCC66;
+    --tracker-fx-pan    : #FF88DD;
+    --tracker-fx-flow   : #FF6B6B;
+    --tracker-fx-sample : #C9A3FF;
 }
 
 :root.theme-clusters .mod-info { row-gap: 6px; }

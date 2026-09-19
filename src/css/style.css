@@ -408,8 +408,35 @@ html.samples-hidden .sample-section    { display: none; }
 
 .channel-label {
     font-size: 0.85rem;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* "Now playing" readout: last note + instrument seen on the channel. The
+   whole line flashes to full opacity on each note-on (tracker.js). */
+.channel-now {
+    display: flex;
+    gap: 0.5ch;
+    width: 100%;
+    margin-bottom: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.2;
+    opacity: 0.7;
+}
+.channel-now .now-note {
+    flex: none;
+    color: var(--tracker-note);
+}
+.channel-now .now-inst {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    color: var(--tracker-sample);
 }
 
 .canvas-parent {
@@ -521,6 +548,15 @@ html.samples-hidden .pane-resizer { display: none; }
 .sample  { color: var(--tracker-sample); }
 .volume  { color: var(--tracker-volume); }
 .effect  { color: var(--tracker-effect); }
+
+/* Effect families (classified in format.js). Themes opt in with the
+   --tracker-fx-* tokens; without them every family keeps the plain effect
+   colour, so untouched themes look exactly as before. */
+.effect.fx-pitch,  .volume.fx-pitch  { color: var(--tracker-fx-pitch,  var(--tracker-effect)); }
+.effect.fx-volume, .volume.fx-volume { color: var(--tracker-fx-volume, var(--tracker-effect)); }
+.effect.fx-pan,    .volume.fx-pan    { color: var(--tracker-fx-pan,    var(--tracker-effect)); }
+.effect.fx-flow,   .volume.fx-flow   { color: var(--tracker-fx-flow,   var(--tracker-effect)); }
+.effect.fx-sample, .volume.fx-sample { color: var(--tracker-fx-sample, var(--tracker-effect)); }
 
 /* ========== Toast ========== */
 
