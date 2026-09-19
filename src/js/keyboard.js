@@ -4,7 +4,7 @@ import { $, isTypingTarget } from './dom.js';
 import { prefs } from './prefs.js';
 import { cycleTheme } from './themes.js';
 import { cycleVisualization } from './controls.js';
-import { toggleMixer } from './mixer.js';
+import { toggleMixer, isMixerOpen } from './mixer.js';
 import { toggleLibrary } from './library.js';
 import { isAnyModalOpen } from './modal.js';
 import { toggleGhostOrders, toggleRoll } from './tracker.js';
@@ -33,7 +33,7 @@ export const SHORTCUTS = [
     { codes: ['KeyE'],          keys: ['E'],             label: 'Toggle effects (viz on/off)', run: () => $('#toggle-visualizations').click(), state: () => prefs.showVisualizations },
     { codes: ['KeyV'],          keys: ['V'],             label: 'Cycle visualization (Shift: reverse)', run: (e) => cycleVisualization(e?.shiftKey) },
     { codes: ['KeyI'],          keys: ['I'],             label: 'Toggle samples',          run: () => $('#toggle-samples').click(), state: () => prefs.showSamples },
-    { codes: ['KeyM'],          keys: ['M'],             label: 'Toggle mixer (playback parameters)', run: () => toggleMixer() },
+    { codes: ['KeyM'],          keys: ['M'],             label: 'Toggle mixer (playback parameters)', run: () => toggleMixer(), state: () => isMixerOpen() },
     { codes: ['KeyT'],          keys: ['T'],             label: 'Cycle theme (Shift: reverse)', run: (e) => cycleTheme(e?.shiftKey) },
     { codes: ['KeyG'],          keys: ['G'],             label: 'Toggle ghost orders (continuous scroll)', run: () => {
         const on = toggleGhostOrders();
