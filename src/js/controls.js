@@ -9,6 +9,7 @@ import {
     clearSampleHighlights,
     resetTracker,
     toggleSamplesVisible,
+    setGhostOrdersVisible,
     toggleVisualizationsVisible,
     refreshMutedChannelsAttribute,
     jumpToOrder,
@@ -702,4 +703,5 @@ function wireVolumeSlider() {
 function applyInitialToggles() {
     toggleVisualizationsVisible(prefs.showVisualizations);
     toggleSamplesVisible(prefs.showSamples);
+    setGhostOrdersVisible(prefs.ghostOrders);
 }

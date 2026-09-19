@@ -312,7 +312,7 @@ html.samples-hidden .sample-section    { display: none; }
 }
 
 .tracker-grid {
-    display: none;
+    display: grid;
     gap: 0 2px;
     background: var(--tracker-bg-alt);
     padding: 4px;
@@ -320,12 +320,79 @@ html.samples-hidden .sample-section    { display: none; }
     min-width: var(--grid-min-width, 100%);
     /* Paint/layout island — hidden prefetched grid isolated from the visible one. */
     contain: content;
+    position: relative;
+}
+
+/* Prefetched / unassigned grids: still display:grid so their cells are laid
+   out while idle, but collapsed to zero height. `contain: paint` above clips
+   them, so nothing shows. Deliberately no visibility:hidden (inherited: its
+   toggle would recalc style on every cell) and no overflow:hidden (makes the
+   grid a scroll container: its toggle relayouts every cell). Showing one is
+   then a change to the grid box alone. */
+.tracker-grid.grid-hidden {
+    height: 0;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+/* The three grids are ordered with CSS `order` (tracker.js), never moved. */
+#trackerPatterns {
+    display: flex;
+    flex-direction: column;
 }
 
 /* Spacers above row 0 and below last row — heights set by tracker.js. */
 .grid-spacer {
     grid-column: 1 / -1;
     background: var(--tracker-bg);
+}
+
+/* Three grids (previous / current / next order) stack inside #trackerPatterns.
+   Only the outermost visible grid keeps the frame's vertical padding, border
+   and corner radius, so the stack reads as one continuous pattern. */
+#trackerPatterns .tracker-grid:not(.grid-top) {
+    padding-top: 0;
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+#trackerPatterns .tracker-grid:not(.grid-bottom) {
+    padding-bottom: 0;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Order-break line at the top of every grid; one row tall (set by tracker.js). */
+.grid-break {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    overflow: hidden;
+    background: var(--tracker-bg);
+    color: var(--tracker-fg);
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--tracker-fg) 30%, transparent);
+}
+
+/* Ghosted neighbours: the previous and next order, dimmed by one veil over
+   the grid rather than an opacity on every cell (toggling .ghost then costs
+   one element's style, not thousands). */
+.tracker-grid.ghost::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--tracker-bg);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .channel-cell {

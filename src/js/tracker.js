@@ -1,8 +1,9 @@
-// Tracker UI: channel headers, pattern grid (double-buffered), sample list.
+// Tracker UI: channel headers, pattern grid (triple-buffered), sample list.
 
 import { $, $$, el, show } from './dom.js';
 import { hb, padNumber, renderNote, noteName } from './format.js';
 import { playerState } from './state.js';
+import { prefs } from './prefs.js';
 import {
     registerCanvas,
     clearCanvasCache,
@@ -15,16 +16,29 @@ let channelSampleId = [];
 let highlightedSampleIds = new Set();
 let pendingSampleIds = new Set();
 
-// Double-buffered grids: activeGrid visible, prefetchGrid holds next pattern.
-let gridA = null;
-let gridB = null;
-let activeGrid   = null;
-let prefetchGrid = null;
+// Triple-buffered grids, one per order slot: previous (ghost), current,
+// next (ghost). They are stacked in #trackerPatterns in that DOM order so
+// the pattern view reads as one continuous scroll across order boundaries.
+// Grids are keyed by ORDER, not pattern index: consecutive orders can play
+// the same pattern, and a cached pattern can be relabelled to a new order
+// without rebuilding it. A grid with order === -1 is unassigned (hidden)
+// but may still cache a pattern's DOM for reuse.
+const grids = [];
+// Off by default: only the active grid is shown (classic one-pattern view); the
+// neighbours are still prefetched so the boundary swap stays hot.
+let ghostOrders = false;
+let prevGrid   = null;
+let activeGrid = null;
+let nextGrid   = null;
 
+// Ghost prefetch: [{ grid, order }], drained one item per idle callback.
+let prefetchQueue = [];
 let prefetchIdleHandle = -1;
+let prefetchBuilding = null;   // grid whose sliced build is in flight, or null
 
 let lastDrawnPattern = -1;
 let lastDrawnRow = -1;
+let lastRowEls = null;
 
 // Per-channel "now playing" readout in the header: last note and
 // instrument seen on each channel, written only when they change.
@@ -47,7 +61,13 @@ let currentOrder = 0;
 // one textContent write — zero DOM queries.
 const statusFields = Object.create(null);
 
+// Row height in px (also the height of each grid's order-break line).
 let scrollOffset = 18;
+// Vertical padding + border of the outermost grids (see .grid-top/.grid-bottom).
+let gridPadTop = 4;
+let gridPadBottom = 4;
+// Cached at cold loads and relayouts so the hot swap path never reads layout.
+let viewMetrics = { headerH: 0, viewportH: 0 };
 
 let trackerMainEl = null;
 function getTrackerMain() {
@@ -117,10 +137,6 @@ export function resetTracker(meta) {
     showPattern(song, firstPattern, 0);
     clearSampleHighlights();
     updateCurrentRow(firstPattern, 0);
-
-    if (!placeholder) {
-        schedulePrefetch(song, 0);
-    }
 }
 
 // Public: jump to a specific order. Returns the shown order (clamped).
@@ -144,14 +160,13 @@ export function jumpToOrder(song, targetOrder) {
     // Arm the stale-pos filter in index.js#onProgress. See state.js#pendingJumpOrder.
     playerState.pendingJumpOrder = clamped;
 
-    showPattern(song, pattern, 0);
+    showPattern(song, pattern, clamped);
     updateCurrentRow(pattern, 0);
     writeIfChanged('#order', `${padNumber(clamped + 1)} / ${padNumber(song.totalOrders)}`);
     writeIfChanged('#pattern', hb(pattern));
     writeIfChanged('#row', '00');
 
     currentOrder = clamped;
-    schedulePrefetch(song, clamped);
     return clamped;
 }
 
@@ -159,17 +174,34 @@ export function getCurrentOrder() {
     return currentOrder;
 }
 
-// Public: diagnostics — bounded by design (always 0–2). See ?diag.
+// Public: show or hide the previous/next order around the current pattern.
+export function setGhostOrdersVisible(visible) {
+    ghostOrders = !!visible;
+    if (!activeGrid) return;
+    applyRoles();
+    measureGeometry();
+    applyGeometry();
+    if (lastDrawnRow >= 0) centerRow(lastDrawnRow);
+}
+
+// Public: keyboard toggle — flips the pref and returns the new state.
+export function toggleGhostOrders() {
+    const visible = !prefs.ghostOrders;
+    prefs.ghostOrders = visible;
+    setGhostOrdersVisible(visible);
+    return visible;
+}
+
+// Public: diagnostics — bounded by design (always 0–3). See ?diag.
 export function getPatternCacheSize() {
     let n = 0;
-    if (activeGrid   && activeGrid.patternIndex   !== -1) n++;
-    if (prefetchGrid && prefetchGrid.patternIndex !== -1) n++;
+    for (const g of grids) if (g.patternIndex !== -1) n++;
     return n;
 }
 
-// Public: diagnostics — bounded (0 or 1).
+// Public: diagnostics — bounded (0–2: the two ghost slots).
 export function getRenderQueueSize() {
-    return prefetchIdleHandle === -1 ? 0 : 1;
+    return prefetchQueue.length;
 }
 
 // Public: called every animation frame while playing.
@@ -186,9 +218,9 @@ export function updateTrackerFrame(song, pos, volumes) {
         return;
     }
 
-    if (pos.pattern !== activeGrid?.patternIndex) {
-        showPattern(song, pos.pattern, pos.row);
-        schedulePrefetch(song, pos.order);
+    const order = typeof pos.order === 'number' ? pos.order : currentOrder;
+    if (!activeGrid || pos.pattern !== activeGrid.patternIndex || order !== activeGrid.order) {
+        showPattern(song, pos.pattern, order);
     }
 
     // Same pattern, moved forward: cover the rows the position feed skipped.
@@ -240,16 +272,12 @@ export function relayoutTracker() {
     if (!playerState.meta || !playerState.meta.song) return;
     layoutGrids(playerState.meta.song);
 
-    if (activeGrid && activeGrid.el) {
-        const rowLabel = activeGrid.el.querySelector('.row-label');
-        if (rowLabel?.offsetHeight) scrollOffset = rowLabel.offsetHeight;
-    }
-
-    refreshPatternPadding();
+    measureGeometry();
+    applyGeometry();
     invalidateCanvasSizes();
 
     if (activeGrid && activeGrid.patternIndex !== -1 && lastDrawnRow >= 0) {
-        centerRow(activeGrid, lastDrawnRow);
+        centerRow(lastDrawnRow);
     }
 }
 
@@ -346,174 +374,375 @@ function renderHeaders(song) {
 
 function createEmptyGrid() {
     const elNode = document.createElement('div');
-    elNode.className = 'tracker-grid';
-    elNode.style.display = 'none';
+    // Hidden grids stay display:grid at zero height (see .grid-hidden) so a
+    // prefetched pattern is laid out while idle and the boundary swap only
+    // flips visibility instead of building the render tree in the frame.
+    elNode.className = 'tracker-grid grid-hidden';
     return {
         el: elNode,
         topSpacer: null,
+        breakEl: null,
         bottomSpacer: null,
         rows: new Map(),
-        patternIndex: -1,
+        order: -1,          // assigned order, -1 = unassigned (hidden)
+        patternIndex: -1,   // cached pattern DOM, -1 = empty
         rowCount: 0,
         topPx: 0,
         bottomPx: 0,
+        buildToken: 0,      // bumped by every (re)build; stale chunked builds stop
     };
 }
 
 function resetGrids(song) {
     cancelPrefetch();
     const container = $('#trackerPatterns');
-    gridA = createEmptyGrid();
-    gridB = createEmptyGrid();
-    activeGrid   = gridA;
-    prefetchGrid = gridB;
-    container.replaceChildren(gridA.el, gridB.el);
+    grids.length = 0;
+    for (let i = 0; i < 3; i++) grids.push(createEmptyGrid());
+    [prevGrid, activeGrid, nextGrid] = grids;
+    container.replaceChildren(prevGrid.el, activeGrid.el, nextGrid.el);
 
     const cols = gridTemplate(song.channels);
-    gridA.el.style.gridTemplateColumns = cols;
-    gridB.el.style.gridTemplateColumns = cols;
+    for (const g of grids) g.el.style.gridTemplateColumns = cols;
+    lastRowEls = null;
 }
 
-// Synchronous (~5–20 ms typical). innerHTML is ~3× faster than createElement here.
-function populateGrid(target, song, patternIndex) {
-    const rows = song.patterns[patternIndex];
-    if (!rows) return false;
+function breakLabel(song, order, patternIndex) {
+    return `ORD ${padNumber(order + 1)} / ${padNumber(song.totalOrders)} · PAT ${hb(patternIndex)}`;
+}
+
+function rowsHtml(song, rows, from, to) {
     const numChannels = song.channels;
-
-    const { topPx, bottomPx } = computeRowPaddingPx();
-
-    let html = `<div class="grid-spacer" style="height:${topPx}px"></div>`;
-    for (let row = 0; row < rows.length; row++) {
+    let html = '';
+    for (let row = from; row < to; row++) {
         html += `<div class="row-label" data-row="${row}">${hb(row)}</div>`;
         const rowCells = rows[row];
         for (let col = 0; col < numChannels; col++) {
             html += `<div class="channel-cell" data-channel="${col}" data-row="${row}">${renderNote(rowCells[col])}</div>`;
         }
     }
-    html += `<div class="grid-spacer" style="height:${bottomPx}px"></div>`;
+    return html;
+}
 
-    target.el.innerHTML = html;
+function gridShellHtml(song, patternIndex, order) {
+    return `<div class="grid-spacer" style="height:0px"></div>`
+         + `<div class="grid-break" style="height:${scrollOffset}px">${breakLabel(song, order, patternIndex)}</div>`
+         + `<div class="grid-spacer" style="height:0px"></div>`;
+}
+
+// Synchronous (~5–20 ms typical). innerHTML is ~3× faster than createElement here.
+// Children layout: [topSpacer, break, ...rows*(N+1), bottomSpacer].
+function populateGrid(target, song, patternIndex, order) {
+    const rows = song.patterns[patternIndex];
+    if (!rows) return false;
+    target.buildToken++;    // abandons any chunked build in flight on this grid
+
+    target.el.innerHTML = gridShellHtml(song, patternIndex, order);
+    target.el.lastChild.insertAdjacentHTML('beforebegin', rowsHtml(song, rows, 0, rows.length));
+    finishGrid(target, song, patternIndex, order, rows.length);
+    return true;
+}
+
+// Prefetch variant: the same DOM, built in slices over idle callbacks so the
+// build and the first layout of a big grid never occupy one long task
+// (a 24-channel pattern is ~7,700 nodes). The grid is unassigned until the
+// last slice lands; assignGrids treats it as free meanwhile and, if it
+// claims it, the token check below abandons the build.
+const PREFETCH_ROWS_PER_SLICE = 12;
+function populateGridChunked(target, song, patternIndex, order, onDone, onAbort) {
+    const rows = song.patterns[patternIndex];
+    if (!rows) return false;
+    const token = ++target.buildToken;
+    target.patternIndex = -1;
+    target.order = -1;
+    target.rows.clear();
+    target.el.innerHTML = gridShellHtml(song, patternIndex, order);
+    target.el.style.gridTemplateColumns = gridTemplate(song.channels);
+    let row = 0;
+    const step = () => {
+        if (target.buildToken !== token || !playerState.meta || playerState.meta.song !== song) { onAbort(); return; }
+        const to = Math.min(rows.length, row + PREFETCH_ROWS_PER_SLICE);
+        target.el.lastChild.insertAdjacentHTML('beforebegin', rowsHtml(song, rows, row, to));
+        row = to;
+        if (row < rows.length) { idle(step); return; }
+        finishGrid(target, song, patternIndex, order, rows.length);
+        onDone();
+    };
+    step();
+    return true;
+}
+
+function idle(fn) {
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(fn);
+    else setTimeout(fn, 16);
+}
+
+function finishGrid(target, song, patternIndex, order, rowCount) {
+    const numChannels = song.channels;
     target.el.dataset.pattern = patternIndex;
     target.el.style.gridTemplateColumns = gridTemplate(numChannels);
 
     target.topSpacer    = target.el.firstChild;
+    target.breakEl      = target.topSpacer.nextSibling;
     target.bottomSpacer = target.el.lastChild;
-    target.topPx        = topPx;
-    target.bottomPx     = bottomPx;
+    target.topPx        = 0;
+    target.bottomPx     = 0;
     target.patternIndex = patternIndex;
-    target.rowCount     = rows.length;
+    target.order        = order;
+    target.rowCount     = rowCount;
+    const rows = { length: rowCount };
 
-    // Children layout: [topSpacer, ...rows*(N+1), bottomSpacer].
     target.rows.clear();
     const cellsPerRow = numChannels + 1;
     const children = target.el.children;
     for (let row = 0; row < rows.length; row++) {
-        const base = 1 + row * cellsPerRow;
+        const base = 2 + row * cellsPerRow;
         const arr = new Array(cellsPerRow);
         for (let k = 0; k < cellsPerRow; k++) arr[k] = children[base + k];
         target.rows.set(row, arr);
     }
-    return true;
 }
 
-function swapGrids() {
-    const oldActive = activeGrid;
-    const newActive = prefetchGrid;
-    newActive.el.style.display = 'grid';
-    oldActive.el.style.display = 'none';
-    activeGrid   = newActive;
-    prefetchGrid = oldActive;
+// Same pattern, different order: keep the DOM, rewrite the break line.
+function relabelGrid(target, song, order) {
+    target.order = order;
+    if (target.breakEl) target.breakEl.textContent = breakLabel(song, order, target.patternIndex);
 }
 
-// Symmetric padding from centerRow's formula. 80px floor for tiny viewports.
-function computeRowPaddingPx() {
-    const headerH = getTrackerHeader()?.offsetHeight ?? 0;
-    const viewportH = getTrackerMain()?.offsetHeight ?? window.innerHeight;
-    const offset = scrollOffset || 18;
-    const half = Math.max(80, Math.floor((viewportH - headerH) / 2 - 4 - offset / 2));
-    return { topPx: half, bottomPx: half };
+function unassignGrid(target) {
+    target.order = -1;
+    target.el.classList.add('grid-hidden');
 }
 
-// Idempotent.
-function refreshPatternPadding() {
-    const { topPx, bottomPx } = computeRowPaddingPx();
-    for (const grid of [activeGrid, prefetchGrid]) {
-        if (!grid || !grid.topSpacer) continue;
-        if (grid.topPx !== topPx) {
-            grid.topPx = topPx;
-            grid.topSpacer.style.height = topPx + 'px';
-        }
-        if (grid.bottomPx !== bottomPx) {
-            grid.bottomPx = bottomPx;
-            grid.bottomSpacer.style.height = bottomPx + 'px';
-        }
-    }
-}
-
-// Three paths: already showing (no-op), prefetched (swap), cold miss (populate).
-function showPattern(song, patternIndex, currentRow) {
-    if (activeGrid.patternIndex === patternIndex) return;
-
-    if (prefetchGrid.patternIndex === patternIndex) {
-        // Hot path — minimum work. Any offsetHeight read would force a
-        // layout flush in the playback frame. The needed flush lands in
-        // centerRow via the next updateCurrentRow.
-        swapGrids();
-        return;
+// Assign the three grids to the prev/active/next slots around `order`.
+// Reuses any grid already holding the wanted order, then any grid caching
+// the wanted pattern (relabel), and builds the active grid synchronously
+// only on a true cold miss. Ghost slots that end up empty are prefetched.
+function assignGrids(song, order, patternIndex) {
+    const prevOrder = order > 0 ? order - 1 : -1;
+    const nextOrder = order + 1 < song.totalOrders ? order + 1 : -1;
+    const wants = [
+        { role: 'active', order, pattern: patternIndex },
+        { role: 'next',   order: nextOrder, pattern: nextOrder === -1 ? null : song.orders[nextOrder] },
+        { role: 'prev',   order: prevOrder, pattern: prevOrder === -1 ? null : song.orders[prevOrder] },
+    ];
+    for (const w of wants) {
+        if (w.pattern != null && (w.pattern < 0 || w.pattern >= song.patterns.length)) w.pattern = null;
     }
 
-    // Cold-miss. Re-measure: computeRowPaddingPx ran against an empty container.
-    populateGrid(activeGrid, song, patternIndex);
-    activeGrid.el.style.display = 'grid';
+    const free = new Set(grids);
+    const pick = (fn) => { for (const g of free) if (fn(g)) { free.delete(g); return g; } return null; };
 
+    // Pass 1: exact order+pattern match. Pass 2: cached pattern, relabel.
+    for (const w of wants) {
+        if (w.pattern == null) continue;
+        w.grid = pick(g => g.order === w.order && g.patternIndex === w.pattern);
+    }
+    for (const w of wants) {
+        if (w.pattern == null || w.grid) continue;
+        w.grid = pick(g => g.patternIndex === w.pattern);
+        if (w.grid) relabelGrid(w.grid, song, w.order);
+    }
+    // Pass 3: whatever is left. Active is built now; ghosts are queued.
+    const pending = [];
+    for (const w of wants) {
+        if (w.grid) continue;
+        w.grid = pick(() => true);
+        if (w.pattern == null) {
+            unassignGrid(w.grid);
+        } else if (w.role === 'active') {
+            populateGrid(w.grid, song, w.pattern, w.order);
+        } else {
+            unassignGrid(w.grid);
+            pending.push({ grid: w.grid, order: w.order, deferrals: 0 });
+        }
+    }
+
+    activeGrid = wants[0].grid;
+    nextGrid   = wants[1].grid;
+    prevGrid   = wants[2].grid;
+
+    // Visual order must be prev, active, next. Done with CSS `order` on the
+    // flex column (#trackerPatterns) rather than moving nodes: insertBefore
+    // on live subtrees tears down and rebuilds their layout at every boundary.
+    const want = [prevGrid.el, activeGrid.el, nextGrid.el];
+    for (let i = 0; i < want.length; i++) {
+        const o = String(i);
+        if (want[i].style.order !== o) want[i].style.order = o;
+    }
+
+    applyRoles();
+
+    cancelPrefetch();
+    prefetchQueue = pending;
+    schedulePrefetch(song);
+}
+
+// Visibility, ghost/edge classes and spacer heights for the current roles.
+function applyRoles() {
+    const shown = [prevGrid, activeGrid, nextGrid].filter(isGridShown);
+    const topGrid = shown[0];
+    const bottomGrid = shown[shown.length - 1];
+    for (const g of grids) {
+        g.el.classList.toggle('grid-hidden', !isGridShown(g));
+        g.el.classList.toggle('ghost', g !== activeGrid);
+        g.el.classList.toggle('grid-top', g === topGrid);
+        g.el.classList.toggle('grid-bottom', g === bottomGrid);
+    }
+    applyGeometry();
+}
+
+function isGridShown(g) {
+    return g.order !== -1 && (g === activeGrid || ghostOrders);
+}
+
+// Layout reads. Only from cold loads and relayouts — never the swap path.
+function measureGeometry() {
+    if (!activeGrid || !activeGrid.el) return;
     const rowLabel = activeGrid.el.querySelector('.row-label');
     if (rowLabel?.offsetHeight) scrollOffset = rowLabel.offsetHeight;
-    refreshPatternPadding();
-    centerRow(activeGrid, currentRow);
+
+    const topEl = grids.find(g => g.el.classList.contains('grid-top'))?.el;
+    const bottomEl = grids.find(g => g.el.classList.contains('grid-bottom'))?.el;
+    if (topEl) {
+        const cs = getComputedStyle(topEl);
+        gridPadTop = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.borderTopWidth) || 0);
+    }
+    if (bottomEl) {
+        const cs = getComputedStyle(bottomEl);
+        gridPadBottom = (parseFloat(cs.paddingBottom) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+    }
+    viewMetrics = {
+        headerH: getTrackerHeader()?.offsetHeight ?? 0,
+        viewportH: getTrackerMain()?.offsetHeight ?? window.innerHeight,
+    };
+}
+
+// Writes only: break-line heights and the spacers that let row 0 / the last
+// row of the active pattern reach the viewport centre. When a ghost is shown
+// on that side, its rows count towards the padding and the spacer shrinks.
+function applyGeometry() {
+    const off = scrollOffset || 18;
+    const breakH = ghostOrders ? off : 0;
+    const half = (viewMetrics.viewportH - viewMetrics.headerH) / 2 - off / 2;
+    const needTop    = Math.max(80, Math.floor(half - gridPadTop - breakH));
+    const needBottom = Math.max(80, Math.floor(half - gridPadBottom));
+
+    for (const g of grids) {
+        if (!g.breakEl) continue;
+        const h = breakH + 'px';
+        if (g.breakEl.style.height !== h) g.breakEl.style.height = h;
+    }
+    if (!activeGrid || activeGrid.order === -1) return;
+
+    let prevTop = 0, activeTop = needTop, activeBottom = needBottom, nextBottom = 0;
+    if (isGridShown(prevGrid)) {
+        prevTop = Math.max(0, needTop - breakH - prevGrid.rowCount * off);
+        activeTop = 0;
+    }
+    if (isGridShown(nextGrid)) {
+        nextBottom = Math.max(0, needBottom - breakH - nextGrid.rowCount * off);
+        activeBottom = 0;
+    }
+    setSpacers(prevGrid, prevTop, 0);
+    setSpacers(activeGrid, activeTop, activeBottom);
+    setSpacers(nextGrid, 0, nextBottom);
+}
+
+function setSpacers(g, topPx, bottomPx) {
+    if (!g.topSpacer) return;
+    if (g.topPx !== topPx) {
+        g.topPx = topPx;
+        g.topSpacer.style.height = topPx + 'px';
+    }
+    if (g.bottomPx !== bottomPx) {
+        g.bottomPx = bottomPx;
+        g.bottomSpacer.style.height = bottomPx + 'px';
+    }
+}
+
+// Hot path when the wanted order is already a ghost (no layout reads: the
+// flush lands in centerRow via the next updateCurrentRow). Cold miss builds
+// the active grid synchronously and re-measures.
+function showPattern(song, patternIndex, order) {
+    if (activeGrid.order === order && activeGrid.patternIndex === patternIndex) return;
+
+    const cold = !grids.some(g => g.patternIndex === patternIndex);
+    assignGrids(song, order, patternIndex);
+    if (!cold) return;
+
+    // applyGeometry ran against stale metrics (or an empty container).
+    measureGeometry();
+    applyGeometry();
     syncSampleListHeight();
 }
 
-//   y_of_row = headerH + 4 + topPx + R*offset + offset/2
+//   y_of_row = headerH + padTop + [prev block] + activeTop + breakH (0 when ghosts are off)
+//              + R*offset + offset/2
 //   scrollTop = y_of_row - (headerH + viewportH) / 2
-function centerRow(grid, row) {
+// Writes only: the metrics come from measureGeometry (cold loads, relayouts).
+// Reading offsetHeight here would force a synchronous layout on every row,
+// and at an order boundary that layout is the whole freshly shown grid.
+function centerRow(row) {
     const main = getTrackerMain();
-    if (!main || !grid) return;
-    const headerH = getTrackerHeader()?.offsetHeight ?? 0;
-    const viewportH = main.offsetHeight;
-    main.scrollTop = headerH + 4 + grid.topPx
-                   + row * scrollOffset + scrollOffset / 2
-                   - (headerH + viewportH) / 2;
+    if (!main || !activeGrid || activeGrid.order === -1) return;
+    const { headerH, viewportH } = viewMetrics;
+
+    const off = scrollOffset;
+    const breakH = ghostOrders ? off : 0;
+    let y = headerH + gridPadTop;
+    if (isGridShown(prevGrid)) y += prevGrid.topPx + breakH + prevGrid.rowCount * off;
+    y += activeGrid.topPx + breakH + row * off + off / 2;
+    main.scrollTop = y - (headerH + viewportH) / 2;
 }
 
-// Cancels any in-flight prefetch first; only the latest schedule wins.
-function schedulePrefetch(song, fromOrder, deferrals = 0) {
-    cancelPrefetch();
-    if (!song || song.totalOrders == null) return;
-    const nextOrder = (fromOrder ?? 0) + 1;
-    if (nextOrder >= song.totalOrders) return;
-    const targetPattern = song.orders[nextOrder];
-    if (targetPattern == null) return;
-    if (targetPattern < 0 || targetPattern >= song.patterns.length) return;
-    if (targetPattern === activeGrid.patternIndex) return;
-    if (targetPattern === prefetchGrid.patternIndex) return;
+// Drains prefetchQueue one grid per idle callback; only the latest
+// assignGrids' queue is live (it cancels any in-flight run).
+function schedulePrefetch(song) {
+    if (prefetchIdleHandle !== -1 || prefetchBuilding || prefetchQueue.length === 0) return;
 
     const run = (deadline) => {
         prefetchIdleHandle = -1;
         // Re-check — world can change between schedule and fire.
-        if (!playerState.meta || playerState.meta.song !== song) return;
-        if (targetPattern === activeGrid.patternIndex) return;
-        if (targetPattern === prefetchGrid.patternIndex) return;
+        if (!playerState.meta || playerState.meta.song !== song) { prefetchQueue = []; return; }
+        const item = prefetchQueue[0];
+        if (!item) return;
+        const stillWanted =
+            (item.grid === nextGrid && activeGrid.order + 1 === item.order) ||
+            (item.grid === prevGrid && activeGrid.order - 1 === item.order);
+        if (!stillWanted || item.grid.order !== -1) { prefetchQueue.shift(); schedulePrefetch(song); return; }
 
         // Prefer a quiet slot, but don't wait forever: while the rAF loop runs
         // the idle budget peaks near one frame (~16 ms), and a cold miss at
         // the boundary would cost the same build inside a playback frame.
         if (deadline && typeof deadline.timeRemaining === 'function'
             && deadline.timeRemaining() < PREFETCH_MIN_BUDGET_MS
-            && deferrals < PREFETCH_MAX_DEFERRALS) {
-            schedulePrefetch(song, fromOrder, deferrals + 1);
+            && ++item.deferrals < PREFETCH_MAX_DEFERRALS) {
+            schedulePrefetch(song);
             return;
         }
-        populateGrid(prefetchGrid, song, targetPattern);
+        prefetchQueue.shift();
+        const pattern = song.orders[item.order];
+        const grid = item.grid;
+        const wantedOrder = item.order;
+        prefetchBuilding = grid;
+        const released = () => { if (prefetchBuilding === grid) prefetchBuilding = null; };
+        populateGridChunked(grid, song, pattern, wantedOrder, () => {
+            released();
+            // Still the neighbour we wanted? (The song may have moved on.)
+            const stillWanted =
+                (grid === nextGrid && activeGrid.order + 1 === wantedOrder) ||
+                (grid === prevGrid && activeGrid.order - 1 === wantedOrder);
+            if (!stillWanted) { grid.order = -1; schedulePrefetch(song); return; }
+            // Reveal on the next frame so the last slice's layout and the
+            // ghost's first paint don't share a task with the build.
+            requestAnimationFrame(() => {
+                if (grid.order !== wantedOrder || !playerState.meta || playerState.meta.song !== song) return;
+                applyRoles();
+                // A ghost appearing above shifts the active rows down: re-centre.
+                if (grid === prevGrid && ghostOrders && lastDrawnRow >= 0) centerRow(lastDrawnRow);
+            });
+            schedulePrefetch(song);
+        }, () => { released(); if (playerState.meta?.song === song) schedulePrefetch(song); });
     };
 
     if (typeof requestIdleCallback === 'function') {
@@ -548,8 +777,7 @@ function layoutGrids(song) {
     if (header.style.gridTemplateColumns !== gridCols) {
         header.style.gridTemplateColumns = gridCols;
     }
-    for (const grid of [activeGrid, prefetchGrid]) {
-        if (!grid || !grid.el) continue;
+    for (const grid of grids) {
         if (grid.el.style.gridTemplateColumns !== gridCols) {
             grid.el.style.gridTemplateColumns = gridCols;
         }
@@ -743,23 +971,20 @@ function updateChannelReadout(song, pattern, fromRow, toRow) {
 function updateCurrentRow(pattern, row) {
     if (pattern === lastDrawnPattern && row === lastDrawnRow) return;
 
-    // Previous row may live on either grid — locate by patternIndex.
-    if (lastDrawnPattern !== -1 && lastDrawnRow !== -1) {
-        const prevGrid = lastDrawnPattern === activeGrid.patternIndex   ? activeGrid
-                       : lastDrawnPattern === prefetchGrid.patternIndex ? prefetchGrid
-                       : null;
-        const prevEls = prevGrid?.rows.get(lastDrawnRow);
-        if (prevEls) {
-            for (let i = 0; i < prevEls.length; i++) prevEls[i].classList.remove('highlighted-row');
-        }
+    // The previous row's cells may now sit in a ghost grid (or be detached
+    // after a rebuild); we kept the element list, so no lookup is needed.
+    if (lastRowEls) {
+        for (let i = 0; i < lastRowEls.length; i++) lastRowEls[i].classList.remove('highlighted-row');
+        lastRowEls = null;
     }
 
     if (pattern === activeGrid.patternIndex) {
         const els = activeGrid.rows.get(row);
         if (els) {
             for (let i = 0; i < els.length; i++) els[i].classList.add('highlighted-row');
+            lastRowEls = els;
         }
-        centerRow(activeGrid, row);
+        centerRow(row);
     }
 
     lastDrawnPattern = pattern;
