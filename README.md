@@ -75,6 +75,7 @@ Other things worth mentioning:
 - The samples pane starts **automatic**: as wide as the longest sample name (floor 120px, cap 40% of the row). Drag the handle on its inner edge to set a width for this browser; double-click the handle (or Home with it focused) to go back to automatic
 - Press `M` for the mixer (stereo, tempo, pitch, gain and other live playback parameters). Settings are remembered in this browser
 - Render the loaded module to a WAV, FLAC or Opus file with the current mixer settings and channel mutes (Mixer → Render to file)
+- Press `B` for the Library: the chipsound.com sample tracks, your recent URLs, a browsable local folder (serve your modules as `./tracks/`), a URL / Mod Archive id box, and The Mod Archive's charts, lists, search and random pick (needs an API key and the small proxy described below)
 - `?` opens the full keyboard shortcut list
 
 ## Quick start
@@ -91,6 +92,9 @@ The app is pure static HTML/CSS/JS in [`src/`](src/). Browsers require `AudioWor
 # Python 3
 cd src && python -m http.server 8765
 
+# Python 3, plus the Mod Archive proxy the Library tab uses (see below; set MODARCHIVE_API_KEY)
+python3 tools/dev-server.py 8765
+
 # Node + npx
 npx http-server src -p 8765 -c-1
 
@@ -105,6 +109,14 @@ Then open <http://localhost:8765/>.
 > Python's server caches aggressively. Hard-reload with `Ctrl + Shift + R`, or use `npx http-server -c-1` which sets `Cache-Control: no-store`.
 
 > **Themes & visualizations are auto-discovered from directory listings.** On startup the player fetches `./css/themes/` and `./js/visualizations/` and parses the HTML index to find all `*.css` / `*.js` files. The three servers above all enable directory listings by default. If you deploy behind a static host that disables them (some CDNs, GitHub Pages with a hand-rolled config, certain nginx setups), the picker will fall back to a single built-in theme + visualization. Either enable directory listing for those two folders, or fork in a static manifest.
+
+### Mod Archive tab (optional, needs an API key)
+
+The Library's **Mod Archive** tab browses [The Mod Archive](https://modarchive.org) — charts, lists by review score or first letter, title / filename search with a format filter, and a random pick — through its [XML API](https://modarchive.org/index.php?xml-api) rather than by scraping pages. The API needs a per-application key, granted by The Mod Archive on application (register on their forums and post your case; the free level 3 tier covers everything but the charts, which are level 5). The key stays on the server: the page calls `./api/modarchive?…` on its own origin and the server adds the key and forwards a strict allowlist of read-only requests to `api.modarchive.org`. The `Caddyfile` ships with that route (set `MODARCHIVE_API_KEY` in the container's environment), and `python3 tools/dev-server.py` provides it for local development (same variable). Without the proxy or the key the tab explains what's missing and everything else keeps working. Module downloads themselves go straight to `api.modarchive.org`, which does allow cross-origin requests.
+
+### Scene tab (optional, needs a Scene Browser)
+
+The Library's **Scene** tab browses demoscene music by who made it and where it placed, from a [Scene Browser](https://github.com/LumenPrima/dotmodmusic) instance: a music-first index built from the [Demozoo](https://demozoo.org) database export (135k tracks, 22k musicians, 7k groups, 2.7k parties with music compos), with download links resolved to [Modland](https://ftp.modland.com) and The Mod Archive. Type a track, musician, group or party; the hits appear as chips you can drill into, every row lists its authors and the compo it placed at as further chips, and era / format / sort selectors narrow the list. Only tracks with a playable file are shown, and loading goes straight to Modland or Mod Archive, which both allow cross-origin requests. The page calls `./api/scene/*` on its own origin; the `Caddyfile` proxies that to `SCENE_API_URL` (default `127.0.0.1:8770`) and `python3 tools/dev-server.py` does the same (same variable). Without a reachable Scene Browser the tab says so and everything else keeps working.
 
 ### Load a module by URL
 
@@ -132,6 +144,7 @@ https://chipsound.com/player.html?modarchive=212083
 | `Space` / `P` | Play / Pause |
 | `S` | Stop |
 | `L` | Open file… |
+| `B` | Library (curated / recent / local / URL) |
 | `←` / `→` | Previous / next order |
 | Handle + `←` / `→` | Nudge samples pane width (Shift: 40px) |
 | Handle + `Home` | Reset samples pane to automatic |

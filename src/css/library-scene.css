@@ -1,0 +1,35 @@
+/* Fork-only: Scene tab for the Library (src/js/library-scene.js). Reuses the
+   Mod Archive tab's bar/pager rules from library-modarchive.css. */
+
+.library-scene-bar .library-scene-sel { flex: 1 1 120px; min-width: 110px; padding: 6px 8px; }
+.library-scene-bar .scene-open { text-decoration: none; }
+.library-scene-bar .scene-open[hidden] { display: none; }
+
+.library-scene-context { display: flex; flex-direction: column; gap: 4px; margin: 2px 0 8px; }
+.library-scene-context:empty { display: none; }
+.library-scene-hits, .library-scene-scope { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.library-scene-hits-label, .library-scene-scope { color: var(--popup-muted); font-size: 11px; margin-right: 4px; }
+.library-scene-context .library-scene-scope { font-size: 13px; color: var(--popup-fg); display: inline; }
+.library-scene-context > .library-scene-chip, .library-scene-context > a { margin-left: 6px; }
+
+.library-scene-chip {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid var(--popup-border);
+    border-radius: 999px;
+    background: var(--popup-surface);
+    color: var(--popup-fg);
+    font: inherit;
+    font-size: 11px;
+    line-height: 1.5;
+    cursor: pointer;
+    text-decoration: none;
+}
+.library-scene-chip:hover, .library-scene-chip:focus-visible { border-color: var(--popup-accent); color: var(--popup-accent); outline: none; }
+.library-scene-chip-party { color: var(--popup-muted); }
+.library-scene-chip-clear { color: var(--popup-muted); }
+
+.library-scene-row { margin: 0 0 2px; }
+.library-scene-row .library-item { padding-bottom: 4px; }
+.library-scene-chips { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 8px 6px 38px; }
+.library-scene-list .library-scene-row + .library-scene-row { border-top: 1px solid var(--popup-border); padding-top: 2px; }

@@ -21,6 +21,49 @@
 	@html path / /index.html
 	header @html Cache-Control "no-cache"
 
+	# Mod Archive XML API proxy for the Library's "Mod Archive" tab. The API
+	# (https://modarchive.org/index.php?xml-api) needs a per-application key,
+	# read here from the MODARCHIVE_API_KEY environment variable so it never
+	# reaches the browser. Only read-only request types are forwarded. Leave the
+	# variable unset (or delete the block) to disable the tab — it degrades
+	# gracefully and explains what's missing.
+	@modarchive {
+		path /api/modarchive
+		query request=search request=chart request=view_by_moduleid request=view_by_list request=view_by_rating_reviews request=view_by_rating_comments
+	}
+	handle @modarchive {
+		rewrite * /xml-tools.php?key={env.MODARCHIVE_API_KEY}&{http.request.uri.query}
+		reverse_proxy https://api.modarchive.org {
+			header_up Host api.modarchive.org
+			header_up -Cookie
+			header_down -Set-Cookie
+			header_down Cache-Control "public, max-age=600"
+		}
+	}
+	@modarchive_random {
+		path /api/modarchive
+		query request=random
+	}
+	handle @modarchive_random {
+		rewrite * /xml-tools.php?key={env.MODARCHIVE_API_KEY}&{http.request.uri.query}
+		reverse_proxy https://api.modarchive.org {
+			header_up Host api.modarchive.org
+			header_up -Cookie
+			header_down -Set-Cookie
+			header_down Cache-Control "no-store"
+		}
+	}
+
+	# Scene tab: proxy to a Scene Browser instance (the fork's Demozoo-backed
+	# music index, see README → Scene tab). No key; set SCENE_API_URL to where
+	# it runs. Without one the tab reports the 502 and explains itself.
+	@scene path /api/scene/*
+	handle @scene {
+		uri strip_prefix /api/scene
+		rewrite * /api{uri}
+		reverse_proxy {$SCENE_API_URL:127.0.0.1:8770}
+	}
+
 	# `precompressed` serves the build-time .br / .zst sibling at zero runtime
 	# CPU cost. `browse` is required for runtime theme + viz directory
 	# discovery (src/js/themes.js, src/js/viz-engine.js parse the HTML listing).
